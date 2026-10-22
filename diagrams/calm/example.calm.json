@@ -1,0 +1,10 @@
+{
+  "$schema": "https://calm.finos.org/release/1.0/meta/calm.json",
+  "nodes": [
+    { "unique-id": "client", "node-type": "webclient" },
+    { "unique-id": "api", "node-type": "service" }
+  ],
+  "relationships": [
+    { "interacts": { "source": "client", "destination": "api" } }
+  ]
+}

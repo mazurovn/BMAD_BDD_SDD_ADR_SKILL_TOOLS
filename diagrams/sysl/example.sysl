@@ -1,0 +1,6 @@
+# Example SYSL system
+ExampleSystem:
+    Service:
+        /health:
+            GET:
+                return ok <: string

@@ -1,0 +1,13 @@
+---
+name: bdd-acceptance
+description: "BDD acceptance criteria in Given/When/Then."
+type: workflow
+lifecycle: active
+---
+
+# BDD
+
+Scenario: ...
+  Given ...
+  When ...
+  Then ...
