@@ -1,10 +1,29 @@
 {
-  "$schema": "https://calm.finos.org/release/1.0/meta/calm.json",
+  "$schema": "https://calm.finos.org/release/1.2/meta/calm.json",
   "nodes": [
-    { "unique-id": "client", "node-type": "webclient" },
-    { "unique-id": "api", "node-type": "service" }
+    {
+      "unique-id": "client",
+      "node-type": "webclient",
+      "name": "Client",
+      "description": "Person using the backlog"
+    },
+    {
+      "unique-id": "api",
+      "node-type": "service",
+      "name": "API",
+      "description": "Backlog command surface"
+    }
   ],
   "relationships": [
-    { "interacts": { "source": "client", "destination": "api" } }
+    {
+      "unique-id": "rel-1",
+      "description": "Client uses the API",
+      "relationship-type": {
+        "interacts": {
+          "actor": "client",
+          "nodes": ["api"]
+        }
+      }
+    }
   ]
 }

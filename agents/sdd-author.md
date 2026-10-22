@@ -77,7 +77,8 @@ src/mazu_method/sdd.py
 
 ## OpenSpec
 
-Чат `/opsx:propose имя исход` выполняется только как `python3 cli/mazu.py chat "/opsx:propose имя исход"`. Функция `mazu_method.openspec_flow.propose` пишет proposal.md, specs, design.md и tasks.md. `apply` создаёт истории и не ставит `[x]`. `complete` требует улику. `archive` отказывает, пока задача открыта. Повторный propose не затирает каталог.
+Официальный CLI, не этот файл: `python3 cli/mazu.py upstream openspec -- version` должен напечатать `1.14.3`. Процедура propose — `.agents/skills/openspec-propose/SKILL.md`, её написал `openspec init`, её не пересказывают. CALM принимается только если `upstream calm -- validate --architecture ФАЙЛ` завершился нулём. Нет бинарника — `UPSTREAM-1` и `npm ci --prefix upstream`, не самодельный PASS.
+
 
 
 ## Политика и контракт модели

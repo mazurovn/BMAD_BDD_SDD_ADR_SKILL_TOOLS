@@ -55,6 +55,9 @@ REQUIRED = [
     "src/mazu_method/calm_draw.py",
     "src/mazu_method/sysl_draw.py",
     "src/mazu_method/openspec_flow.py",
+    "src/mazu_method/upstream_cli.py",
+    "upstream/package.json",
+    "upstream/package-lock.json",
 ]
 SKILLS = [
     "bmad", "sdd", "bdd", "adr", "agile-delivery", "product-ideas",
@@ -69,7 +72,7 @@ ROLES = [
     "calm-modeler.md", "scrum-master.md", "dev.md", "lazy-senior.md", "qa.md",
     "integrator.md", "skill-creator.md", "researcher.md", "writer.md", "release.md",
 ]
-HELP_WORDS = ["project", "import", "export", "pull", "connectors", "skill", "dashboard", "serve", "check", "workflow", "gate", "openspec", "chat", "diagram"]
+HELP_WORDS = ["project", "import", "export", "pull", "connectors", "skill", "dashboard", "serve", "check", "workflow", "gate", "openspec", "chat", "diagram", "upstream"]
 
 
 def fail(errors: list[str], message: str) -> None:

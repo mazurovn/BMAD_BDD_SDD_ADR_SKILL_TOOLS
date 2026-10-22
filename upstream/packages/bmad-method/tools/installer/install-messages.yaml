@@ -1,0 +1,44 @@
+# BMAD Installer Messages
+# These messages are displayed during installation
+# Edit this file to change what users see during the install process
+
+# Display at the START of installation (after logo, before prompts)
+startMessage: |
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  The Breakthrough Method of Agile AI-Driven Development - the original and best AI SDLC. Powered by BMad Core and a growing module ecosystem.
+  Install official and community modules during setup to customize your experience.
+
+  🌟 100% free. 100% open source. Always.
+     No paywalls. No gated content. Knowledge shared, not sold.
+
+  🚀 BMad v7 is close, and you can preview and test it now:
+     npx skills add bmad-code-org/BMAD-METHOD
+     then ask your agent for `bmad setup`. After setup, `bmad migrate`
+     tests the v6 to v7 migration (still in beta).
+
+  🐍 REQUIRED: uv (https://docs.astral.sh/uv/) runs the Python scripts BMAD
+     skills rely on. If it's not set up yet, ask your AI agent to "install and set up uv for me".
+
+  🌐 CONNECT:
+    Website:   https://bmadcode.com/
+    Discord:   https://discord.gg/gk8jAdXWmj
+    YouTube:   https://www.youtube.com/@BMadCode
+    X:         https://x.com/BMadCode
+    Facebook:  https://facebook.com/@BMadCode
+
+  ⭐ SUPPORT THE PROJECT:
+    Star us:   https://github.com/bmad-code-org/BMAD-METHOD/
+    Donate:    https://buymeacoffee.com/bmad
+    Corporate sponsorship and speaking inquiries: contact@bmadcode.com
+
+  Docs, blog, and latest updates: https://bmadcode.com/
+
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Display at the END of installation (after the install summary)
+endMessage: |
+  🚀 BMad v7 is close, and you can preview and test it now:
+     npx skills add bmad-code-org/BMAD-METHOD
+     then ask your agent for `bmad setup`. After setup, `bmad migrate`
+     tests the v6 to v7 migration (still in beta).

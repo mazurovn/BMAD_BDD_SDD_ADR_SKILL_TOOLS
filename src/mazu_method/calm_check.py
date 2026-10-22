@@ -45,15 +45,33 @@ def issues(text: str) -> list[str]:
         if not isinstance(rel, dict) or not rel:
             found.append("CALM-3 empty relationship")
             continue
+        ends = []
+        typed = rel.get("relationship-type")
+        bodies = []
+        if isinstance(typed, dict):
+            bodies.extend(typed.items())
         for name, body in rel.items():
+            if name in {"unique-id", "description", "relationship-type", "protocol", "metadata", "controls"}:
+                continue
+            bodies.append((name, body))
+        if not bodies:
+            found.append("CALM-3 empty relationship")
+            continue
+        for name, body in bodies:
             if name not in ("interacts", "connects"):
                 found.append(f"CALM-3 unknown relationship {name}")
                 continue
             if not isinstance(body, dict):
                 found.append(f"CALM-3 {name} is not an object")
                 continue
-            for end in ("source", "destination"):
-                ref = body.get(end)
-                if ref not in known:
-                    found.append(f"CALM-3 {end} {ref} is not a node")
+            if "actor" in body or "nodes" in body:
+                ends.append(body.get("actor"))
+                ends.extend(body.get("nodes") or [])
+            else:
+                ends.extend(body.get(end) for end in ("source", "destination"))
+        for ref in ends:
+            if isinstance(ref, dict):
+                ref = ref.get("unique-id") or ref.get("node")
+            if ref not in known:
+                found.append(f"CALM-3 end {ref} is not a node")
     return found

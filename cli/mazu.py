@@ -418,6 +418,12 @@ def cmd_doctor(_args: argparse.Namespace) -> None:
         root / "src" / "mazu_method" / "calm_draw.py",
         root / "src" / "mazu_method" / "sysl_draw.py",
         root / "src" / "mazu_method" / "openspec_flow.py",
+        root / "src" / "mazu_method" / "upstream_cli.py",
+        root / "upstream" / "package.json",
+        root / "upstream" / "package-lock.json",
+        root / "upstream" / "packages" / "openspec" / "package.json",
+        root / "upstream" / "packages" / "calm-cli" / "package.json",
+        root / "upstream" / "packages" / "bmad-method" / "package.json",
         root / "wiki" / "Manual.md",
         root / "wiki" / "Rules.md",
         root / "wiki" / "Team.md",
@@ -1300,6 +1306,15 @@ def cmd_chat(args: argparse.Namespace) -> None:
     cmd_openspec(ns)
 
 
+
+def cmd_upstream(args: argparse.Namespace) -> None:
+    from mazu_method.upstream_cli import execute
+    rest = list(args.rest)
+    if rest and rest[0] == "--":
+        rest = rest[1:]
+    raise SystemExit(execute(args.tool, rest))
+
+
 def cmd_diagram(args: argparse.Namespace) -> None:
     raw = Path(args.file).read_text(encoding="utf-8")
     svg = draw_calm(raw) if args.kind == "calm" else draw_sysl(raw)
@@ -1411,6 +1426,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_guide = sub.add_parser("guide", help="print one section of the operating manual")
     p_guide.add_argument("topic")
     p_guide.set_defaults(func=cmd_guide)
+
+    p_up = sub.add_parser("upstream", help="run a pinned OpenSpec, CALM, or BMAD binary")
+    p_up.add_argument("tool", choices=("openspec", "calm", "bmad", "bmad-method"))
+    p_up.add_argument("rest", nargs=argparse.REMAINDER)
+    p_up.set_defaults(func=cmd_upstream)
 
     p_os = sub.add_parser("openspec", help="OpenSpec propose, apply, archive")
     p_os.add_argument("action", choices=("propose", "validate", "apply", "complete", "archive", "explore", "update", "sync"))

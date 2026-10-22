@@ -31,16 +31,32 @@ def draw(text: str) -> str:
     for rel in data.get("relationships") or []:
         if not isinstance(rel, dict):
             continue
+        pairs = []
+        typed = rel.get("relationship-type")
+        if isinstance(typed, dict):
+            pairs.extend(typed.items())
         for name, body in rel.items():
+            if name in {"unique-id", "description", "relationship-type", "protocol", "metadata", "controls"}:
+                continue
+            if isinstance(body, dict):
+                pairs.append((name, body))
+        for name, body in pairs:
             if not isinstance(body, dict):
                 continue
-            source = positions.get(body.get("source"))
-            dest = positions.get(body.get("destination"))
-            if not source or not dest:
-                continue
-            x1, y1 = source[0] + 140, source[1] + 32
-            x2, y2 = dest[0], dest[1] + 32
-            parts.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#b9a99a" stroke-width="2"/>')
-            parts.append(f'<text x="{(x1 + x2) / 2}" y="{y1 - 6}" font-size="11" fill="#6f6676">{html.escape(name)}</text>')
+            edges = []
+            if body.get("source") and body.get("destination"):
+                edges.append((body.get("source"), body.get("destination")))
+            if body.get("actor") and body.get("nodes"):
+                for node in body["nodes"]:
+                    edges.append((body.get("actor"), node))
+            for left, right in edges:
+                source = positions.get(left)
+                dest = positions.get(right)
+                if not source or not dest:
+                    continue
+                x1, y1 = source[0] + 140, source[1] + 32
+                x2, y2 = dest[0], dest[1] + 32
+                parts.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#b9a99a" stroke-width="2"/>')
+                parts.append(f'<text x="{(x1 + x2) / 2}" y="{y1 - 6}" font-size="11" fill="#6f6676">{html.escape(str(name))}</text>')
     parts.append("</svg>")
     return "".join(parts)

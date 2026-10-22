@@ -1,18 +1,18 @@
 {
-  "$schema": "https://calm.finos.org/release/1.0/meta/calm.json",
+  "$schema": "https://calm.finos.org/release/1.2/meta/calm.json",
   "nodes": [
-    {"unique-id": "operator", "node-type": "actor", "name": "Operator"},
-    {"unique-id": "mazu-cli", "node-type": "service", "name": "MAZU CLI"},
-    {"unique-id": "store", "node-type": "datastore", "name": "mazu-data/store.json"},
-    {"unique-id": "dashboard", "node-type": "webclient", "name": "dashboard.html"},
-    {"unique-id": "skills", "node-type": "system", "name": "Skill files"},
-    {"unique-id": "boundaries", "node-type": "control", "name": "Always / Ask First / Never"}
+    {"unique-id": "operator", "node-type": "actor", "name": "Operator", "description": "Person running the method"},
+    {"unique-id": "mazu-cli", "node-type": "service", "name": "MAZU CLI", "description": "Local command surface"},
+    {"unique-id": "store", "node-type": "datastore", "name": "Store", "description": "mazu-data/store.json"},
+    {"unique-id": "dashboard", "node-type": "webclient", "name": "Dashboard", "description": "Local board"},
+    {"unique-id": "skills", "node-type": "system", "name": "Skills", "description": "Procedure files"},
+    {"unique-id": "boundaries", "node-type": "control", "name": "Boundaries", "description": "Always, Ask First, Never"}
   ],
   "relationships": [
-    {"interacts": {"source": "operator", "destination": "mazu-cli"}},
-    {"connects": {"source": "mazu-cli", "destination": "store"}},
-    {"connects": {"source": "mazu-cli", "destination": "dashboard"}},
-    {"interacts": {"source": "mazu-cli", "destination": "skills"}},
-    {"interacts": {"source": "skills", "destination": "boundaries"}}
+    {"unique-id": "rel-1", "description": "Operator runs the CLI", "relationship-type": {"interacts": {"actor": "operator", "nodes": ["mazu-cli"]}}},
+    {"unique-id": "rel-2", "description": "CLI reads the store", "relationship-type": {"interacts": {"actor": "mazu-cli", "nodes": ["store"]}}},
+    {"unique-id": "rel-3", "description": "CLI writes the dashboard", "relationship-type": {"interacts": {"actor": "mazu-cli", "nodes": ["dashboard"]}}},
+    {"unique-id": "rel-4", "description": "CLI follows skills", "relationship-type": {"interacts": {"actor": "mazu-cli", "nodes": ["skills"]}}},
+    {"unique-id": "rel-5", "description": "Skills enforce boundaries", "relationship-type": {"interacts": {"actor": "skills", "nodes": ["boundaries"]}}}
   ]
 }
