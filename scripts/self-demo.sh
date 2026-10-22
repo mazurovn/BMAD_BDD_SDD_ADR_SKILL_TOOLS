@@ -4,6 +4,25 @@
 set -eu
 cd "$(dirname "$0")/.."
 
+# The demo switches to kit-self; the operator's projects reuse the same IDs.
+# Put their selection back on every exit path, including a failed gate.
+PREV_ACTIVE=""
+if [ -f mazu-data/active-project ]; then
+  PREV_ACTIVE=$(cat mazu-data/active-project)
+fi
+restore_active() {
+  if [ -n "$PREV_ACTIVE" ]; then
+    printf '%s\n' "$PREV_ACTIVE" >mazu-data/active-project
+  else
+    rm -f mazu-data/active-project
+  fi
+}
+trap restore_active EXIT
+# dash skips the EXIT trap on an untrapped signal.
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
 # Isolate: only reset the kit-self project. Leave sibling projects alone.
 rm -rf mazu-data/projects/kit-self
 # Disposable OpenSpec change name — do not delete the tracked openspec/changes/self-demo.
