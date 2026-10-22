@@ -5,38 +5,55 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>MAZU-ADGILE</title>
 <style>
-  :root { --bg:#f4f1ea; --ink:#241f29; --muted:#6d6474; --card:#fffdf9; --line:#e6ddd2; --sage:#d9eed4; --blush:#f8d6d4; --lilac:#e6def6; --sand:#f6e6c4; --sky:#d7e8f6; }
+  :root { --bg:#efeae2; --ink:#221e28; --muted:#6a6172; --card:#fffdfb; --line:#e4dacf; --sage:#d7efd4; --blush:#f6d4d1; --lilac:#e4daf6; --sand:#f4e4c2; --sky:#d5e7f6; }
   * { box-sizing:border-box; }
   body { margin:0; font-family:"Segoe UI", system-ui, sans-serif; color:var(--ink); background:var(--bg); }
   button, input, select, textarea { font:inherit; color:var(--ink); }
   button { cursor:pointer; }
-  .app { display:grid; grid-template-columns:220px 1fr 340px; min-height:100vh; }
-  nav { background:#2c2834; color:#f6f1ea; padding:1rem; }
-  nav h1 { font-size:1.15rem; margin:.2rem 0 1rem; }
-  nav button { display:block; width:100%; text-align:left; background:transparent; color:inherit; border:0; border-radius:10px; padding:.55rem .7rem; margin:.15rem 0; }
-  nav button.active { background:#443e50; }
-  main { padding:1rem 1.1rem 2rem; }
-  aside { background:var(--card); border-left:1px solid var(--line); padding:1rem; }
-  h2 { margin:.2rem 0 .8rem; font-size:1.25rem; }
-  .muted, p { color:var(--muted); }
-  .row { display:flex; gap:.45rem; flex-wrap:wrap; align-items:center; }
-  input, select, textarea { background:white; border:1px solid var(--line); border-radius:10px; padding:.45rem .6rem; }
+  .app { display:grid; grid-template-columns:210px minmax(0,1fr) 380px; min-height:100vh; }
+  nav, aside { position:sticky; top:0; height:100vh; overflow:auto; }
+  nav { background:#2a2633; color:#f7f2ea; padding:1rem .8rem; }
+  nav h1 { font-size:1.05rem; margin:.2rem .4rem 1rem; letter-spacing:.02em; }
+  nav button { display:block; width:100%; text-align:left; background:transparent; color:inherit; border:0; border-radius:10px; padding:.6rem .75rem; margin:.15rem 0; }
+  nav button.active { background:#4a4358; }
+  main { padding:1rem 1rem 2rem; min-width:0; }
+  aside { background:var(--card); border-left:1px solid var(--line); padding:1rem 1rem 2rem; }
+  h2 { margin:.2rem 0 .7rem; font-size:1.35rem; }
+  .muted, aside p { color:var(--muted); }
+  .row { display:flex; gap:.4rem; flex-wrap:wrap; align-items:center; }
+  input, select, textarea { background:white; border:1px solid var(--line); border-radius:10px; padding:.5rem .65rem; }
+  #q { min-width:220px; }
   .stats { display:grid; grid-template-columns:repeat(5,1fr); gap:.5rem; margin:.8rem 0; }
-  .stat, .panel, .card, .col { background:var(--card); border:1px solid var(--line); border-radius:14px; }
-  .stat { padding:.7rem .8rem; } .stat b { display:block; font-size:1.4rem; }
-  .board { display:grid; grid-template-columns:repeat(5,minmax(160px,1fr)); gap:.6rem; }
-  .col { padding:.55rem; min-height:120px; background:#fbf7f2; }
-  .card { padding:.7rem; margin:.4rem 0; cursor:pointer; }
-  .card .id { color:var(--muted); font-size:.75rem; }
-  .pill { border-radius:999px; padding:.05rem .45rem; font-size:.72rem; background:var(--sand); }
-  .backlog { background:var(--sand);} .ready { background:var(--sky);} .in-progress { background:var(--lilac);} .review { background:var(--blush);} .done { background:var(--sage);} .no { background:var(--blush);} .ok { background:var(--sage);} .skip { background:#eee; }
+  .stat { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:.65rem .75rem; }
+  .stat b { display:block; font-size:1.35rem; }
+  .banner { border-radius:12px; padding:.55rem .75rem; margin:0 0 .8rem; }
+  .banner.bad { background:var(--blush); }
+  .banner.ok { background:var(--sage); }
+  .board { display:grid; grid-template-columns:repeat(5,minmax(190px,1fr)); gap:.65rem; align-items:start; }
+  .col { background:#fbf7f2; border:1px solid var(--line); border-top:4px solid var(--line); border-radius:14px; padding:.55rem; min-height:140px; }
+  .col.backlog { border-top-color:#c9a24a; } .col.ready { border-top-color:#5d93bf; } .col.in-progress { border-top-color:#7d68ad; } .col.review { border-top-color:#c56a66; } .col.done { border-top-color:#5e9460; }
+  .col h3 { margin:.2rem .2rem .45rem; font-size:.82rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:.7rem; margin:.4rem 0; cursor:pointer; }
+  .card.selected { border-color:#6d5a8e; box-shadow:0 0 0 2px #e4daf6; }
+  .card .id { color:var(--muted); font-size:.75rem; margin-bottom:.2rem; }
+  .card strong { display:block; line-height:1.3; margin-bottom:.4rem; }
+  .steps { display:flex; gap:.2rem; margin-top:.45rem; }
+  .step { width:.55rem; height:.55rem; border-radius:99px; background:#e7e0d8; display:inline-block; }
+  .step.ok { background:#6a9a64; } .step.no { background:#c56a66; } .step.skip { background:#ddd; }
+  .pill { border-radius:999px; padding:.08rem .45rem; font-size:.72rem; background:var(--sand); }
+  .pill.backlog { background:var(--sand);} .pill.ready { background:var(--sky);} .pill.in-progress { background:var(--lilac);} .pill.review { background:var(--blush);} .pill.done { background:var(--sage);} .pill.no { background:var(--blush);} .pill.ok { background:var(--sage);} .pill.skip { background:#eee; }
   table { width:100%; border-collapse:collapse; background:var(--card); border-radius:14px; overflow:hidden; }
-  th, td { text-align:left; padding:.5rem; border-bottom:1px solid var(--line); vertical-align:top; }
-  tr { cursor:pointer; }
-  .slice { border:1px solid var(--line); border-radius:12px; padding:.7rem; margin:.5rem 0; background:#fff; }
-  svg { max-width:100%; height:auto; }
-  #toast { position:fixed; bottom:1rem; right:1rem; background:#2c2834; color:white; padding:.7rem .9rem; border-radius:12px; display:none; max-width:420px; }
-  @media (max-width:1000px) { .app { grid-template-columns:1fr; } aside { border-left:0; } .board, .stats { grid-template-columns:1fr; } }
+  th, td { text-align:left; padding:.55rem .6rem; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { font-size:.75rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+  tr { cursor:pointer; } tbody tr:hover { background:#fbf7f2; }
+  .slice { border:1px solid var(--line); border-radius:14px; padding:.8rem; margin:.55rem 0; background:#fff; }
+  .flow { display:flex; gap:.35rem; flex-wrap:wrap; margin:.4rem 0 .6rem; }
+  svg { max-width:100%; height:auto; background:#fbf7f2; border-radius:12px; }
+  pre { white-space:pre-wrap; background:#fbf7f2; border-radius:12px; padding:.7rem; }
+  aside button { border:1px solid var(--line); background:white; border-radius:999px; padding:.28rem .55rem; }
+  aside button:disabled { background:#efeaf6; }
+  #toast { position:fixed; bottom:1rem; right:1rem; background:#2a2633; color:white; padding:.7rem .9rem; border-radius:12px; display:none; max-width:420px; }
+  @media (max-width:1100px) { .app { grid-template-columns:1fr; } nav, aside { position:static; height:auto; } .board, .stats { grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
@@ -59,14 +76,14 @@
       <button id="reload" type="button">обновить</button>
     </div>
     <section class="stats" id="stats"></section>
-    <p id="gaps"></p>
+    <p id="gaps" class="banner"></p>
     <h2 id="view-title">Доска</h2>
     <section id="view"></section>
   </main>
   <aside id="drawer"><p class="muted">Выберите карточку.</p></aside>
 </div>
 <div id="toast"></div>
-<script id="boot" type="application/json">{"live": false, "generated": "2026-10-22T15:15:21Z", "project": "local", "store": {"version": 1, "items": [{"id": "IDEA-001", "kind": "idea", "title": "Доска показывает путь от боли до релиза", "description": "intake", "status": "backlog", "points": null, "parent": null, "sprint": null, "acceptance": [], "boundaries": {"always": [], "ask_first": [], "never": []}, "created_at": "2026-10-22T15:15:21Z", "updated_at": "2026-10-22T15:15:21Z"}, {"id": "EPIC-001", "kind": "epic", "title": "Срез: Доска показывает путь от боли до релиза", "description": "Доска показывает путь от боли до релиза", "status": "backlog", "points": null, "parent": "IDEA-001", "sprint": null, "acceptance": [], "boundaries": {"always": [], "ask_first": [], "never": []}, "created_at": "2026-10-22T15:15:21Z", "updated_at": "2026-10-22T15:15:21Z"}, {"id": "US-001", "kind": "story", "title": "Трекер показывает только статус, а цикл по карточке не виден", "description": "Трекер показывает только статус, а цикл по карточке не виден", "status": "ready", "points": 3, "parent": "EPIC-001", "sprint": "S1", "acceptance": ["Given the source note is stored When the operator opens the card Then the card shows: Трекер показывает только статус, а цикл по карточке не виден"], "boundaries": {"always": ["keep the source quote on the card"], "ask_first": ["merge two notes into one story"], "never": ["invent a customer quote"]}, "created_at": "2026-10-22T15:15:21Z", "updated_at": "2026-10-22T15:15:21Z"}, {"id": "US-002", "kind": "story", "title": "На карточке видны гейт, улика, родитель и точки цикла", "description": "На карточке видны гейт, улика, родитель и точки цикла", "status": "ready", "points": 2, "parent": "EPIC-001", "sprint": "S1", "acceptance": ["Given the source note is stored When the operator opens the card Then the card shows: На карточке видны гейт, улика, родитель и точки цикла"], "boundaries": {"always": ["keep the source quote on the card"], "ask_first": ["merge two notes into one story"], "never": ["invent a customer quote"]}, "created_at": "2026-10-22T15:15:21Z", "updated_at": "2026-10-22T15:15:21Z"}, {"id": "REQ-001", "kind": "requirement", "title": "Заказчик вставляет заметки из разных трекеров и хочет эпики, а не свалку строк", "description": "Заказчик вставляет заметки из разных трекеров и хочет эпики, а не свалку строк", "status": "backlog", "points": null, "parent": "EPIC-001", "sprint": null, "acceptance": [], "boundaries": {"always": [], "ask_first": [], "never": []}, "created_at": "2026-10-22T15:15:21Z", "updated_at": "2026-10-22T15:15:21Z"}, {"id": "REQ-002", "kind": "requirement", "title": "Команды путают story points и часы, поэтому на доске это разные числа", "description": "Команды путают story points и часы, поэтому на доске это разные числа", "status": "backlog", "points": null, "parent": "EPIC-001", "sprint": null, "acceptance": [], "boundaries": {"always": [], "ask_first": [], "never": []}, "created_at": "2026-10-22T15:15:21Z", "updated_at": "2026-10-22T15:15:21Z"}], "sprints": [{"id": "S1", "goal": "Срез: Доска показывает путь от боли до релиза", "status": "planned", "created_at": "2026-10-22T15:15:21Z"}], "time_logs": [], "links": []}, "hours": {"IDEA-001": 0, "EPIC-001": 0, "US-001": 0, "US-002": 0, "REQ-001": 0, "REQ-002": 0}, "blocked": {}, "cycle": {"IDEA-001": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": false, "state": "no"}, {"name": "границы", "ok": false, "state": "skip"}, {"name": "гейт", "ok": false, "state": "skip"}, {"name": "улика", "ok": false, "state": "skip"}, {"name": "спринт", "ok": false, "state": "skip"}, {"name": "готово", "ok": false, "state": "no"}], "EPIC-001": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": true, "state": "ok"}, {"name": "границы", "ok": false, "state": "skip"}, {"name": "гейт", "ok": false, "state": "skip"}, {"name": "улика", "ok": false, "state": "skip"}, {"name": "спринт", "ok": false, "state": "skip"}, {"name": "готово", "ok": false, "state": "no"}], "US-001": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": true, "state": "ok"}, {"name": "границы", "ok": true, "state": "ok"}, {"name": "гейт", "ok": true, "state": "ok"}, {"name": "улика", "ok": false, "state": "no"}, {"name": "спринт", "ok": true, "state": "ok"}, {"name": "готово", "ok": false, "state": "no"}], "US-002": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": true, "state": "ok"}, {"name": "границы", "ok": true, "state": "ok"}, {"name": "гейт", "ok": true, "state": "ok"}, {"name": "улика", "ok": false, "state": "no"}, {"name": "спринт", "ok": true, "state": "ok"}, {"name": "готово", "ok": false, "state": "no"}], "REQ-001": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": true, "state": "ok"}, {"name": "границы", "ok": false, "state": "skip"}, {"name": "гейт", "ok": false, "state": "skip"}, {"name": "улика", "ok": false, "state": "skip"}, {"name": "спринт", "ok": false, "state": "skip"}, {"name": "готово", "ok": false, "state": "no"}], "REQ-002": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": true, "state": "ok"}, {"name": "границы", "ok": false, "state": "skip"}, {"name": "гейт", "ok": false, "state": "skip"}, {"name": "улика", "ok": false, "state": "skip"}, {"name": "спринт", "ok": false, "state": "skip"}, {"name": "готово", "ok": false, "state": "no"}]}, "specs": {"EPIC-001": "# Spec EPIC-001\n\n## ADDED Requirements\n\n### Requirement: Source stays visible\nThe system MUST show the source of this slice: Доска показывает путь от боли до релиза\n\n#### Scenario: card opened\n- **WHEN** the operator opens a story card\n- **THEN** the card shows the source quote\n- GIVEN the note was taken in by intake\n\n- US-001: Трекер показывает только статус, а цикл по карточке не виден\n- US-002: На карточке видны гейт, улика, родитель и точки цикла\n"}, "calm": "\u003csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"220\" viewBox=\"0 0 400 220\">\u003crect width=\"100%\" height=\"100%\" fill=\"#f7f1e8\"/>\u003crect x=\"30\" y=\"40\" width=\"140\" height=\"64\" rx=\"14\" fill=\"#fffaf6\" stroke=\"#e4d9cc\"/>\u003ctext x=\"42\" y=\"68\" font-size=\"14\" fill=\"#2c2830\">Operator\u003c/text>\u003ctext x=\"42\" y=\"88\" font-size=\"11\" fill=\"#6f6676\">webclient · client\u003c/text>\u003crect x=\"210\" y=\"40\" width=\"140\" height=\"64\" rx=\"14\" fill=\"#fffaf6\" stroke=\"#e4d9cc\"/>\u003ctext x=\"222\" y=\"68\" font-size=\"14\" fill=\"#2c2830\">EPIC-001\u003c/text>\u003ctext x=\"222\" y=\"88\" font-size=\"11\" fill=\"#6f6676\">service · epic-1\u003c/text>\u003cline x1=\"170\" y1=\"72\" x2=\"210\" y2=\"72\" stroke=\"#b9a99a\" stroke-width=\"2\"/>\u003ctext x=\"190.0\" y=\"66\" font-size=\"11\" fill=\"#6f6676\">interacts\u003c/text>\u003c/svg>", "sysl": "\u003csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"420\" height=\"152\" viewBox=\"0 0 420 152\">\u003crect width=\"100%\" height=\"100%\" fill=\"#f7f1e8\"/>\u003crect x=\"24\" y=\"24\" width=\"360\" height=\"80\" rx=\"14\" fill=\"#fffaf6\" stroke=\"#e4d9cc\"/>\u003ctext x=\"40\" y=\"46\" font-size=\"14\" fill=\"#2c2830\">Backlog\u003c/text>\u003ctext x=\"40\" y=\"68\" font-size=\"12\" fill=\"#6f6676\">/story1\u003c/text>\u003ctext x=\"40\" y=\"90\" font-size=\"12\" fill=\"#6f6676\">/story2\u003c/text>\u003c/svg>"}</script>
+<script id="boot" type="application/json">{"live": false, "generated": "2026-10-22T16:21:07Z", "project": "local", "store": {"version": 1, "items": [{"id": "IDEA-001", "kind": "idea", "title": "Доска показывает путь от боли до релиза", "description": "intake", "status": "backlog", "points": null, "parent": null, "sprint": null, "acceptance": [], "boundaries": {"always": [], "ask_first": [], "never": []}, "created_at": "2026-10-22T16:21:07Z", "updated_at": "2026-10-22T16:21:07Z"}, {"id": "EPIC-001", "kind": "epic", "title": "Срез: Доска показывает путь от боли до релиза", "description": "Доска показывает путь от боли до релиза", "status": "backlog", "points": null, "parent": "IDEA-001", "sprint": null, "acceptance": [], "boundaries": {"always": [], "ask_first": [], "never": []}, "created_at": "2026-10-22T16:21:07Z", "updated_at": "2026-10-22T16:21:07Z"}, {"id": "US-001", "kind": "story", "title": "Трекер показывает только статус, а цикл по карточке не виден", "description": "Трекер показывает только статус, а цикл по карточке не виден", "status": "ready", "points": 3, "parent": "EPIC-001", "sprint": "S1", "acceptance": ["Given the source note is stored When the operator opens the card Then the card shows: Трекер показывает только статус, а цикл по карточке не виден"], "boundaries": {"always": ["keep the source quote on the card"], "ask_first": ["merge two notes into one story"], "never": ["invent a customer quote"]}, "created_at": "2026-10-22T16:21:07Z", "updated_at": "2026-10-22T16:21:07Z"}, {"id": "US-002", "kind": "story", "title": "На карточке видны гейт, улика, родитель и точки цикла", "description": "На карточке видны гейт, улика, родитель и точки цикла", "status": "ready", "points": 2, "parent": "EPIC-001", "sprint": "S1", "acceptance": ["Given the source note is stored When the operator opens the card Then the card shows: На карточке видны гейт, улика, родитель и точки цикла"], "boundaries": {"always": ["keep the source quote on the card"], "ask_first": ["merge two notes into one story"], "never": ["invent a customer quote"]}, "created_at": "2026-10-22T16:21:07Z", "updated_at": "2026-10-22T16:21:07Z"}, {"id": "REQ-001", "kind": "requirement", "title": "Заказчик вставляет заметки из разных трекеров и хочет эпики, а не свалку строк", "description": "Заказчик вставляет заметки из разных трекеров и хочет эпики, а не свалку строк", "status": "backlog", "points": null, "parent": "EPIC-001", "sprint": null, "acceptance": [], "boundaries": {"always": [], "ask_first": [], "never": []}, "created_at": "2026-10-22T16:21:07Z", "updated_at": "2026-10-22T16:21:07Z"}, {"id": "REQ-002", "kind": "requirement", "title": "Команды путают story points и часы, поэтому на доске это разные числа", "description": "Команды путают story points и часы, поэтому на доске это разные числа", "status": "backlog", "points": null, "parent": "EPIC-001", "sprint": null, "acceptance": [], "boundaries": {"always": [], "ask_first": [], "never": []}, "created_at": "2026-10-22T16:21:07Z", "updated_at": "2026-10-22T16:21:07Z"}], "sprints": [{"id": "S1", "goal": "Срез: Доска показывает путь от боли до релиза", "status": "planned", "created_at": "2026-10-22T16:21:07Z"}], "time_logs": [], "links": []}, "hours": {"IDEA-001": 0, "EPIC-001": 0, "US-001": 0, "US-002": 0, "REQ-001": 0, "REQ-002": 0}, "blocked": {}, "cycle": {"IDEA-001": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": false, "state": "no"}, {"name": "границы", "ok": false, "state": "skip"}, {"name": "гейт", "ok": false, "state": "skip"}, {"name": "улика", "ok": false, "state": "skip"}, {"name": "спринт", "ok": false, "state": "skip"}, {"name": "готово", "ok": false, "state": "no"}], "EPIC-001": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": true, "state": "ok"}, {"name": "границы", "ok": false, "state": "skip"}, {"name": "гейт", "ok": false, "state": "skip"}, {"name": "улика", "ok": false, "state": "skip"}, {"name": "спринт", "ok": false, "state": "skip"}, {"name": "готово", "ok": false, "state": "no"}], "US-001": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": true, "state": "ok"}, {"name": "границы", "ok": true, "state": "ok"}, {"name": "гейт", "ok": true, "state": "ok"}, {"name": "улика", "ok": false, "state": "no"}, {"name": "спринт", "ok": true, "state": "ok"}, {"name": "готово", "ok": false, "state": "no"}], "US-002": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": true, "state": "ok"}, {"name": "границы", "ok": true, "state": "ok"}, {"name": "гейт", "ok": true, "state": "ok"}, {"name": "улика", "ok": false, "state": "no"}, {"name": "спринт", "ok": true, "state": "ok"}, {"name": "готово", "ok": false, "state": "no"}], "REQ-001": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": true, "state": "ok"}, {"name": "границы", "ok": false, "state": "skip"}, {"name": "гейт", "ok": false, "state": "skip"}, {"name": "улика", "ok": false, "state": "skip"}, {"name": "спринт", "ok": false, "state": "skip"}, {"name": "готово", "ok": false, "state": "no"}], "REQ-002": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": true, "state": "ok"}, {"name": "границы", "ok": false, "state": "skip"}, {"name": "гейт", "ok": false, "state": "skip"}, {"name": "улика", "ok": false, "state": "skip"}, {"name": "спринт", "ok": false, "state": "skip"}, {"name": "готово", "ok": false, "state": "no"}]}, "specs": {"EPIC-001": "# Spec EPIC-001\n\n## ADDED Requirements\n\n### Requirement: Source stays visible\nThe system MUST show the source of this slice: Доска показывает путь от боли до релиза\n\n#### Scenario: card opened\n- **WHEN** the operator opens a story card\n- **THEN** the card shows the source quote\n- GIVEN the note was taken in by intake\n\n- US-001: Трекер показывает только статус, а цикл по карточке не виден\n- US-002: На карточке видны гейт, улика, родитель и точки цикла\n"}, "calm": "\u003csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"220\" viewBox=\"0 0 400 220\">\u003crect width=\"100%\" height=\"100%\" fill=\"#f7f1e8\"/>\u003crect x=\"30\" y=\"40\" width=\"140\" height=\"64\" rx=\"14\" fill=\"#fffaf6\" stroke=\"#e4d9cc\"/>\u003ctext x=\"42\" y=\"68\" font-size=\"14\" fill=\"#2c2830\">Operator\u003c/text>\u003ctext x=\"42\" y=\"88\" font-size=\"11\" fill=\"#6f6676\">webclient · client\u003c/text>\u003crect x=\"210\" y=\"40\" width=\"140\" height=\"64\" rx=\"14\" fill=\"#fffaf6\" stroke=\"#e4d9cc\"/>\u003ctext x=\"222\" y=\"68\" font-size=\"14\" fill=\"#2c2830\">EPIC-001\u003c/text>\u003ctext x=\"222\" y=\"88\" font-size=\"11\" fill=\"#6f6676\">service · epic-1\u003c/text>\u003cline x1=\"170\" y1=\"72\" x2=\"210\" y2=\"72\" stroke=\"#b9a99a\" stroke-width=\"2\"/>\u003ctext x=\"190.0\" y=\"66\" font-size=\"11\" fill=\"#6f6676\">interacts\u003c/text>\u003c/svg>", "sysl": "\u003csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"420\" height=\"152\" viewBox=\"0 0 420 152\">\u003crect width=\"100%\" height=\"100%\" fill=\"#f7f1e8\"/>\u003crect x=\"24\" y=\"24\" width=\"360\" height=\"80\" rx=\"14\" fill=\"#fffaf6\" stroke=\"#e4d9cc\"/>\u003ctext x=\"40\" y=\"46\" font-size=\"14\" fill=\"#2c2830\">Backlog\u003c/text>\u003ctext x=\"40\" y=\"68\" font-size=\"12\" fill=\"#6f6676\">/story1\u003c/text>\u003ctext x=\"40\" y=\"90\" font-size=\"12\" fill=\"#6f6676\">/story2\u003c/text>\u003c/svg>"}</script>
 <script>
 const STATUSES = ["backlog", "ready", "in-progress", "review", "done"];
 const boot = JSON.parse(document.getElementById("boot").textContent);
@@ -103,7 +120,8 @@ function visibleItems() {
 function cardHtml(item) {
   const blocks = blocked(item.id);
   const missing = stagesOf(item.id).filter(step => step.state === "no").map(step => step.name);
-  return `<article class="card" data-open="${escapeHtml(item.id)}">
+  const steps = stagesOf(item.id).map(step => `<i class="step ${escapeHtml(step.state || "")}" title="${escapeHtml(step.name)}"></i>`).join("");
+  return `<article class="card${item.id === openId ? " selected" : ""}" data-open="${escapeHtml(item.id)}">
     <div class="id">${escapeHtml(item.id)} · ${escapeHtml(item.kind)}${item.parent ? " · " + escapeHtml(item.parent) : ""}</div>
     <strong>${escapeHtml(item.title)}</strong>
     <div class="row">
@@ -114,6 +132,7 @@ function cardHtml(item) {
       ${blocks.length ? `<span class="pill no">гейт ${blocks.length}</span>` : ""}
       ${missing.length ? `<span class="pill no">${escapeHtml(missing.join(", "))}</span>` : ""}
     </div>
+    <div class="steps">${steps}</div>
   </article>`;
 }
 function drawDrawer() {
@@ -128,12 +147,12 @@ function drawDrawer() {
   const acceptance = (item.acceptance || []).map(line => `<li>${escapeHtml(line)}</li>`).join("") || "<li>нет сценария</li>";
   const evidence = (item.evidence || []).map(line => `<li>${escapeHtml(line.text || "")}</li>`).join("") || "<li>нет улики</li>";
   const bounds = item.boundaries || {};
-  const stages = stagesOf(item.id).map(step => `<li class="pill ${escapeHtml(step.state || "no")}">${escapeHtml(step.name)}: ${escapeHtml(step.state || "")}</li>`).join("");
+  const stages = `<div class="flow">${stagesOf(item.id).map(step => `<span class="pill ${escapeHtml(step.state || "no")}">${escapeHtml(step.name)}: ${escapeHtml(step.state || "")}</span>`).join("")}</div>`;
   const spec = (state.specs || {})[item.kind === "epic" ? item.id : item.parent] || "";
   drawer.innerHTML = `<h2>${escapeHtml(item.id)}</h2><p><strong>${escapeHtml(item.title)}</strong></p>
     <p>${escapeHtml(item.description || "без описания")}</p>
     <div class="row">${STATUSES.map(status => `<button type="button" data-move="${escapeHtml(item.id)}" data-status="${status}" ${item.status === status ? "disabled" : ""}>${status}</button>`).join("")}</div>
-    <h3>Цикл</h3><ul>${stages || "<li>нет</li>"}</ul>
+    <h3>Цикл</h3>${stages || "<p>нет</p>"}
     <p class="muted">Дети: ${childrenOf(item.id).map(child => escapeHtml(child.id + " " + child.title)).join("; ") || "нет"}</p>
     <h3>Приёмка</h3><ul>${acceptance}</ul>
     <h3>Гардрейлы</h3>
@@ -164,7 +183,9 @@ function draw() {
   if (!sprintSelect.value && state.store.sprints[0]) sprintSelect.value = state.store.sprints[0].id;
   document.getElementById("stats").innerHTML = [[items.length,"записей"],[openPoints,"SP открыто"],[donePoints,"SP готово"],[totalHours.toFixed(2),"часов"],[state.store.sprints.length,"спринтов"]].map(([value,label]) => `<div class="stat"><b>${value}</b><span>${label}</span></div>`).join("");
   const gaps = stories.filter(item => stagesOf(item.id).some(step => step.name === "улика" && step.state === "no"));
-  document.getElementById("gaps").textContent = gaps.length ? "Без улики, done закрыть нельзя: " + gaps.map(item => item.id).join(", ") : "У каждой истории в выборке есть улика, либо историй нет.";
+  const gapEl = document.getElementById("gaps");
+  gapEl.className = gaps.length ? "banner bad" : "banner ok";
+  gapEl.textContent = gaps.length ? "Без улики, done закрыть нельзя: " + gaps.map(item => item.id).join(", ") : "У каждой истории в выборке есть улика, либо историй нет.";
   const shown = visibleItems();
   const titles = {backlog:"Бэклог", kanban:"Доска", scrum:"Спринт", cycle:"Цикл", architecture:"Архитектура", intake:"Сырьё"};
   document.getElementById("view-title").textContent = titles[view] || view;
