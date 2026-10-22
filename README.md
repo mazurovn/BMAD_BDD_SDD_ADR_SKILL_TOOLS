@@ -1,21 +1,20 @@
 # BMAD_BDD_SDD_ADR_SKILL_TOOLS
 
-Репозиторий **только** для скиллов, методологий и фреймворков: BMAD, BDD, SDD, ADR.
+Репозиторий методологий и скиллов. **Без данных конкретных проектов.**
 
-Содержит исходники скиллов, конфигурации для любых harness/агентов, примеры диаграмм в форматах **SYSL** и **FINOS CALM**.
-
-**Не содержит данных конкретных проектов.**
+## MAZU-ADGILE
+Единая методология: см. `methodology/MAZU-ADGILE.md`
 
 ## Структура
+- methodology/ — MAZU-ADGILE
+- wiki/ — вики
+- skills/ — скиллы
+- cli/ — дашборд и работа с бэклогом
+- examples/ — примеры артефактов
+- diagrams/ — SYSL + CALM
 
-skills/ — исходники скиллов
-diagrams/ — SYSL и CALM
-configs/ — конфиги
-agents/ — описания агентов
-templates/ — шаблоны
-ONBOARDING.md — промпты
-
-## Быстрый старт
-См. ONBOARDING.md
-
-MIT
+## Боты
+- BMAD Expert
+- SDD Spec Expert
+- ADR Decision Expert
+- BDD Acceptance Expert

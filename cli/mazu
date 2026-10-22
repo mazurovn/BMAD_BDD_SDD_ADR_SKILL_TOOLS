@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+"""MAZU CLI dashboard"""
+import json, sys
+from pathlib import Path
+DATA = Path("mazu-data")
+DATA.mkdir(exist_ok=True)
+BACKLOG = DATA / "backlog.json"
+if not BACKLOG.exists():
+    BACKLOG.write_text('{"items":[]}')
+def load(): return json.loads(BACKLOG.read_text())
+def save(d): BACKLOG.write_text(json.dumps(d, indent=2, ensure_ascii=False))
+if len(sys.argv)<2: print("Usage: mazu [dashboard|list|add]"); sys.exit(1)
+cmd=sys.argv[1]
+if cmd=="dashboard":
+    d=load(); st={}
+    for i in d["items"]: st[i["status"]]=st.get(i["status"],0)+1
+    print("=== MAZU Dashboard ===")
+    for s,c in st.items(): print(f"  {s}: {c}")
+    print(f"Total: {len(d['items'])}")
+elif cmd=="list":
+    for i in load()["items"]: print(i)
+elif cmd=="add":
+    d=load(); d["items"].append({"id":len(d["items"])+1,"title":" ".join(sys.argv[2:]) or "New","status":"backlog"}); save(d); print("Added")
