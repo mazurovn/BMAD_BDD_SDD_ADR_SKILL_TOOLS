@@ -5,6 +5,7 @@
 Страницы:
 
 - Onboarding — с чего начать и как проверить архив без установки Node
+- SETUP — свежий clone, `upstream/py`, размер/лицензии, гейты validate
 - Workflows — фазы и два именованных потока
 - BMAD-v6 — роли фаз и нарезка
 - SDD-boundaries — Always / Ask First / Never

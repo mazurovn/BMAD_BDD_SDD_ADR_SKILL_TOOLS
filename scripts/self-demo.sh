@@ -59,10 +59,9 @@ prove "$US_CALM" bin/calm validate --architecture diagrams/calm/example.calm.jso
 prove "$US_BMAD" bin/bmad --version
 prove "$US_CUC" bin/cucumber examples/bdd/gate.feature --require examples/bdd/steps.js
 prove "$US_SYSL" bin/sysl validate diagrams/sysl/example.sysl
-# specify needs upstream/py (specify_cli). Vendoring that tree is Ask First; fail closed if absent.
+# specify needs vendored upstream/py (specify_cli). Fail closed if absent.
 if ! bin/specify version >/dev/null 2>&1; then
   echo "SELF_DEMO_FAIL specify: upstream/py (specify_cli) missing from this checkout" >&2
-  echo "Ask First: vendor upstream/py or document an install path before release can go green." >&2
   exit 1
 fi
 prove "$US_SPEC" bin/specify version

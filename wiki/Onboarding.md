@@ -63,7 +63,7 @@ sh scripts/self-demo.sh
 - `bin/` — команды, с которых начинают.
 - `upstream/packages/` — исходники OpenSpec, CALM, BMAD и adr-tools.
 - `upstream/node_modules/` — их зависимости, уже установлены. `npm install` не нужен.
-- `upstream/py` и `upstream/cpython` — Specify и его Python 3.12. Системный Python 3.10 для Specify недостаточен.
+- `upstream/py` и `upstream/cpython` — Specify и его Python 3.12 (оба в git; размер и лицензии в `wiki/SETUP.md`). Системный Python 3.10 для Specify недостаточен.
 - `bin/sysl` — бинарник Sysl. Компилятор Go в архив не входит и не требуется.
 - `skills/`, `agents/`, `wiki/` — как работать.
 - `src/mazu_method/` и `cli/mazu.py` — гейты.

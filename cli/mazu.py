@@ -541,7 +541,8 @@ def cmd_doctor(_args: argparse.Namespace) -> None:
     if specify_site.exists() and any(specify_site.rglob("specify_cli*")):
         print("specify: upstream/py present")
     else:
-        print("specify: missing upstream/py (Ask First to vendor; release/self-demo need it)")
+        print("specify: missing upstream/py (required for doctor/release/self-demo)")
+        raise SystemExit(1)
 
 
 def slug(value: str) -> str:
@@ -1599,8 +1600,12 @@ def cmd_release(args: argparse.Namespace) -> None:
         [sys.executable, "scripts/audit.py"],
         [sys.executable, "-m", "pytest", "-q", "tests"],
         [sys.executable, "cli/mazu.py", "doctor"],
+        # In-house lint (fast structural rules).
         [sys.executable, "cli/mazu.py", "check", "sysl", "diagrams/sysl/example.sysl"],
         [sys.executable, "cli/mazu.py", "check", "calm", "diagrams/calm/example.calm.json"],
+        # Upstream validators (fail closed; stricter than in-house check).
+        ["bin/sysl", "validate", "diagrams/sysl/example.sysl"],
+        ["bin/calm", "validate", "--architecture", "diagrams/calm/example.calm.json", "--format", "json"],
         ["sh", "scripts/self-demo.sh"],
     ]
     report = []
