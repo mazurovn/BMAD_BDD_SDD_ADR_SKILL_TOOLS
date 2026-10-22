@@ -41,6 +41,24 @@
             },
             "acceptance": {
               "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "always": {
+              "type": "string"
+            },
+            "ask_first": {
+              "type": "string"
+            },
+            "never": {
+              "type": "string"
+            },
+            "decision": {
+              "type": "string"
+            },
+            "consequences": {
+              "type": "string"
             }
           },
           "required": [
@@ -262,6 +280,24 @@
             },
             "target": {
               "type": "string"
+            },
+            "outcome": {
+              "type": "string"
+            },
+            "has_boundaries": {
+              "type": "boolean"
+            },
+            "has_check": {
+              "type": "boolean"
+            },
+            "always": {
+              "type": "string"
+            },
+            "ask": {
+              "type": "string"
+            },
+            "never": {
+              "type": "string"
             }
           },
           "required": [
@@ -315,7 +351,7 @@
       "type": "function",
       "function": {
         "name": "mazu_evidence",
-        "description": "Record proof for one acceptance line",
+        "description": "Record command-verified proof: prefer --run COMMAND (free text is refused)",
         "parameters": {
           "type": "object",
           "properties": {
@@ -324,11 +360,17 @@
             },
             "text": {
               "type": "string"
+            },
+            "run": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Command argv; required for gate done (exit must be 0)"
             }
           },
           "required": [
-            "id",
-            "text"
+            "id"
           ]
         }
       }
@@ -370,6 +412,216 @@
           "required": [
             "action",
             "name"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_show",
+        "description": "Show one backlog item as JSON",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_board",
+        "description": "Print the kanban board by status",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "sprint": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_sprint",
+        "description": "Create a sprint or add a ready story to a sprint",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "new",
+                "add"
+              ]
+            },
+            "goal": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "sprint": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "action"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_project",
+        "description": "Create, use, or list named local projects under mazu-data",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "new",
+                "use",
+                "list"
+              ]
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "action"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_guide",
+        "description": "Print one Manual section",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "topic": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "topic"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_doctor",
+        "description": "Check required kit sources and pytest/specify availability",
+        "parameters": {
+          "type": "object",
+          "properties": {}
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_audit",
+        "description": "Run scripts/audit.py through the CLI",
+        "parameters": {
+          "type": "object",
+          "properties": {}
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_release",
+        "description": "Run release gates and pack sources",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "string"
+            },
+            "previous": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "version"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_fill",
+        "description": "Fill ADR Decision/Consequences via CLI",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "adr"
+              ]
+            },
+            "id": {
+              "type": "string"
+            },
+            "decision": {
+              "type": "string"
+            },
+            "consequences": {
+              "type": "string"
+            },
+            "context": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "id"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_pull",
+        "description": "Pull Jira or YouTrack when tokens exist",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "system": {
+              "type": "string",
+              "enum": [
+                "jira",
+                "youtrack"
+              ]
+            },
+            "jql": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "system"
           ]
         }
       }

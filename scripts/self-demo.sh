@@ -1,8 +1,19 @@
 #!/bin/sh
 # Rebuild the kit-self demo from the CLIs in this repo. No network.
+# Never wipe the operator's whole mazu-data (POLICY Never: client data / store history).
 set -eu
 cd "$(dirname "$0")/.."
-rm -rf mazu-data openspec/changes/self-demo
+
+# Isolate: only reset the kit-self project. Leave sibling projects alone.
+rm -rf mazu-data/projects/kit-self
+# Disposable OpenSpec change name — do not delete the tracked openspec/changes/self-demo.
+CHANGE=self-demo-run
+rm -rf "openspec/changes/${CHANGE}"
+
+if [ ! -f mazu-data/store.json ] && [ ! -f mazu-data/projects/kit-self/store.json ]; then
+  python3 cli/mazu.py init >/dev/null || true
+fi
+
 python3 cli/mazu.py project new kit-self >/dev/null
 python3 cli/mazu.py project use kit-self >/dev/null
 IDEA=$(python3 cli/mazu.py add idea "Прогнать CLI этого репозитория без скачивания")
@@ -35,6 +46,7 @@ python3 cli/mazu.py gate sprint S1
 prove() {
   id=$1
   shift
+  python3 cli/mazu.py move "$id" ready
   python3 cli/mazu.py move "$id" in-progress
   python3 cli/mazu.py log "$id" 0.2 --note "$*"
   python3 cli/mazu.py evidence "$id" --run "$@"
@@ -47,10 +59,16 @@ prove "$US_CALM" bin/calm validate --architecture diagrams/calm/example.calm.jso
 prove "$US_BMAD" bin/bmad --version
 prove "$US_CUC" bin/cucumber examples/bdd/gate.feature --require examples/bdd/steps.js
 prove "$US_SYSL" bin/sysl validate diagrams/sysl/example.sysl
+# specify needs upstream/py (specify_cli). Vendoring that tree is Ask First; fail closed if absent.
+if ! bin/specify version >/dev/null 2>&1; then
+  echo "SELF_DEMO_FAIL specify: upstream/py (specify_cli) missing from this checkout" >&2
+  echo "Ask First: vendor upstream/py or document an install path before release can go green." >&2
+  exit 1
+fi
 prove "$US_SPEC" bin/specify version
 prove "$US_ADR" bin/adr help
-python3 cli/mazu.py openspec propose self-demo --intent "Show this repository's own CLI run on the dashboard"
-python3 cli/mazu.py upstream openspec -- validate self-demo --strict
+python3 cli/mazu.py openspec propose "$CHANGE" --intent "Show this repository's own CLI run on the dashboard"
+python3 cli/mazu.py upstream openspec -- validate "$CHANGE" --strict
 python3 cli/mazu.py upstream openspec -- validate bind-upstreams --strict
 python3 cli/mazu.py probe
 python3 cli/mazu.py dashboard >/tmp/self-demo-dash.txt

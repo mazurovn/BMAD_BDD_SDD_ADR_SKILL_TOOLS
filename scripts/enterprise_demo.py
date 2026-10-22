@@ -85,6 +85,7 @@ def main() -> int:
     step(["sprint", "add", "--id", "US-003", "--sprint", "S1"], 0)
     step(["workflow", "sprint", "--sprint", "S1"], 0)
     step(["gate", "sprint", "S1"], 0)
+    # sprint add already moved US-002 to ready; one column forward only
     step(["move", "US-002", "in-progress"], 0)
     step(["log", "US-002", "1.5", "--note", "saved the row"], 0)
     step(["move", "US-002", "review"], 0)

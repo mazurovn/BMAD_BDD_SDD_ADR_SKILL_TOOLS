@@ -47,6 +47,16 @@ def done_issues(item: dict) -> list[str]:
                 "BDD-4 evidence is not command-verified (use: evidence ID --run COMMAND); "
                 f"bad lines {unverified}"
             )
+        # Duplicate identical proofs cannot cover two distinct scenarios.
+        fingerprints = []
+        for row in evidence:
+            if isinstance(row, dict):
+                key = " ".join(str(x) for x in (row.get("command") or [])) or str(row.get("text") or "")
+            else:
+                key = str(row)
+            fingerprints.append(key.strip())
+        if len(set(fingerprints)) < len(acceptance):
+            issues.append("BDD-4 duplicate evidence cannot cover distinct acceptance lines")
     return issues
 
 

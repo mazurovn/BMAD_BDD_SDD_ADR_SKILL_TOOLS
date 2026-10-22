@@ -273,28 +273,45 @@ def cmd_move(args: argparse.Namespace) -> None:
         raise SystemExit(f"status must be one of {STATUSES}")
     data = load()
     item = find(data, args.id)
-    if args.status == "ready":
+    current = item.get("status") or "backlog"
+    target = args.status
+    if item.get("kind") == "story" and current != target:
+        try:
+            here = STATUSES.index(current)
+            there = STATUSES.index(target)
+        except ValueError:
+            raise SystemExit(f"bad status transition {current} -> {target}")
+        if abs(there - here) != 1:
+            print(f"FAIL AGILE-7 move one column only ({current} -> {target})")
+            raise SystemExit(1)
+    if target == "ready":
         issues = ready_issues(item)
         if issues:
             for issue in issues:
                 print(f"FAIL {issue}")
             raise SystemExit(1)
-    if args.status == "done":
-        issues = done_issues(item)
+    if target == "in-progress" and current != "in-progress":
+        # Must already satisfy ready; cannot sneak past a failed gate ready.
+        issues = ready_issues(item)
         if issues:
             for issue in issues:
                 print(f"FAIL {issue}")
             raise SystemExit(1)
-    if args.status == "in-progress" and item.get("status") != "in-progress":
         issues = wip_issues([i for i in data["items"] if i is not item] + [{**item, "status": "in-progress"}])
         if issues:
             for issue in issues:
                 print(f"FAIL {issue}")
             raise SystemExit(1)
-    item["status"] = args.status
+    if target == "done":
+        issues = done_issues(item)
+        if issues:
+            for issue in issues:
+                print(f"FAIL {issue}")
+            raise SystemExit(1)
+    item["status"] = target
     item["updated_at"] = now()
     save(data)
-    print(f"{item['id']} -> {args.status}")
+    print(f"{item['id']} -> {target}")
 
 
 def cmd_log(args: argparse.Namespace) -> None:
@@ -520,6 +537,11 @@ def cmd_doctor(_args: argparse.Namespace) -> None:
         print("pytest: available")
     except ImportError:
         print("pytest: missing (install: python3 -m pip install -r requirements-dev.txt)")
+    specify_site = root / "upstream" / "py" / "lib"
+    if specify_site.exists() and any(specify_site.rglob("specify_cli*")):
+        print("specify: upstream/py present")
+    else:
+        print("specify: missing upstream/py (Ask First to vendor; release/self-demo need it)")
 
 
 def slug(value: str) -> str:
