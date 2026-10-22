@@ -1,12 +1,15 @@
-# BMAD v6 map
+# BMAD в этом методе
 
-Upstream docs: https://docs.bmad-method.org/reference/workflow-map/
+BMAD здесь — порядок фаз и разделение ролей, а не внешний установщик.
 
-| Phase | Upstream | Here |
-|---|---|---|
-| Analysis | brief / research | `add idea`, agents/analyst.md |
-| Planning | PRD | templates/spec.md, `add requirement` |
-| Solutioning | architecture, create-epics-and-stories | ADR + Sysl + CALM + `add epic` / `add story` |
-| Implementation | sprint-planning, build, review | `sprint`, `move`, `log`, QA `done` |
+Роли фаз: аналитик формулирует исход, PO держит ценность и приоритет, архитектор фиксирует выбор, SM ведёт доску, разработчик делает одну историю, QA закрывает по уликe. Отдельные файлы ролей лежат в `agents/` и перечислены на странице Roles.
 
-Statuses match the sprint tracker idea: backlog, ready, in-progress, review, done.
+Что считается готовым к разработке: у истории есть родитель, points из ряда Фибоначчи, хотя бы один наблюдаемый сценарий. Границы либо на истории, либо явно унаследованы из спецификации. Пока этого нет, статус `ready` не ставят.
+
+Именованные потоки v6, которые агент выполняет локально:
+
+- create-epics-and-stories — страница Workflows и скилл `skills/create-epics-and-stories`
+- sprint-planning — страница Workflows и скилл `skills/sprint-planning`
+- состояние спринта — `board` и `dashboard`, не отдельная таблица в голове агента
+
+Агент не перескакивает из идеи сразу в код, если не названы исход, границы и способ проверки.

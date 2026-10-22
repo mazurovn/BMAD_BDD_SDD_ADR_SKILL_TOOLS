@@ -1,21 +1,31 @@
-# Harnesses
+# Как агенту стартовать
 
-Any agent that can read a file and run `python3 cli/mazu.py` can use this repo.
+Агент читает эту вики, затем скилл под задачу, затем выполняет CLI. Второй бэклог в переписке не ведут.
 
-| Harness | What it reads |
+Какой скилл открыть:
+
+| Задача | Скилл |
 |---|---|
-| Claude Code | `CLAUDE.md`, `skills/` |
-| Codex | `AGENTS.md`, `configs/codex/PROMPT.md` |
-| Qwen Code | `QWEN.md` and `AGENTS.md` |
-| OpenCode | `opencode.json`, `.opencode/agent/mazu.md`, `AGENTS.md` |
-| Kimi CLI | `AGENTS.md`, `configs/kimi/PROMPT.md` |
-| GPT | `configs/gpt/PROMPT.md`, `tools/openai.json` |
-| DeepSeek | `configs/deepseek/PROMPT.md`, `tools/openai.json` |
-| GigaChat | `configs/gigachat/PROMPT.md`, `tools/gigachat.json` |
-| GigaCode | `configs/gigacode/PROMPT.md` (paste; no verified project filename) |
-| Grok | `configs/grok/prompt.md` |
-| Grok bot | `configs/grok-bot/PROMPT.md`, `agents/catalog.json` |
+| Фазы | skills/bmad |
+| Нарезка эпиков и историй | skills/create-epics-and-stories |
+| Спринт или канбан | skills/sprint-planning |
+| Спека и границы | skills/sdd |
+| Сценарии | skills/bdd |
+| Решение | skills/adr |
+| Доска, points, часы, дробление | skills/agile-delivery |
+| Идея и эпик | skills/product-ideas |
+| Формулировка требования | skills/requirements |
+| Поведение | skills/sysl |
+| Состав | skills/calm |
+| Несколько проектов | skills/projects |
+| Jira, YouTrack, CSV, Excel | skills/backlog-connectors |
+| Вызов функций | skills/tool-calling |
+| Новый скилл | skills/skill-creator |
 
-Tool loop: `skills/tool-calling/SKILL.md`.
+Файлы старта в репозитории, без внешней документации: `AGENTS.md`, `CLAUDE.md`, `QWEN.md`, `opencode.json`, `.opencode/agent/mazu.md`, каталог `configs/` для GPT, Codex, DeepSeek, Kimi, GigaChat, GigaCode, Grok и Grok-бота.
 
-Roles: eleven files in `agents/`. The four Grok bots stay the expert bots. The other roles are prompts.
+Схемы вызова, которые агент отдаёт модели, а не придумывает: `tools/openai.json` и `tools/gigachat.json`. Имя функции из схемы исполняют через CLI. Пока stdout не получен, агент не отвечает так, будто команда уже прошла.
+
+Для GigaChat после `finish_reason` равного `function_call` ответ функции возвращают отдельным сообщением роли function.
+
+Проверка, что метод ещё целый: `python3 scripts/audit.py`. Ненулевой код означает, что работать «как будто всё на месте» нельзя.

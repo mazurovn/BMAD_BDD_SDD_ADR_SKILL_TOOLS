@@ -1,11 +1,21 @@
-# Artifacts
+# Артефакты
 
-- Idea, epic, story, task, requirement, ADR — rows in `mazu-data/store.json`
-- ADR body — `mazu-data/adr/ADR-00N.md` from `templates/adr.md`
-- Spec — `mazu-data/specs/` from `templates/spec.md`
-- Sprint goal — `sprints[]` in the store
-- Dashboard — `mazu-data/dashboard.md` and `dashboard.html`
-- Behavior diagram — `diagrams/sysl/`
-- Structure diagram — `diagrams/calm/`
+Источник правды после записи — `store.json` активного проекта. Схема полей: `schemas/store.schema.json`.
 
-`mazu-data/` is local working state. Do not commit it.
+У записи есть `id`, `kind`, `title`, `description`, `status`, `points`, `parent`, `sprint`, `acceptance`, `boundaries`, `created_at`, `updated_at`. После импорта ещё `source` и `external_id`.
+
+`boundaries` — объект с тремя списками: `always`, `ask_first`, `never`.
+
+`sprints` хранит `id`, `goal`, `status`, `created_at`.
+
+`time_logs` хранит `item`, `hours`, `note`, `at`. Несколько записей по одной карточке суммируются.
+
+Рядом со store:
+
+- `adr/ADR-00N.md` — текст решения
+- `specs/` — спецификации, которые агент кладёт сам из шаблона
+- `dashboard.md` и `dashboard.html` — снимок
+
+Шаблоны метода, не проекта: `templates/adr.md`, `templates/user-story.md`, `templates/spec.md`, `templates/epic.md`, `templates/boundaries.md`, `templates/sprint-status.yaml`.
+
+Sysl и CALM метода лежат в `diagrams/`. Для клиентского описания такие же файлы кладут в каталог проекта и не коммитят в репозиторий метода.

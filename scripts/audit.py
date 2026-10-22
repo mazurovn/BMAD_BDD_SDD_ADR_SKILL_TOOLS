@@ -45,13 +45,15 @@ REQUIRED = [
 SKILLS = [
     "bmad", "sdd", "bdd", "adr", "agile-delivery", "product-ideas",
     "requirements", "sysl", "calm", "skill-creator", "backlog-connectors",
-    "tool-calling", "projects",
+    "tool-calling", "projects", "create-epics-and-stories", "sprint-planning",
 ]
 ROLES = [
     "analyst.md", "po.md", "architect.md", "scrum-master.md", "dev.md", "qa.md",
     "integrator.md", "skill-creator.md", "researcher.md", "writer.md", "release.md",
+    "bmad-lead.md", "sdd-author.md", "bdd-author.md", "adr-keeper.md",
+    "sysl-modeler.md", "calm-modeler.md",
 ]
-HELP_WORDS = ["project", "import", "export", "pull", "connectors", "skill", "dashboard"]
+HELP_WORDS = ["project", "import", "export", "pull", "connectors", "skill", "dashboard", "serve"]
 
 
 def fail(errors: list[str], message: str) -> None:
@@ -74,6 +76,11 @@ def main() -> int:
         text = path.read_text(encoding="utf-8")
         if "name:" not in text or "description:" not in text:
             fail(errors, f"skill {name} has no frontmatter")
+    print("2b. wiki has no external urls")
+    for page in (ROOT / "wiki").glob("*.md"):
+        text = page.read_text(encoding="utf-8")
+        if "http://" in text or "https://" in text:
+            fail(errors, f"external url in {page.name}")
     print("3. roles")
     for name in ROLES:
         if not (ROOT / "agents" / name).exists():

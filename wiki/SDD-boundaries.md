@@ -1,12 +1,17 @@
-# Always / Ask First / Never
+# SDD и границы
 
-Source pattern: Scrum Manager BoK, used as a delegation frame for specs.
+Порядок спецификации: сначала что и для кого, потом план, потом задачи, потом реализация. Спека — якорь. Если требование изменилось, правят спеку и заново смотрят на истории. Тихо расширять историю нельзя.
 
-- Always — the agent proceeds.
-- Ask First — the agent stops.
-- Never — the agent does not do it, even if it would "finish" the task.
+Шаблон: `templates/spec.md`. Поля: цель, акторы, вне scope, требования, приёмка, план, задачи, границы, улика.
 
-Store them on the story (`--always`, `--ask-first`, `--never`) and in the spec.
-Default set: [templates/boundaries.md](../templates/boundaries.md).
+## Три уровня
 
-Two scopes: repo-wide rules in that template, and extra rules on the single story.
+Always. Агент делает сам. В этом методе всегда: store остаётся валидным JSON, у нового поведения CLI есть проверка, принятый ADR соблюдается.
+
+Ask First. Агент останавливается и спрашивает. Сюда входят новая зависимость, смена схемы store, смена публичной команды, правка за пределами истории.
+
+Never. Агент не делает этого, даже если так быстрее получить зелёный статус. Сюда входят секреты в репозитории, удаление истории store, удаление проверки ради зелёного прогона, бэклог клиента внутри репозитория метода.
+
+Границы бывают общими (`templates/boundaries.md`) и дополнительными на одной истории (`--always`, `--ask-first`, `--never`). Более узкий запрет истории не отменяет общий Never.
+
+Фраза «сделай как считаешь нужным» не отменяет Ask First и Never.

@@ -332,64 +332,7 @@ def cmd_dashboard(_args: argparse.Namespace) -> None:
     md = "\n".join(lines) + "\n"
     dash_md().write_text(md, encoding="utf-8")
 
-    def cell(text: str) -> str:
-        return (
-            str(text)
-            .replace("&", "&")
-            .replace("<", "<")
-            .replace(">", ">")
-        )
-
-    rows = []
-    for item in data["items"]:
-        rows.append(
-            "<tr>"
-            f"<td>{cell(item['id'])}</td>"
-            f"<td>{cell(item['kind'])}</td>"
-            f"<td>{cell(item['status'])}</td>"
-            f"<td>{cell('' if item.get('points') is None else item['points'])}</td>"
-            f"<td>{hours_for(data, item['id'])}</td>"
-            f"<td>{cell(item.get('sprint') or '')}</td>"
-            f"<td>{cell(item['title'])}</td>"
-            "</tr>"
-        )
-    html = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<title>MAZU dashboard</title>
-<style>
-body {{ font-family: ui-sans-serif, system-ui, sans-serif; margin: 2rem; background: #0f1419; color: #e7ecf1; }}
-h1 {{ font-weight: 600; }}
-.cards {{ display: flex; gap: 1rem; flex-wrap: wrap; }}
-.card {{ background: #1b2430; border-radius: 10px; padding: 1rem 1.2rem; min-width: 140px; }}
-.card b {{ display: block; font-size: 1.6rem; }}
-table {{ border-collapse: collapse; width: 100%; margin-top: 1.5rem; }}
-th, td {{ border-bottom: 1px solid #2a3644; text-align: left; padding: 0.45rem 0.5rem; }}
-th {{ color: #9fb0c3; font-weight: 500; }}
-</style>
-</head>
-<body>
-<h1>MAZU-ADGILE</h1>
-<p>Generated {cell(now())}. Story points are complexity. Hours are time spent. They are not the same.</p>
-<div class="cards">
-  <div class="card"><b>{len(data['items'])}</b>items</div>
-  <div class="card"><b>{points_open}</b>SP open</div>
-  <div class="card"><b>{points_done}</b>SP done</div>
-  <div class="card"><b>{total_hours}</b>hours</div>
-  <div class="card"><b>{len(data['sprints'])}</b>sprints</div>
-</div>
-<h2>Backlog</h2>
-<table>
-<thead><tr><th>ID</th><th>Kind</th><th>Status</th><th>SP</th><th>Hours</th><th>Sprint</th><th>Title</th></tr></thead>
-<tbody>
-{''.join(rows) or '<tr><td colspan="7">empty</td></tr>'}
-</tbody>
-</table>
-</body>
-</html>
-"""
-    dash_html().write_text(html, encoding="utf-8")
+    dash_html().write_text(render_html(data, live=False), encoding="utf-8")
     print(md)
     print(f"wrote {dash_md()}")
     print(f"wrote {dash_html()}")
@@ -437,6 +380,13 @@ def cmd_doctor(_args: argparse.Namespace) -> None:
         root / "CLAUDE.md",
         root / "QWEN.md",
         root / "scripts" / "audit.py",
+        root / "cli" / "dashboard.html",
+        root / "skills" / "create-epics-and-stories" / "SKILL.md",
+        root / "skills" / "sprint-planning" / "SKILL.md",
+        root / "wiki" / "Home.md",
+        root / "wiki" / "BDD.md",
+        root / "wiki" / "ADR.md",
+        root / "wiki" / "Dashboard.md",
     ]
     missing = [str(p.relative_to(root)) for p in required if not p.exists()]
     if missing:
@@ -709,9 +659,9 @@ def write_xlsx(path: Path, rows: list[list[str]]) -> None:
 
 def _xml(text: str) -> str:
     return (
-        text.replace("&", "&")
-        .replace("<", "<")
-        .replace(">", ">")
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
     )
 
 
@@ -881,6 +831,107 @@ def cmd_skill(args: argparse.Namespace) -> None:
     print(path.relative_to(KIT))
 
 
+
+def render_html(data: dict, live: bool) -> str:
+    template = (KIT / "cli" / "dashboard.html").read_text(encoding="utf-8")
+    project = data_dir().name if data_dir().parent.name == "projects" else "local"
+    boot = {
+        "live": live,
+        "generated": now(),
+        "project": project,
+        "store": data,
+        "hours": {item["id"]: hours_for(data, item["id"]) for item in data["items"]},
+    }
+    payload = json.dumps(boot, ensure_ascii=False).replace("<", "\\u003c")
+    if "__BOOT__" not in template:
+        raise SystemExit("dashboard template has no boot slot")
+    return template.replace("__BOOT__", payload)
+
+
+def snapshot(live: bool = True) -> dict:
+    data = load()
+    project = data_dir().name if data_dir().parent.name == "projects" else "local"
+    return {
+        "live": live,
+        "generated": now(),
+        "project": project,
+        "store": data,
+        "hours": {item["id"]: hours_for(data, item["id"]) for item in data["items"]},
+    }
+
+
+def cmd_serve(args: argparse.Namespace) -> None:
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+    class Handler(BaseHTTPRequestHandler):
+        def log_message(self, fmt: str, *values) -> None:
+            print(fmt % values)
+
+        def _send(self, code: int, body: bytes, content_type: str) -> None:
+            self.send_response(code)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def _json(self, code: int, payload: dict) -> None:
+            raw = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+            self._send(code, raw, "application/json; charset=utf-8")
+
+        def do_GET(self) -> None:
+            if self.path in ("/", "/index.html"):
+                page = render_html(load(), live=True).encode("utf-8")
+                self._send(200, page, "text/html; charset=utf-8")
+                return
+            if self.path == "/api/store":
+                self._json(200, snapshot())
+                return
+            self._json(404, {"error": "not found"})
+
+        def do_POST(self) -> None:
+            length = int(self.headers.get("Content-Length", "0") or "0")
+            if length > 100_000:
+                self._json(413, {"error": "body too large"})
+                return
+            try:
+                payload = json.loads(self.rfile.read(length).decode("utf-8") or "{}")
+            except json.JSONDecodeError:
+                self._json(400, {"error": "bad json"})
+                return
+            try:
+                if self.path == "/api/move":
+                    cmd_move(argparse.Namespace(id=payload["id"], status=payload["status"]))
+                elif self.path == "/api/log":
+                    cmd_log(argparse.Namespace(id=payload["id"], hours=float(payload["hours"]), note=payload.get("note") or ""))
+                elif self.path == "/api/add":
+                    points = payload.get("points")
+                    cmd_add(argparse.Namespace(
+                        kind=payload.get("kind") or "story",
+                        title=payload.get("title") or "",
+                        description="",
+                        points=int(points) if points not in (None, "") else None,
+                        parent=payload.get("parent") or None,
+                        status="backlog",
+                        acceptance="",
+                        always=None,
+                        ask_first=None,
+                        never=None,
+                    ))
+                elif self.path == "/api/sprint":
+                    cmd_sprint(argparse.Namespace(action="new", goal=payload.get("goal") or "", id=None, sprint=None))
+                else:
+                    self._json(404, {"error": "not found"})
+                    return
+            except SystemExit as exc:
+                self._json(400, {"error": str(exc)})
+                return
+            self._json(200, snapshot())
+
+    server = ThreadingHTTPServer(("127.0.0.1", int(args.port)), Handler)
+    print(f"MAZU dashboard http://127.0.0.1:{server.server_address[1]}/")
+    server.serve_forever()
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="mazu", description="MAZU-ADGILE backlog CLI")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -933,6 +984,10 @@ def build_parser() -> argparse.ArgumentParser:
     p_board = sub.add_parser("board", help="kanban by status")
     p_board.add_argument("--sprint")
     p_board.set_defaults(func=cmd_board)
+
+    p_serve = sub.add_parser("serve", help="interactive pastel dashboard on localhost")
+    p_serve.add_argument("--port", type=int, default=8765)
+    p_serve.set_defaults(func=cmd_serve)
 
     p_project = sub.add_parser("project", help="named local projects")
     p_project.add_argument("action", choices=("new", "use", "list"))

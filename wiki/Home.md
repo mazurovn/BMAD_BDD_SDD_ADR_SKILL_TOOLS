@@ -1,10 +1,36 @@
-# Wiki
+# База знаний MAZU-ADGILE
 
-- [MAZU-ADGILE](../methodology/MAZU-ADGILE.md) — how to apply the loop
-- [CLI](CLI.md)
-- [BMAD v6 map](BMAD-v6.md)
-- [SDD boundaries](SDD-boundaries.md)
-- [Points and time](Estimation.md)
-- [Artifacts](Artifacts.md)
-- [Agents and harnesses](Harnesses.md)
-- [Onboarding](../ONBOARDING.md)
+Эта вики самодостаточна. Агент не должен выходить из неё, чтобы понять, как работать. Команды ниже — те, которые принимает `python3 cli/mazu.py`. Если вики и `--help` расходятся, права команда, и вики надо поправить.
+
+Страницы:
+
+- CLI — все команды
+- Workflows — фазы и два именованных потока
+- BMAD-v6 — роли фаз и нарезка
+- SDD-boundaries — Always / Ask First / Never
+- BDD — приёмка
+- ADR — решения
+- Agile — Scrum и Kanban
+- Estimation — points и часы
+- Projects — несколько бэклогов
+- Artifacts — поля store
+- Sysl — поведение системы
+- CALM — состав системы
+- Dashboard — доска и кнопки
+- Roles — кто что делает
+- Harnesses — как стартовать агента
+
+## Петля
+
+1. Идея: проблема и исход одной фразой.
+2. Эпик: один исход, не список отделов.
+3. Требование и спецификация: что можно проверить.
+4. Границы: Always делают сразу, Ask First останавливает, Never запрещено.
+5. Истории с points и Given / When / Then.
+6. Спринт или канбан.
+7. Часы пишут во время работы. Points не переводят в часы.
+8. `done` ставит только тот, кто сверил каждый Then с уликой.
+
+## Чего агент не делает
+
+Не записывает бэклог клиента в репозиторий метода. Не говорит, что Jira синхронизирована, если `pull` не завершился нулём. Не ставит `done` без улики. Не выдумывает запись, которой не было в файле или в ответе API.

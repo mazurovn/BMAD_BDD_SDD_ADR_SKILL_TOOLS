@@ -79,6 +79,36 @@
       "name": "MAZU-Release",
       "file": "agents/release.md",
       "phase": "audit"
+    },
+    {
+      "name": "MAZU-BMAD-Lead",
+      "file": "agents/bmad-lead.md",
+      "phase": "phases"
+    },
+    {
+      "name": "MAZU-SDD-Author",
+      "file": "agents/sdd-author.md",
+      "phase": "spec"
+    },
+    {
+      "name": "MAZU-BDD-Author",
+      "file": "agents/bdd-author.md",
+      "phase": "acceptance"
+    },
+    {
+      "name": "MAZU-ADR-Keeper",
+      "file": "agents/adr-keeper.md",
+      "phase": "decisions"
+    },
+    {
+      "name": "MAZU-Sysl-Modeler",
+      "file": "agents/sysl-modeler.md",
+      "phase": "behavior"
+    },
+    {
+      "name": "MAZU-CALM-Modeler",
+      "file": "agents/calm-modeler.md",
+      "phase": "structure"
     }
   ],
   "harnesses": [

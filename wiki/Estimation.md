@@ -1,11 +1,17 @@
-# Story points and time
+# Points и время
 
-| | Points | Hours |
+Story points отвечают на вопрос «насколько сложно и неопределённо». Часы отвечают на вопрос «сколько уже потратили».
+
+| | Points | Часы |
 |---|---|---|
-| Means | complexity and uncertainty | time actually spent |
-| Scale | 1 2 3 5 8 13 21 | decimal hours |
-| Command | `--points` | `log` |
-| Planning use | velocity | cost and retro |
+| Шкала | 1, 2, 3, 5, 8, 13, 21 | число больше нуля, можно дробное |
+| Команда | `--points` | `log ID 1.5 --note` |
+| Для чего | планирование и velocity | стоимость и ретро |
 
-Velocity on the dashboard is the sum of points of **stories** in that sprint with status `done`.
-A point is not an hour. The CLI rejects points outside the Fibonacci set.
+CLI отвергает points вне ряда. Оценка 4 из Jira не записывается как 5 и не становится часами. Поле points остаётся пустым, ключ задачи сохраняется.
+
+13 — повод разрезать. 21 — история не готова к спринту.
+
+Velocity спринта — сумма points только тех историй, которые в этом спринте и в статусе `done`. Эпики, задачи и незакрытые истории в сумму не входят.
+
+На дашборде три полосы: открытые SP, готовые SP, часы. Их нельзя складывать между собой.

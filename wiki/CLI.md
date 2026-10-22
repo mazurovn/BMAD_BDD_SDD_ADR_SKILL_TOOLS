@@ -1,17 +1,52 @@
 # CLI
 
+Запуск из каталога, где должен появиться `mazu-data/`. Интерпретатор: Python 3.11+.
+
 ```bash
-python3 cli/mazu.py init
-python3 cli/mazu.py add {idea|epic|story|task|requirement|adr} "title"
-python3 cli/mazu.py list --kind story --status ready
-python3 cli/mazu.py show US-001
-python3 cli/mazu.py move US-001 in-progress
-python3 cli/mazu.py log US-001 1.5 --note "slice"
-python3 cli/mazu.py sprint new --goal "..."
-python3 cli/mazu.py sprint add --id US-001 --sprint S1
-python3 cli/mazu.py board
-python3 cli/mazu.py dashboard
-python3 cli/mazu.py doctor
+python3 cli/mazu.py <команда>
 ```
 
-Data: `mazu-data/store.json` (gitignored). Schema: `schemas/store.schema.json`.
+`cli/mazu` делает то же самое.
+
+## Команды
+
+`init` создаёт store, папки `adr` и `specs`. Повторный запуск ничего не затирает.
+
+`project new ИМЯ` создаёт `mazu-data/projects/имя` и делает его активным. `project use ИМЯ` переключает. `project list` помечает активный звёздочкой. Без активного проекта команды пишут в `mazu-data/store.json`.
+
+`add ВИД "название"` — вид один из `idea`, `epic`, `story`, `task`, `requirement`, `adr`.
+
+Флаги `add`:
+
+- `--description`
+- `--parent ID`
+- `--points` только 1, 2, 3, 5, 8, 13, 21
+- `--status` из `backlog`, `ready`, `in-progress`, `review`, `done`
+- `--acceptance` сценарии через `|`
+- `--always`, `--ask-first`, `--never` пункты через `|`
+
+`list` фильтры `--kind`, `--status`, `--sprint`. `show ID` печатает JSON.
+
+`move ID СТАТУС` переносит карточку. `log ID ЧАСЫ --note "..."` добавляет затраченное время. Часы должны быть больше нуля.
+
+`sprint new --goal "..."`. `sprint add --id US-001 --sprint S1`. История из `backlog` при добавлении в спринт становится `ready`.
+
+`board` печатает колонки. `--sprint S1` сужает.
+
+`dashboard` пишет `dashboard.md` и пастельный `dashboard.html`. В снимке кнопки не меняют store.
+
+`serve --port 8765` поднимает ту же доску на `127.0.0.1`. Кнопки влево и вправо вызывают `move`. Формы добавляют запись, пишут часы и открывают спринт. Слушает только localhost.
+
+`import csv|jira-csv|youtrack-csv|xlsx ФАЙЛ` читает первую таблицу. `export csv|xlsx ФАЙЛ` выгружает активный store.
+
+`connectors` говорит, заданы ли переменные Jira и YouTrack. Значения не печатает.
+
+`pull jira --jql "..."` требует `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_TOKEN`. `pull youtrack --jql "..."` требует `YOUTRACK_URL`, `YOUTRACK_TOKEN`. Без них команда завершается с ошибкой и предлагает CSV.
+
+`skill new имя --title --description` создаёт `skills/имя/SKILL.md`. `--force` перезаписывает.
+
+`doctor` проверяет, что обязательные файлы метода на месте.
+
+## Идентификаторы
+
+`IDEA`, `EPIC`, `US`, `TASK`, `REQ`, `ADR` плюс номер. Спринты: `S1`, `S2`. Внешний ключ трекера лежит в `external_id` и не подменяет локальный id.
