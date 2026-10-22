@@ -43,7 +43,7 @@
 ## Инструменты
 
 - `show ID`
-- `check guard "add a dependency" --ask "new dependency"`
+- `check guard "add a new dependency" --ask "new dependency"`
 - `log`
 
 Имена функций только из `tools/openai.json` и `tools/gigachat.json`. Команда без stdout не считается выполненной. Раздел руководства: `python3 cli/mazu.py guide dev`.

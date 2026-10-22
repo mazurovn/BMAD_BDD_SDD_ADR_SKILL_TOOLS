@@ -232,6 +232,12 @@ def cmd_move(args: argparse.Namespace) -> None:
             for issue in issues:
                 print(f"FAIL {issue}")
             raise SystemExit(1)
+    if args.status == "in-progress" and item.get("status") != "in-progress":
+        issues = wip_issues([i for i in data["items"] if i is not item] + [{**item, "status": "in-progress"}])
+        if issues:
+            for issue in issues:
+                print(f"FAIL {issue}")
+            raise SystemExit(1)
     item["status"] = args.status
     item["updated_at"] = now()
     save(data)

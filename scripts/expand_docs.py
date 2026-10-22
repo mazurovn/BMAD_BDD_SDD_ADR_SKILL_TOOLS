@@ -875,7 +875,7 @@ SKILLS = [
             "Нет строки про остаточный риск.",
         ],
         "handoff": "Review забирает QA вместе с уликой на каждый Then. Если выяснилось, что сценария нет, карточка возвращается BDD author.",
-        "example": "python3 cli/mazu.py show US-001\npython3 cli/mazu.py check guard \"add a dependency\" --ask \"new dependency\"\npython3 cli/mazu.py log US-001 1 --note \"reused the existing parser\"",
+        "example": "python3 cli/mazu.py show US-001\npython3 cli/mazu.py check guard \"add a new dependency\" --ask \"new dependency\"\npython3 cli/mazu.py log US-001 1 --note \"reused the existing parser\"",
     },
     {
         "name": "projects",
