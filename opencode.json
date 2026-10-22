@@ -3,12 +3,12 @@
   "instructions": [
     "AGENTS.md",
     "standards/PROMPT_BLOCK.md",
-    "wiki/Rules.md"
+    "wiki/Manual.md"
   ],
   "agent": {
     "mazu": {
       "description": "MAZU-ADGILE backlog, specs, and boundaries",
-      "prompt": "# MAZU rules\n\nFollow wiki/Rules.md. State is only `python3 cli/mazu.py`.\n\nBMAD-1 phases in order. BMAD-4 no second backlog in chat.\nSDD-1 spec before code. SDD-2 change the spec before widening a story.\nBOUND-1 Always: valid store, a check for new behavior, accepted ADR.\nBOUND-2 Ask First stops: new dependency, schema change, public command, edit outside the story, blending the three architecture layers.\nBOUND-3 Never: secrets, deleting history, deleting a check to go green, client backlog in this repo, a sync you did not run.\nBDD-1 Then is observable. BDD-4 done only with evidence.\nADR-4 supersede, do not delete.\nEST-1 points are not hours. EST-2 Fibonacci only.\nEPIC-2 a 13 is split, a 21 is not ready. SPRINT-3 velocity is done story points only.\nSYSL-1 behavior. CALM-1 structure. They do not replace each other.\nARCH-1 business capabilities. ARCH-2 system ownership. ARCH-3 the contract other teams build. ARCH-4 the chair routes, it does not merge the layers.\nDEV-1 walk the ladder and stop at the first rung that fully works. DEV-2 do not cut trust-boundary checks. DEV-4 name what you did not check.\nPERF-1 one role question per pass.\n"
+      "prompt": "# MAZU rules\n\nFollow wiki/Manual.md and wiki/Rules.md. State is only `python3 cli/mazu.py`. The methods are code in src/mazu_method/, not only text.\n\nBefore a story is ready: `gate ready ID`. It checks the parent, Fibonacci points 1-8, Given/When/Then, and Always/Ask First/Never.\nBefore done: `evidence` for every scenario, then `gate done ID`.\nBefore a sprint: `workflow sprint --sprint S1`.\nBefore an epic is called sliced: `workflow epics --idea IDEA --epic EPIC`.\nBoundaries: `check guard \"action\" --ask \"...\" --never \"...\"`. Ask First stops. Never refuses.\nDiagrams: `check sysl FILE` and `check calm FILE`.\nPoints and hours: `check points ID`. Do not add them together.\nPhases: `check phase implementation --outcome \"...\" --has-boundaries --has-check`.\nA non-zero exit is a failed gate. Do not say the work passed.\n\nBMAD-1 phases in order. SDD-1 spec before code.\nBOUND-3 Never: secrets, deleting history, deleting a check to go green, client backlog in this repo.\nDEV-1 smallest complete change. DEV-2 do not cut a trust-boundary check. DEV-4 name what you did not check.\nARCH-4 the chair routes business, enterprise, and solution architects. Do not merge the three layers.\n"
     }
   }
 }

@@ -18,6 +18,21 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 KIT = Path(__file__).resolve().parents[1]
+if str(KIT / "src") not in sys.path:
+    sys.path.insert(0, str(KIT / "src"))
+from mazu_method.adr import issues as adr_issues
+from mazu_method.adr import render as render_adr
+from mazu_method.agile import done_issues as agile_done_issues
+from mazu_method.agile import ready_issues as agile_ready_issues
+from mazu_method.agile import velocity as agile_velocity
+from mazu_method.agile import wip_issues
+from mazu_method.bdd import acceptance_issues
+from mazu_method.bmad import phase_issues
+from mazu_method.calm_check import issues as calm_issues
+from mazu_method.estimation import hours_total, points_issue
+from mazu_method.sdd import boundary_issues, guard
+from mazu_method.sysl_check import issues as sysl_issues
+from mazu_method.workflows import epic_tree_issues, sprint_plan_issues
 
 
 def workspace() -> Path:
@@ -167,25 +182,7 @@ def write_adr_file(item: dict) -> None:
     folder.mkdir(parents=True, exist_ok=True)
     path = folder / f"{item['id']}.md"
     path.write_text(
-        "\n".join(
-            [
-                f"# {item['id']}: {item['title']}",
-                "",
-                f"## Status",
-                item["status"],
-                "",
-                "## Context",
-                item.get("description") or "_fill in_",
-                "",
-                "## Decision",
-                "_fill in_",
-                "",
-                "## Consequences",
-                "- Positive:",
-                "- Negative:",
-                "",
-            ]
-        ),
+        render_adr(item["id"], item["title"], item["status"], item.get("description") or ""),
         encoding="utf-8",
     )
 
@@ -386,6 +383,16 @@ def cmd_doctor(_args: argparse.Namespace) -> None:
         root / "skills" / "lazy-senior" / "SKILL.md",
         root / "skills" / "architecture" / "SKILL.md",
         root / "standards" / "RULES.md",
+        root / "src" / "mazu_method" / "bmad.py",
+        root / "src" / "mazu_method" / "sdd.py",
+        root / "src" / "mazu_method" / "bdd.py",
+        root / "src" / "mazu_method" / "adr.py",
+        root / "src" / "mazu_method" / "agile.py",
+        root / "src" / "mazu_method" / "estimation.py",
+        root / "src" / "mazu_method" / "workflows.py",
+        root / "src" / "mazu_method" / "sysl_check.py",
+        root / "src" / "mazu_method" / "calm_check.py",
+        root / "wiki" / "Manual.md",
         root / "wiki" / "Rules.md",
         root / "wiki" / "Team.md",
         root / "wiki" / "Home.md",
@@ -937,6 +944,191 @@ def cmd_serve(args: argparse.Namespace) -> None:
     server.serve_forever()
 
 
+
+def cmd_evidence(args: argparse.Namespace) -> None:
+    if not (args.text or "").strip():
+        raise SystemExit("evidence text required")
+    data = load()
+    item = find(data, args.id)
+    item.setdefault("evidence", []).append({"text": args.text.strip(), "at": now()})
+    item["updated_at"] = now()
+    save(data)
+    print(f"evidence {len(item['evidence'])} on {item['id']}")
+
+
+def ready_issues(item: dict) -> list[str]:
+    return agile_ready_issues(item)
+
+
+def done_issues(item: dict) -> list[str]:
+    return agile_done_issues(item)
+
+
+def cmd_gate(args: argparse.Namespace) -> None:
+    data = load()
+    if args.kind == "sprint":
+        sprint_id = args.id
+        if not any(s["id"] == sprint_id for s in data["sprints"]):
+            raise SystemExit(f"unknown sprint {sprint_id}")
+        goal = next(s.get("goal") or "" for s in data["sprints"] if s["id"] == sprint_id)
+        failed = False
+        if not goal.strip():
+            print("FAIL SPRINT-1 goal is empty")
+            failed = True
+        stories = [i for i in data["items"] if i.get("sprint") == sprint_id and i.get("kind") == "story"]
+        if not stories:
+            print("FAIL SPRINT-1 sprint has no stories")
+            failed = True
+        for item in stories:
+            for issue in ready_issues(item):
+                print(f"FAIL {item['id']} {issue}")
+                failed = True
+        if failed:
+            raise SystemExit(1)
+        print(f"PASS sprint {sprint_id}")
+        return
+    item = find(data, args.id)
+    issues = ready_issues(item) if args.kind == "ready" else done_issues(item)
+    if issues:
+        for issue in issues:
+            print(f"FAIL {item['id']} {issue}")
+        raise SystemExit(1)
+    print(f"PASS {args.kind} {item['id']}")
+
+
+def cmd_tools(_args: argparse.Namespace) -> None:
+    rows = [
+        ("init", "writer", "none", "create the local store"),
+        ("project", "integrator", "none", "separate backlogs"),
+        ("add", "role that owns the kind", "gate ready after a story", "record idea epic story task requirement adr"),
+        ("evidence", "qa", "gate done", "record one proof line per acceptance line"),
+        ("gate ready", "po and sm", "blocks ready", "parent, points 1-8, acceptance, boundaries"),
+        ("gate done", "qa", "blocks done", "ready gate plus evidence"),
+        ("gate sprint", "sm", "blocks planning", "goal and every story passes ready"),
+        ("move", "dev until review, qa for done", "gate", "change column"),
+        ("log", "dev", "none", "hours, not points"),
+        ("sprint", "sm", "gate sprint", "goal and membership"),
+        ("board", "sm", "none", "read the columns"),
+        ("dashboard", "sm", "none", "write the snapshot"),
+        ("serve", "sm", "none", "localhost board that calls move, add, log, sprint"),
+        ("import", "integrator", "none", "csv, jira csv, youtrack csv, xlsx"),
+        ("export", "integrator", "none", "csv or xlsx"),
+        ("connectors", "integrator", "none", "tell whether tokens exist"),
+        ("pull", "integrator", "fails closed", "live jira or youtrack, or a hard stop"),
+        ("skill", "skill creator", "none", "new skill skeleton"),
+        ("guide", "any role", "none", "print one manual section"),
+        ("doctor", "release", "none", "required files exist"),
+        ("check", "qa and architect", "method", "bdd, boundaries, points, adr, sysl, calm, phase, guard"),
+        ("workflow", "bmad lead", "epics or sprint", "create-epics-and-stories and sprint-planning"),
+    ]
+    print(f"{'COMMAND':<16} {'OWNER':<28} {'GATE':<18} WHAT")
+    for command, owner, gate, what in rows:
+        print(f"{command:<16} {owner:<28} {gate:<18} {what}")
+
+
+def cmd_guide(args: argparse.Namespace) -> None:
+    manual = (KIT / "wiki" / "Manual.md").read_text(encoding="utf-8")
+    parts = re.split(r"\n(?=## )", manual)
+    want = args.topic.strip().lower()
+    names = []
+    for part in parts:
+        first = part.splitlines()[0]
+        if not first.startswith("## "):
+            continue
+        name = first[3:].strip().lower()
+        names.append(name)
+        if name == want:
+            print(part.strip())
+            return
+    raise SystemExit("unknown topic. choose: " + ", ".join(names))
+
+
+
+def _print_issues(issues: list[str]) -> None:
+    if issues:
+        for issue in issues:
+            print(f"FAIL {issue}")
+        raise SystemExit(1)
+    print("PASS")
+
+
+def cmd_check(args: argparse.Namespace) -> None:
+    kind = args.kind
+    if kind == "sysl":
+        _print_issues(sysl_issues(Path(args.target).read_text(encoding="utf-8")))
+        return
+    if kind == "calm":
+        _print_issues(calm_issues(Path(args.target).read_text(encoding="utf-8")))
+        return
+    if kind == "phase":
+        _print_issues(phase_issues(args.target, {
+            "outcome": args.outcome or "",
+            "boundaries": args.has_boundaries,
+            "check": args.has_check,
+        }))
+        return
+    if kind == "guard":
+        reason = guard(args.target, {"always": _split(args.always), "ask_first": _split(args.ask), "never": _split(args.never)})
+        if reason:
+            raise SystemExit(reason)
+        print("PASS proceed")
+        return
+    data = load()
+    item = find(data, args.target)
+    if kind == "bdd":
+        _print_issues(acceptance_issues(item.get("acceptance") or []))
+        return
+    if kind == "boundaries":
+        _print_issues(boundary_issues(item.get("boundaries")))
+        return
+    if kind == "points":
+        issue = points_issue(item.get("points"))
+        hours = hours_total(data["time_logs"], item["id"])
+        print(f"points={item.get('points')} hours={hours}")
+        _print_issues([issue] if issue else [])
+        return
+    if kind == "adr":
+        path = data_dir() / "adr" / f"{item['id']}.md"
+        if not path.exists():
+            raise SystemExit(f"missing {path}")
+        _print_issues(adr_issues(path.read_text(encoding="utf-8")))
+        return
+    if kind == "wip":
+        _print_issues(wip_issues(data["items"]))
+        return
+    if kind == "story":
+        issues = ready_issues(item) + [f"hours={hours_total(data['time_logs'], item['id'])} (not points)"]
+        # hours line is informational, not a failure
+        info = issues.pop()
+        if issues:
+            for issue in issues:
+                print(f"FAIL {issue}")
+            raise SystemExit(1)
+        print("PASS")
+        print(info)
+        return
+    raise SystemExit(f"unknown check {kind}")
+
+
+def cmd_workflow(args: argparse.Namespace) -> None:
+    data = load()
+    if args.name == "epics":
+        idea = find(data, args.idea)
+        epic = find(data, args.epic)
+        stories = [i for i in data["items"] if i.get("kind") == "story" and i.get("parent") == epic["id"]]
+        _print_issues(epic_tree_issues(idea, epic, stories))
+        return
+    if args.name == "sprint":
+        sprint = next((s for s in data["sprints"] if s["id"] == args.sprint), None)
+        if sprint is None:
+            raise SystemExit(f"unknown sprint {args.sprint}")
+        stories = [i for i in data["items"] if i.get("kind") == "story" and i.get("sprint") == sprint["id"]]
+        _print_issues(sprint_plan_issues(sprint.get("goal") or "", stories))
+        print(f"velocity {agile_velocity(data['items'], sprint['id'])}")
+        return
+    raise SystemExit(f"unknown workflow {args.name}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="mazu", description="MAZU-ADGILE backlog CLI")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -1023,6 +1215,39 @@ def build_parser() -> argparse.ArgumentParser:
     p_skill.add_argument("--description", default="")
     p_skill.add_argument("--force", action="store_true")
     p_skill.set_defaults(func=cmd_skill)
+
+    p_evidence = sub.add_parser("evidence", help="record proof for one acceptance line")
+    p_evidence.add_argument("id")
+    p_evidence.add_argument("text")
+    p_evidence.set_defaults(func=cmd_evidence)
+
+    p_gate = sub.add_parser("gate", help="quality gate: ready, done, or sprint")
+    p_gate.add_argument("kind", choices=("ready", "done", "sprint"))
+    p_gate.add_argument("id")
+    p_gate.set_defaults(func=cmd_gate)
+
+    sub.add_parser("tools", help="commands, owners, and gates").set_defaults(func=cmd_tools)
+    p_guide = sub.add_parser("guide", help="print one section of the operating manual")
+    p_guide.add_argument("topic")
+    p_guide.set_defaults(func=cmd_guide)
+
+    p_check = sub.add_parser("check", help="run one method checker")
+    p_check.add_argument("kind", choices=("story", "bdd", "boundaries", "points", "adr", "sysl", "calm", "phase", "guard", "wip"))
+    p_check.add_argument("target")
+    p_check.add_argument("--outcome", default="")
+    p_check.add_argument("--has-boundaries", action="store_true")
+    p_check.add_argument("--has-check", action="store_true")
+    p_check.add_argument("--always")
+    p_check.add_argument("--ask")
+    p_check.add_argument("--never")
+    p_check.set_defaults(func=cmd_check)
+
+    p_flow = sub.add_parser("workflow", help="create-epics-and-stories or sprint-planning")
+    p_flow.add_argument("name", choices=("epics", "sprint"))
+    p_flow.add_argument("--idea")
+    p_flow.add_argument("--epic")
+    p_flow.add_argument("--sprint")
+    p_flow.set_defaults(func=cmd_workflow)
     return parser
 
 

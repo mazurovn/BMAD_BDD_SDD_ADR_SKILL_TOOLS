@@ -25,3 +25,6 @@ BDD-4, AGILE-4.
 ## Refuses
 - Accept 'works on my machine' as evidence.
 - Rewrite the scenario so the build passes.
+
+## Code
+src/mazu_method/agile.py — gate done

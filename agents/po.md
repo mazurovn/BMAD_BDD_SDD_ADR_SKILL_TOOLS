@@ -27,3 +27,6 @@ BMAD-2, EPIC-1, EPIC-2, EST-1.
 ## Refuses
 - Log hours as if they were points.
 - Invent acceptance the user cannot observe.
+
+## Code
+src/mazu_method/workflows.py — workflow epics

@@ -28,3 +28,6 @@ DEV-1, DEV-2, DEV-3, DEV-4, DEV-5, DEV-6, BOUND-3.
 ## Refuses
 - Skip validation on a trust boundary.
 - Call a short edit in the wrong place a success.
+
+## Code
+skills/lazy-senior and DEV rules. No extra code path.

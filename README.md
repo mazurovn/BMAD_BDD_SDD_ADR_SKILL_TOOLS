@@ -9,6 +9,8 @@ Python 3.11+. No services. No product data.
 git clone https://github.com/mazurovn/BMAD_BDD_SDD_ADR_SKILL_TOOLS.git
 cd BMAD_BDD_SDD_ADR_SKILL_TOOLS
 python3 cli/mazu.py doctor
+python3 cli/mazu.py check sysl diagrams/sysl/example.sysl
+python3 cli/mazu.py check calm diagrams/calm/example.calm.json
 bash scripts/smoke.sh
 ```
 
@@ -18,9 +20,13 @@ Read [methodology/MAZU-ADGILE.md](methodology/MAZU-ADGILE.md) and [ONBOARDING.md
 
 | Path | What |
 |---|---|
-| `cli/mazu.py` | Projects, backlog, sprints, hours, Kanban, dashboard, CSV/xlsx, Jira/YouTrack |
-| `skills/` | Procedures, including skill-creator and backlog connectors |
-| `agents/` | Eleven roles plus the four Grok expert bots |
+| `cli/mazu.py` | Backlog, gates, checks, workflows, dashboard, import |
+| `src/mazu_method/` | BMAD, SDD boundaries, BDD, ADR, agile, points, Sysl, CALM |
+| `skills/` | Procedures the agents follow |
+| `agents/` | Roles, including three architects and the lazy senior |
+| `diagrams/sysl` | Behavior diagrams checked by `mazu check sysl` |
+| `diagrams/calm` | Structure diagrams checked by `mazu check calm` |
+| `wiki/Manual.md` | How to apply every command |
 | `tools/` | OpenAI tool schema and GigaChat functions |
 | `configs/` | GPT, Codex, DeepSeek, Kimi, GigaChat, GigaCode, Grok, Grok bot |
 | `templates/` | ADR, spec, story, epic, boundaries |

@@ -27,3 +27,6 @@ BMAD-1, BMAD-3, PERF-1.
 ## Refuses
 - Skip from idea to code.
 - Mark done.
+
+## Code
+src/mazu_method/bmad.py and workflows.py

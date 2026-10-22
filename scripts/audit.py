@@ -41,6 +41,16 @@ REQUIRED = [
     "configs/grok/prompt.md",
     "configs/grok-bot/PROMPT.md",
     ".opencode/agent/mazu.md",
+    "wiki/Manual.md",
+    "src/mazu_method/bmad.py",
+    "src/mazu_method/sdd.py",
+    "src/mazu_method/bdd.py",
+    "src/mazu_method/adr.py",
+    "src/mazu_method/agile.py",
+    "src/mazu_method/estimation.py",
+    "src/mazu_method/workflows.py",
+    "src/mazu_method/sysl_check.py",
+    "src/mazu_method/calm_check.py",
 ]
 SKILLS = [
     "bmad", "sdd", "bdd", "adr", "agile-delivery", "product-ideas",
@@ -55,7 +65,7 @@ ROLES = [
     "calm-modeler.md", "scrum-master.md", "dev.md", "lazy-senior.md", "qa.md",
     "integrator.md", "skill-creator.md", "researcher.md", "writer.md", "release.md",
 ]
-HELP_WORDS = ["project", "import", "export", "pull", "connectors", "skill", "dashboard", "serve"]
+HELP_WORDS = ["project", "import", "export", "pull", "connectors", "skill", "dashboard", "serve", "check", "workflow", "gate"]
 
 
 def fail(errors: list[str], message: str) -> None:

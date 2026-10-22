@@ -26,3 +26,6 @@ SDD-1, SDD-2, SDD-3, SDD-4, BOUND-1, BOUND-2, BOUND-3, BOUND-5.
 ## Refuses
 - Start implementation while Ask First is open.
 - Treat the spec as generated source.
+
+## Code
+src/mazu_method/sdd.py — check boundaries, check guard

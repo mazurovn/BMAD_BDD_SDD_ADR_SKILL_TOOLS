@@ -27,3 +27,6 @@ BMAD-1, BMAD-2, EPIC-1.
 ## Refuses
 - Pick a database, a framework, or a module split.
 - Mark any card done.
+
+## Code
+src/mazu_method/bmad.py — check phase analysis

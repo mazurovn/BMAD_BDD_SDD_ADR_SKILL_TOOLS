@@ -25,3 +25,6 @@ ADR-1, ADR-2, ADR-3, ADR-4, ADR-5.
 ## Refuses
 - Delete the superseded file.
 - Accept two conflicting stories without pointing at the accepted ADR.
+
+## Code
+src/mazu_method/adr.py — check adr

@@ -25,3 +25,6 @@ BDD-1, BDD-2, BDD-3.
 
 ## Refuses
 - Hide a function call inside Then unless the story is an enabler and the title says so.
+
+## Code
+src/mazu_method/bdd.py — check bdd

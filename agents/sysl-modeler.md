@@ -25,3 +25,6 @@ SYSL-1, SYSL-2, SYSL-3, SYSL-4.
 ## Refuses
 - Put production hosts or secrets in the spec.
 - Use Sysl to describe only boxes and arrows with no calls.
+
+## Code
+src/mazu_method/sysl_check.py — check sysl

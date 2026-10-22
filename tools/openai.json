@@ -221,6 +221,117 @@
           ]
         }
       }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_gate",
+        "description": "Run ready, done, or sprint quality gate. Non-zero means not allowed.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "ready",
+                "done",
+                "sprint"
+              ]
+            },
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "id"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_check",
+        "description": "Run a method checker: story, bdd, boundaries, points, adr, sysl, calm, phase, guard, wip.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string"
+            },
+            "target": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "target"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_workflow_epics",
+        "description": "create-epics-and-stories against the store",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "idea": {
+              "type": "string"
+            },
+            "epic": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "idea",
+            "epic"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_workflow_sprint",
+        "description": "sprint-planning gate plus velocity",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "sprint": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "sprint"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_evidence",
+        "description": "Record proof for one acceptance line",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "text"
+          ]
+        }
+      }
     }
   ]
 }
