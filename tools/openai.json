@@ -812,6 +812,77 @@
           ]
         }
       }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_edit",
+        "description": "Alias of mazu_set: update story fields via CLI",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "story"
+              ]
+            },
+            "id": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "points": {
+              "type": "integer"
+            },
+            "acceptance": {
+              "type": "string"
+            },
+            "always": {
+              "type": "string"
+            },
+            "ask_first": {
+              "type": "string"
+            },
+            "never": {
+              "type": "string"
+            },
+            "boundaries_mode": {
+              "type": "string",
+              "enum": [
+                "merge",
+                "replace"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "id"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_serve",
+        "description": "Interactive pastel dashboard on localhost",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            }
+          }
+        }
+      }
     }
   ]
 }

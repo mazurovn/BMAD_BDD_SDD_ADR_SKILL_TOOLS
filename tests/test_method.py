@@ -167,6 +167,9 @@ def test_schemas_include_trace_probe_intake_upstream_diagram_chat():
         "mazu_upstream",
         "mazu_diagram",
         "mazu_chat",
+        "mazu_edit",
+        "mazu_serve",
+        "mazu_tools",
     }
     for path in (ROOT / "tools" / "openai.json", ROOT / "tools" / "gigachat.json"):
         data = json.loads(path.read_text(encoding="utf-8"))
@@ -175,3 +178,58 @@ def test_schemas_include_trace_probe_intake_upstream_diagram_chat():
         else:
             names = {t["name"] for t in data["functions"]}
         assert required <= names, f"{path.name} missing {sorted(required - names)}"
+
+
+def test_guide_tools_names_mazu_tools_and_schema_paths():
+    guide = subprocess.run(CLI + ["guide", "tools"], text=True, capture_output=True, check=True)
+    text = guide.stdout
+    assert "mazu_tools" in text
+    assert "tools/openai.json" in text
+    assert "tools/gigachat.json" in text
+    assert "tools" in text  # self-row called out
+
+
+def test_sprint_new_refuses_blank_goal(tmp_path):
+    subprocess.run(CLI + ["init"], cwd=tmp_path, check=True)
+    for goal in ("", "   "):
+        proc = subprocess.run(
+            CLI + ["sprint", "new", "--goal", goal],
+            cwd=tmp_path,
+            text=True,
+            capture_output=True,
+        )
+        assert proc.returncode != 0, goal
+        assert "SPRINT-1" in proc.stdout + proc.stderr
+    ok = subprocess.run(
+        CLI + ["sprint", "new", "--goal", "Ship"],
+        cwd=tmp_path,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    assert ok.stdout.strip() == "S1"
+
+
+def test_add_refuses_unknown_parent(tmp_path):
+    subprocess.run(CLI + ["init"], cwd=tmp_path, check=True)
+    before = json.loads((tmp_path / "mazu-data/store.json").read_text(encoding="utf-8"))
+    bad = subprocess.run(
+        CLI + ["add", "story", "orphan", "--parent", "EPIC-999", "--points", "1"],
+        cwd=tmp_path,
+        text=True,
+        capture_output=True,
+    )
+    assert bad.returncode != 0
+    assert "EPIC-2" in bad.stdout + bad.stderr
+    after = json.loads((tmp_path / "mazu-data/store.json").read_text(encoding="utf-8"))
+    assert len(after["items"]) == len(before["items"])
+    subprocess.run(CLI + ["add", "idea", "Outcome"], cwd=tmp_path, check=True)
+    subprocess.run(CLI + ["add", "epic", "Slice", "--parent", "IDEA-001"], cwd=tmp_path, check=True)
+    ok = subprocess.run(
+        CLI + ["add", "story", "Child", "--parent", "EPIC-001", "--points", "2"],
+        cwd=tmp_path,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    assert ok.stdout.strip() == "US-001"

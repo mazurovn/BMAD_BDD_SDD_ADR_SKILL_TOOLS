@@ -160,12 +160,18 @@ def cmd_add(args: argparse.Namespace) -> None:
         "ask_first": _split(args.ask_first),
         "never": _split(args.never),
     }
+    parent = (args.parent or "").strip() or None
+    if parent:
+        data = load()
+        if not any(i.get("id") == parent for i in data.get("items") or []):
+            print(f"FAIL EPIC-2 parent {parent} not found")
+            raise SystemExit(1)
     item = add_item(
         args.kind,
         args.title,
         description=args.description or "",
         points=args.points,
-        parent=args.parent,
+        parent=parent,
         acceptance=ac,
         boundaries=boundaries,
         status=args.status,
@@ -417,11 +423,15 @@ def cmd_log(args: argparse.Namespace) -> None:
 def cmd_sprint(args: argparse.Namespace) -> None:
     data = load()
     if args.action == "new":
+        goal = (args.goal or "").strip()
+        if not goal:
+            print("FAIL SPRINT-1 goal is empty")
+            raise SystemExit(1)
         sid = f"S{len(data['sprints']) + 1}"
         data["sprints"].append(
             {
                 "id": sid,
-                "goal": args.goal or "",
+                "goal": goal,
                 "status": "planned",
                 "created_at": now(),
             }
