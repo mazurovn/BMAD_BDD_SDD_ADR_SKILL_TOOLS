@@ -88,4 +88,4 @@ scripts/audit.py и tests/
 
 ## Релиз
 
-Релиз: архив собирается из `main`. Проверка — `sh scripts/self-demo.sh` и `python3 cli/mazu.py doctor`.
+Релиз делает только `python3 cli/mazu.py release --version ВЕРСИЯ`. Команда сама гоняет audit, pytest, doctor, check sysl, check calm и self-demo. Ненулевой код останавливает архив. Node в архив не кладётся.

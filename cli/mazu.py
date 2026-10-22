@@ -420,6 +420,7 @@ def cmd_doctor(_args: argparse.Namespace) -> None:
         root / "src" / "mazu_method" / "sysl_draw.py",
         root / "src" / "mazu_method" / "openspec_flow.py",
         root / "src" / "mazu_method" / "upstream_cli.py",
+        root / "src" / "mazu_method" / "release_pack.py",
         root / "upstream" / "package.json",
         root / "upstream" / "package-lock.json",
         root / "upstream" / "packages" / "openspec" / "package.json",
@@ -1358,6 +1359,66 @@ def cmd_probe(_args: argparse.Namespace) -> None:
         raise SystemExit(1)
 
 
+def cmd_release(args: argparse.Namespace) -> None:
+    from mazu_method.release_pack import write_zip
+
+    gates = [
+        [sys.executable, "scripts/audit.py"],
+        [sys.executable, "-m", "pytest", "-q", "tests"],
+        [sys.executable, "cli/mazu.py", "doctor"],
+        [sys.executable, "cli/mazu.py", "check", "sysl", "diagrams/sysl/example.sysl"],
+        [sys.executable, "cli/mazu.py", "check", "calm", "diagrams/calm/example.calm.json"],
+        ["sh", "scripts/self-demo.sh"],
+    ]
+    report = []
+    for command in gates:
+        proc = subprocess.run(command, cwd=KIT, text=True, capture_output=True)
+        lines = (proc.stdout or proc.stderr).strip().splitlines()
+        line = lines[-1][:200] if lines else ""
+        print(f"{proc.returncode} {' '.join(command[1:])} {line}")
+        report.append({"command": command, "code": proc.returncode, "line": line})
+        if proc.returncode != 0:
+            raise SystemExit(1)
+    version = args.version
+    dest = KIT / "dist" / f"mazu-adgile-{version}.zip"
+    count = write_zip(KIT, dest)
+    names = set()
+    with zipfile.ZipFile(dest) as book:
+        names = set(book.namelist())
+    if any(name.endswith("upstream/node/node.xz") for name in names):
+        raise SystemExit("RELEASE-1 node archive was packed")
+    if not any(name.endswith("upstream/packages/openspec/package.json") for name in names):
+        raise SystemExit("RELEASE-2 openspec source missing")
+    previous = Path(args.previous) if args.previous else None
+    diff_lines = [f"# {version}", "", f"files {count}", f"bytes {dest.stat().st_size}", ""]
+    for row in report:
+        diff_lines.append(f"- {row['code']} {' '.join(row['command'])} {row['line']}")
+    if previous and previous.exists():
+        with zipfile.ZipFile(previous) as old:
+            old_names = set(old.namelist())
+        def tails(members: set[str]) -> set[str]:
+            return {name.split("/", 1)[-1] for name in members if not name.endswith("/")}
+
+        new_tail = tails(names)
+        old_tail = tails(set(old.namelist()))
+        diff_lines += [
+            "",
+            f"previous {previous.name} files {len(old_names)} bytes {previous.stat().st_size}",
+            f"only in previous {len(old_tail - new_tail)}",
+            f"only in {version} {len(new_tail - old_tail)}",
+            "",
+            "## Only in the first archive",
+        ]
+        diff_lines.extend(f"- {name}" for name in sorted(old_tail - new_tail)[:40])
+        diff_lines += ["", f"## Only in {version}"]
+        diff_lines.extend(f"- {name}" for name in sorted(new_tail - old_tail)[:40])
+    notes = KIT / "docs" / "release" / f"{version}.md"
+    notes.parent.mkdir(parents=True, exist_ok=True)
+    notes.write_text("\n".join(diff_lines) + "\n", encoding="utf-8")
+    print(f"PASS release {version} {dest} files {count}")
+    print(f"wrote {notes}")
+
+
 def cmd_upstream(args: argparse.Namespace) -> None:
     from mazu_method.upstream_cli import execute
     rest = list(args.rest)
@@ -1480,6 +1541,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_probe = sub.add_parser("probe", help="run every shipped CLI and store the result")
     p_probe.set_defaults(func=cmd_probe)
+
+    p_rel = sub.add_parser("release", help="run the release gates and pack sources, without the Node runtime")
+    p_rel.add_argument("--version", required=True)
+    p_rel.add_argument("--previous", default="")
+    p_rel.set_defaults(func=cmd_release)
 
     p_up = sub.add_parser("upstream", help="run a pinned OpenSpec, CALM, or BMAD binary")
     p_up.add_argument("tool", choices=("openspec", "calm", "bmad", "bmad-method", "cucumber", "adr", "sysl", "specify"))
