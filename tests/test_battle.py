@@ -10,6 +10,22 @@ def run(args, cwd, check=True):
     return subprocess.run(CLI + args, cwd=cwd, text=True, capture_output=True, check=check)
 
 
+def test_move_refuses_third_story_in_progress(tmp_path):
+    run(["init"], tmp_path)
+    run(["add", "idea", "Limit"], tmp_path)
+    run(["add", "epic", "Limit epic", "--parent", "IDEA-001"], tmp_path)
+    for n in (1, 2, 3):
+        run(["add", "story", f"S{n}", "--parent", "EPIC-001", "--points", "2",
+             "--acceptance", "Given a card When it moves Then the board shows it", "--never", "Commit secrets"], tmp_path)
+    run(["move", "US-001", "in-progress"], tmp_path)
+    run(["move", "US-002", "in-progress"], tmp_path)
+    third = run(["move", "US-003", "in-progress"], tmp_path, check=False)
+    assert third.returncode == 1
+    assert "AGILE-6" in third.stdout
+    run(["check", "wip", "board"], tmp_path)
+    run(["move", "US-002", "in-progress"], tmp_path)
+
+
 def test_battle_story_lifecycle(tmp_path):
     run(["init"], tmp_path)
     run(["project", "new", "battle"], tmp_path)
