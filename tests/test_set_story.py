@@ -60,6 +60,34 @@ def test_set_acceptance_and_merge_never(tmp_path):
     assert _run(tmp_path, "check", "boundaries", "US-001").returncode == 0
 
 
+def test_role_hint_names_only_touched_field_owners(tmp_path):
+    _story(tmp_path)
+    cases = (
+        (("--acceptance", "Given a When b Then c exists"), "bdd"),
+        (("--always", "Keep the store valid"), "sdd"),
+        (("--points", "5"), "po"),
+    )
+    for flags, expected in cases:
+        r = _run(tmp_path, "set", "story", "US-001", *flags)
+        assert r.returncode == 0, r.stderr + r.stdout
+        assert r.stderr.splitlines()[-1] == f"role hint: {expected}"
+
+    mixed = _run(
+        tmp_path,
+        "set",
+        "story",
+        "US-001",
+        "--acceptance",
+        "Given a When b Then c exists",
+        "--always",
+        "Keep the store valid",
+        "--title",
+        "Mixed update",
+    )
+    assert mixed.returncode == 0, mixed.stderr + mixed.stdout
+    assert mixed.stderr.splitlines()[-1] == "role hint: bdd, sdd, po"
+
+
 def test_empty_never_is_noop_and_edit_alias(tmp_path):
     _story(tmp_path)
     before = json.loads(_run(tmp_path, "show", "US-001").stdout)["boundaries"]["never"]
