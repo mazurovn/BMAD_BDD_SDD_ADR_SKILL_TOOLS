@@ -49,6 +49,22 @@ def test_documented_guard_examples_stop():
         assert proc.returncode != 0, example
 
 
+def test_documented_failing_examples_fail():
+    import re
+    import shlex
+
+    pattern = re.compile(r"`python3 cli/mazu\.py ([^`]+)` ожидаемо падает")
+    examples = set()
+    for path in list((ROOT / "agents").glob("*.md")) + list((ROOT / "skills").glob("*/SKILL.md")):
+        examples.update(pattern.findall(path.read_text(encoding="utf-8")))
+    assert examples
+    for example in sorted(examples):
+        proc = subprocess.run(CLI + shlex.split(example), text=True, capture_output=True)
+        assert proc.returncode != 0, example
+    filled = subprocess.run(CLI + ["check", "phase", "planning", "--outcome", "One outcome"], text=True, capture_output=True)
+    assert filled.returncode == 0 and filled.stdout.strip() == "PASS"
+
+
 def test_diagrams_pass():
     assert sysl_issues((ROOT / "diagrams/sysl/example.sysl").read_text(encoding="utf-8")) == []
     assert calm_issues((ROOT / "diagrams/calm/example.calm.json").read_text(encoding="utf-8")) == []

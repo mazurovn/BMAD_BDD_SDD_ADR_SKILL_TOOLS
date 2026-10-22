@@ -42,7 +42,7 @@
 ## Инструменты
 
 - `python3 cli/mazu.py add idea "исход" --description "проблема"`
-- `python3 cli/mazu.py check phase analysis --outcome ""` ожидаемо падает, если идти дальше без фразы.
+- `python3 cli/mazu.py check phase planning --outcome ""` ожидаемо падает, если идти дальше без фразы.
 - `python3 cli/mazu.py show IDEA-001`
 
 Имена функций только из `tools/openai.json` и `tools/gigachat.json`. Команда без stdout не считается выполненной. Раздел руководства: `python3 cli/mazu.py guide bmad`.
