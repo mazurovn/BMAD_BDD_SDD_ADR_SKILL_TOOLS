@@ -21,7 +21,7 @@
 - Team — модели и статы ролей
 - Manual — как применять команды и гейты
 - Rules — правила с идентификаторами
-- Harnesses — как стартовать агента
+- Commands — команды установленных OpenSpec, CALM, BMAD, Cucumber, adr-tools, Sysl и Specify, снятые с их `--help`
 
 ## Петля
 

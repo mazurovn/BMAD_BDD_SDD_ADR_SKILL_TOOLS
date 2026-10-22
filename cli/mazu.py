@@ -1428,7 +1428,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_guide.set_defaults(func=cmd_guide)
 
     p_up = sub.add_parser("upstream", help="run a pinned OpenSpec, CALM, or BMAD binary")
-    p_up.add_argument("tool", choices=("openspec", "calm", "bmad", "bmad-method"))
+    p_up.add_argument("tool", choices=("openspec", "calm", "bmad", "bmad-method", "cucumber", "adr", "sysl", "specify"))
     p_up.add_argument("rest", nargs=argparse.REMAINDER)
     p_up.set_defaults(func=cmd_upstream)
 

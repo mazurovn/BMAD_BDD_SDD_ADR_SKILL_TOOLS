@@ -1,6 +1,6 @@
 # MAZU dashboard
 
-Generated: 2026-10-22T14:13:22Z
+Generated: 2026-10-22T14:27:01Z
 
 ## By status
 - backlog: 7

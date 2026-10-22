@@ -1,6 +1,4 @@
-# Example SYSL system
 ExampleSystem:
-    Service:
-        /health:
-            GET:
-                return ok <: string
+    /health:
+        GET:
+            return ok <: string

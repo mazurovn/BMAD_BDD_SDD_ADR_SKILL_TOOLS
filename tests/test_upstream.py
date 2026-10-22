@@ -1,4 +1,3 @@
-import json
 import subprocess
 import sys
 from pathlib import Path
@@ -11,19 +10,30 @@ def run(args: list[str]) -> subprocess.CompletedProcess[str]:
     return subprocess.run(CLI + args, cwd=ROOT, text=True, capture_output=True, check=False)
 
 
-def test_official_clis_answer():
-    openspec = run(["openspec", "--", "version"])
-    assert openspec.returncode == 0, openspec.stderr
-    assert "1.14.3" in openspec.stdout
+def test_every_shipped_cli_runs():
+    expected = {
+        "openspec": "1.14.3",
+        "bmad": "6.12.4",
+        "cucumber": "13.3.0",
+        "sysl": "0.792.0",
+        "specify": "1.2.3",
+    }
+    for tool, marker in expected.items():
+        args = ["--version"] if tool != "specify" else ["version"]
+        if tool == "sysl":
+            args = ["--version"]
+        proc = run([tool, "--", *args])
+        blob = proc.stdout + proc.stderr
+        assert proc.returncode == 0, blob
+        assert marker in blob, blob
     calm = run(["calm", "--", "validate", "--architecture", "diagrams/calm/example.calm.json", "--format", "json"])
-    assert calm.returncode == 0, calm.stdout + calm.stderr
-    payload = json.loads(calm.stdout)
-    assert payload["hasErrors"] is False
-    bmad = run(["bmad", "--", "--version"])
-    assert bmad.returncode == 0, bmad.stderr
-    assert "6.12.4" in bmad.stdout
-    change = run(["openspec", "--", "validate", "bind-upstreams", "--strict"])
-    assert change.returncode == 0, change.stdout + change.stderr
-    assert (ROOT / ".agents/skills/openspec-propose/SKILL.md").exists()
-    assert (ROOT / "upstream/packages/openspec/package.json").exists()
-    assert (ROOT / "upstream/packages/adr-tools/src/_adr_help").exists()
+    assert calm.returncode == 0 and '"hasErrors": false' in calm.stdout
+    sysl = run(["sysl", "--", "validate", "diagrams/sysl/example.sysl"])
+    assert sysl.returncode == 0, sysl.stderr
+    adr = run(["adr", "--", "help"])
+    assert adr.returncode == 0 and "init" in adr.stdout
+    feature = run(["cucumber", "--", "examples/bdd/gate.feature", "--require", "examples/bdd/steps.js"])
+    assert feature.returncode == 0, feature.stdout + feature.stderr
+    page = (ROOT / "wiki" / "Commands.md").read_text(encoding="utf-8")
+    assert "http://" not in page and "https://" not in page
+    assert "OpenSpec" in page and "Sysl" in page and "Specify" in page

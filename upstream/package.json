@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@cucumber/cucumber": "13.3.0",
     "@finos/calm-cli": "1.65.0",
     "@fission-ai/openspec": "1.14.3",
     "bmad-method": "6.12.4"
