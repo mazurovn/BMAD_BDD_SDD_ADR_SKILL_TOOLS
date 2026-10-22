@@ -1,20 +1,16 @@
 # BMAD_BDD_SDD_ADR_SKILL_TOOLS
 
-Репозиторий методологий и скиллов. **Без данных конкретных проектов.**
+Полный пакет методологий. Работает из коробки. **Без данных проектов.**
 
-## MAZU-ADGILE
-Единая методология: см. `methodology/MAZU-ADGILE.md`
+## Содержимое
+- skills/ — исходники (BMAD, SDD, BDD, ADR, agile-delivery)
+- templates/ — ADR, user story, sprint-status
+- cli/mazu — дашборд и бэклог
+- configs/ — Claude, Cursor, Grok
+- examples/ — артефакты и диаграммы
+- docs/SETUP.md
 
-## Структура
-- methodology/ — MAZU-ADGILE
-- wiki/ — вики
-- skills/ — скиллы
-- cli/ — дашборд и работа с бэклогом
-- examples/ — примеры артефактов
-- diagrams/ — SYSL + CALM
-
-## Боты
-- BMAD Expert
-- SDD Spec Expert
-- ADR Decision Expert
-- BDD Acceptance Expert
+## Быстрый старт
+```bash
+python3 cli/mazu dashboard
+```
