@@ -30,6 +30,8 @@
 
 Always проходит. Ask First останавливает процесс, код выхода не ноль, текст начинается с BOUND-2. Never отказывает, текст начинается с BOUND-3. Never сильнее Ask First, Ask First сильнее Always.
 
+Совпадение правила с действием: либо правило целиком встречается в тексте действия (подстрока в одну сторону), либо каждый смысловой токен правила покрыт синонимами в действии (`commit secrets` ловит `push credentials to git`). Обратное вхождение короткого фрагмента действия в правило не считается. Один и тот же алгоритм для Always, Ask First и Never — Ask First не ослабляют.
+
 Пустые границы — FAIL BOUND-5. Узкий список истории не удаляет Never спецификации: это делает `merge` в коде.
 
 Нельзя считать фразу «сделай как считаешь нужным» снятием гейта.
@@ -96,7 +98,7 @@ Points только 1, 2, 3, 5, 8, 13, 21. Иное CLI не запишет. 13 
 
 Ответственность: Sysl modeler. Код: `src/mazu_method/sysl_check.py`.
 
-Делать: файл с блоком приложения, эндпоинтом на `/` и `return ... <: type`. Проверка: `check sysl diagrams/sysl/example.sysl`.
+Делать: файл с блоком приложения, эндпоинтом на `/` и `return ... <: type`. Быстрая проверка: `check sysl diagrams/sysl/example.sysl`. Перед релизом обязателен upstream: `bin/sysl validate diagrams/sysl/example.sysl`.
 
 Не делать: класть пароли и ключи. Не считать картинку источником. Если программы рисования нет, так и сказать.
 
@@ -106,7 +108,7 @@ Points только 1, 2, 3, 5, 8, 13, 21. Иное CLI не запишет. 13 
 
 Ответственность: CALM modeler. Код: `src/mazu_method/calm_check.py`.
 
-Делать: JSON с nodes и relationships. У узла unique-id и node-type. Связь interacts или connects, source и destination существуют. Проверка: `check calm diagrams/calm/example.calm.json`.
+Делать: JSON с nodes и relationships. У узла unique-id и node-type. Связь interacts или connects, source и destination существуют. Быстрая проверка: `check calm diagrams/calm/example.calm.json`. Перед релизом обязателен upstream: `bin/calm validate --architecture diagrams/calm/example.calm.json --format json`.
 
 Не делать: менять unique-id из-за подписи. Не описывать этим файлом поведение эндпоинта: для этого Sysl.
 

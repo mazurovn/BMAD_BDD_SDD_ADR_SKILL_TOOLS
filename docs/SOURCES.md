@@ -5,7 +5,7 @@ This repo does not vendor those trees. It implements the loop so it runs with Py
 | Name | Upstream | License | What we use |
 |---|---|---|---|
 | BMAD Method | https://github.com/bmad-code-org/BMAD-METHOD | MIT | phase names, create-epics-and-stories, sprint-planning |
-| Spec Kit | https://github.com/github/spec-kit | MIT | specify → plan → tasks → implement |
+| Spec Kit | https://github.com/github/spec-kit | MIT | specify → plan → tasks → implement; CLI vendored under `upstream/py` (see wiki/SETUP.md) |
 | agile-delivery-skills | https://github.com/45ck/agile-delivery-skills | MIT | backlog, splitting, sprint goal, DoD |
 | Sysl | https://github.com/anz-bank/sysl | Apache-2.0 | `.sysl` system spec |
 | FINOS CALM | https://github.com/finos/architecture-as-code | Apache-2.0 | architecture JSON |

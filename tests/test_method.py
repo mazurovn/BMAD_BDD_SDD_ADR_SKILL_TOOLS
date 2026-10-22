@@ -24,6 +24,12 @@ def test_points_and_boundaries_and_bdd():
     assert decide("commit secrets now", rules) == "never"
     assert guard("add a new dependency", rules).startswith("BOUND-2")
     assert "commit secrets" in merge(rules, {"never": []})["never"]
+    # Synonym cover: paraphrase must still hit Never / Ask First; reverse substring must not.
+    assert decide("push credentials to git", rules) == "never"
+    assert guard("push credentials to git", rules).startswith("BOUND-3")
+    assert decide("install a package from pip", rules) == "ask_first"
+    assert decide("e", {"never": ["commit secrets"]}) == "unspecified"
+    assert decide("refactor the dashboard layout", rules) == "unspecified"
 
 
 def test_documented_guard_examples_stop():

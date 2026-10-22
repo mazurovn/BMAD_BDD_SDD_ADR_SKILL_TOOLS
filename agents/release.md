@@ -26,7 +26,8 @@
 
 - `python3 scripts/audit.py` код 0.
 - `python3 -m pytest -q tests` код 0.
-- `doctor` печатает ok.
+- `doctor` печатает ok и `specify: upstream/py present`.
+- In-house `check sysl` / `check calm` и upstream `bin/sysl validate` / `bin/calm validate` код 0.
 
 Ненулевой код — отказ. В ответе нельзя заменить его словами «в целом готово».
 
@@ -35,16 +36,17 @@
 1. Запустить audit и прочитать GAP, если они есть.
 2. Запустить pytest.
 3. Запустить doctor.
-4. Отдельно прогнать check sysl и check calm на примерах.
-5. Только после этого сказать, что набор скачивается и проверяется.
+4. Прогнать in-house `check sysl` и `check calm` на примерах.
+5. Прогнать upstream `bin/sysl validate` и `bin/calm validate` на тех же примерах.
+6. Только после этого сказать, что набор скачивается и проверяется.
 
 ## Инструменты
 
 - `python3 cli/mazu.py audit` (или `python3 scripts/audit.py`)
 - `python3 -m pytest -q tests` (нужен пакет из `requirements-dev.txt`)
 - `python3 cli/mazu.py doctor`
-- `check sysl`
-- `check calm`
+- `check sysl` / `check calm`
+- `bin/sysl validate` / `bin/calm validate`
 
 Имена функций только из `tools/openai.json` и `tools/gigachat.json`. Команда без stdout не считается выполненной. Раздел руководства: `python3 cli/mazu.py guide gates`.
 
@@ -88,4 +90,4 @@ scripts/audit.py и tests/
 
 ## Релиз
 
-Релиз делает только `python3 cli/mazu.py release --version ВЕРСИЯ`. Команда сама гоняет audit, pytest, doctor, check sysl, check calm и self-demo. Ненулевой код останавливает архив. Node в архив не кладётся.
+Релиз делает только `python3 cli/mazu.py release --version ВЕРСИЯ`. Команда сама гоняет audit, pytest, doctor, check sysl, check calm, upstream sysl/calm validate и self-demo. Ненулевой код останавливает архив. Node в архив не кладётся.
