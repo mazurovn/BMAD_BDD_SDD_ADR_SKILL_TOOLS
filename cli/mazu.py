@@ -1085,6 +1085,9 @@ def cmd_check(args: argparse.Namespace) -> None:
             raise SystemExit(reason)
         print("PASS proceed")
         return
+    if kind == "wip":
+        _print_issues(wip_issues(load()["items"]))
+        return
     data = load()
     item = find(data, args.target)
     if kind == "bdd":
@@ -1104,9 +1107,6 @@ def cmd_check(args: argparse.Namespace) -> None:
         if not path.exists():
             raise SystemExit(f"missing {path}")
         _print_issues(adr_issues(path.read_text(encoding="utf-8")))
-        return
-    if kind == "wip":
-        _print_issues(wip_issues(data["items"]))
         return
     if kind == "story":
         issues = ready_issues(item) + [f"hours={hours_total(data['time_logs'], item['id'])} (not points)"]
