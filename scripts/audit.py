@@ -51,6 +51,9 @@ REQUIRED = [
     "src/mazu_method/workflows.py",
     "src/mazu_method/sysl_check.py",
     "src/mazu_method/calm_check.py",
+    "src/mazu_method/openspec.py",
+    "src/mazu_method/calm_draw.py",
+    "src/mazu_method/sysl_draw.py",
 ]
 SKILLS = [
     "bmad", "sdd", "bdd", "adr", "agile-delivery", "product-ideas",

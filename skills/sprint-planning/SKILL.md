@@ -32,7 +32,7 @@ description: Собирает спринт только из историй, к�
 
 1. Посмотреть кандидатов: `python3 cli/mazu.py list --status ready`.
 2. Создать спринт: `python3 cli/mazu.py sprint new --goal "одна фраза"`.
-3. Добавить истории: `python3 cli/mazu.py sprint add --id US-001 --sprint S1`. История из backlog при этом становится ready только как статус колонки. Гейт это не заменяет.
+3. Добавить истории: `python3 cli/mazu.py sprint add --id US-001 --sprint S1`. Команда сама гоняет gate ready. Неготовая история не попадает в спринт.
 4. Проверить план: `python3 cli/mazu.py workflow sprint --sprint S1`.
 5. Продублировать жёсткий гейт: `python3 cli/mazu.py gate sprint S1`.
 

@@ -33,6 +33,9 @@ from mazu_method.estimation import hours_total, points_issue
 from mazu_method.sdd import boundary_issues, guard
 from mazu_method.sysl_check import issues as sysl_issues
 from mazu_method.workflows import epic_tree_issues, sprint_plan_issues
+from mazu_method.openspec import issues as spec_issues
+from mazu_method.calm_draw import draw as draw_calm
+from mazu_method.sysl_draw import draw as draw_sysl
 
 
 def workspace() -> Path:
@@ -267,6 +270,13 @@ def cmd_sprint(args: argparse.Namespace) -> None:
         item = find(data, args.id)
         if not any(s["id"] == args.sprint for s in data["sprints"]):
             raise SystemExit(f"unknown sprint {args.sprint}")
+        if item.get("kind") != "story":
+            raise SystemExit("only a story can enter a sprint")
+        issues = ready_issues(item)
+        if issues:
+            for issue in issues:
+                print(f"FAIL {issue}")
+            raise SystemExit(1)
         item["sprint"] = args.sprint
         if item["status"] == "backlog":
             item["status"] = "ready"
@@ -404,6 +414,9 @@ def cmd_doctor(_args: argparse.Namespace) -> None:
         root / "src" / "mazu_method" / "workflows.py",
         root / "src" / "mazu_method" / "sysl_check.py",
         root / "src" / "mazu_method" / "calm_check.py",
+        root / "src" / "mazu_method" / "openspec.py",
+        root / "src" / "mazu_method" / "calm_draw.py",
+        root / "src" / "mazu_method" / "sysl_draw.py",
         root / "wiki" / "Manual.md",
         root / "wiki" / "Rules.md",
         root / "wiki" / "Team.md",
@@ -856,6 +869,31 @@ def cmd_skill(args: argparse.Namespace) -> None:
 
 
 
+
+def blocked_map(data: dict) -> dict[str, list[str]]:
+    found = {}
+    for item in data["items"]:
+        if item.get("kind") != "story" or item.get("status") == "done":
+            continue
+        issues = ready_issues(item)
+        if issues:
+            found[item["id"]] = issues
+    return found
+
+
+def diagram_svg(kind: str) -> str:
+    folder = data_dir()
+    if kind == "calm":
+        path = folder / "calm.json"
+        if not path.exists():
+            path = KIT / "diagrams" / "calm" / "backlog.calm.json"
+        return draw_calm(path.read_text(encoding="utf-8"))
+    path = folder / "system.sysl"
+    if not path.exists():
+        path = KIT / "diagrams" / "sysl" / "backlog.sysl"
+    return draw_sysl(path.read_text(encoding="utf-8"))
+
+
 def render_html(data: dict, live: bool) -> str:
     template = (KIT / "cli" / "dashboard.html").read_text(encoding="utf-8")
     project = data_dir().name if data_dir().parent.name == "projects" else "local"
@@ -865,6 +903,9 @@ def render_html(data: dict, live: bool) -> str:
         "project": project,
         "store": data,
         "hours": {item["id"]: hours_for(data, item["id"]) for item in data["items"]},
+        "blocked": blocked_map(data),
+        "calm": diagram_svg("calm"),
+        "sysl": diagram_svg("sysl"),
     }
     payload = json.dumps(boot, ensure_ascii=False).replace("<", "\\u003c")
     if "__BOOT__" not in template:
@@ -881,6 +922,9 @@ def snapshot(live: bool = True) -> dict:
         "project": project,
         "store": data,
         "hours": {item["id"]: hours_for(data, item["id"]) for item in data["items"]},
+        "blocked": blocked_map(data),
+        "calm": diagram_svg("calm"),
+        "sysl": diagram_svg("sysl"),
     }
 
 
@@ -910,6 +954,11 @@ def cmd_serve(args: argparse.Namespace) -> None:
             if self.path == "/api/store":
                 self._json(200, snapshot())
                 return
+            if self.path in ("/api/diagram/calm.svg", "/api/diagram/sysl.svg"):
+                kind = "calm" if self.path.endswith("calm.svg") else "sysl"
+                raw = diagram_svg(kind).encode("utf-8")
+                self._send(200, raw, "image/svg+xml")
+                return
             self._json(404, {"error": "not found"})
 
         def do_POST(self) -> None:
@@ -936,11 +985,15 @@ def cmd_serve(args: argparse.Namespace) -> None:
                         points=int(points) if points not in (None, "") else None,
                         parent=payload.get("parent") or None,
                         status="backlog",
-                        acceptance="",
-                        always=None,
-                        ask_first=None,
-                        never=None,
+                        acceptance=payload.get("acceptance") or "",
+                        always=payload.get("always"),
+                        ask_first=payload.get("ask_first"),
+                        never=payload.get("never"),
                     ))
+                elif self.path == "/api/evidence":
+                    cmd_evidence(argparse.Namespace(id=payload["id"], text=payload.get("text") or ""))
+                elif self.path == "/api/sprint-add":
+                    cmd_sprint(argparse.Namespace(action="add", goal=None, id=payload.get("id"), sprint=payload.get("sprint")))
                 elif self.path == "/api/sprint":
                     cmd_sprint(argparse.Namespace(action="new", goal=payload.get("goal") or "", id=None, sprint=None))
                 else:
@@ -1088,6 +1141,9 @@ def cmd_check(args: argparse.Namespace) -> None:
     if kind == "wip":
         _print_issues(wip_issues(load()["items"]))
         return
+    if kind == "spec":
+        _print_issues(spec_issues(Path(args.target).read_text(encoding="utf-8")))
+        return
     data = load()
     item = find(data, args.target)
     if kind == "bdd":
@@ -1139,6 +1195,17 @@ def cmd_workflow(args: argparse.Namespace) -> None:
         print(f"velocity {agile_velocity(data['items'], sprint['id'])}")
         return
     raise SystemExit(f"unknown workflow {args.name}")
+
+
+
+def cmd_diagram(args: argparse.Namespace) -> None:
+    raw = Path(args.file).read_text(encoding="utf-8")
+    svg = draw_calm(raw) if args.kind == "calm" else draw_sysl(raw)
+    if args.output:
+        Path(args.output).write_text(svg, encoding="utf-8")
+        print(args.output)
+        return
+    print(svg)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -1243,8 +1310,15 @@ def build_parser() -> argparse.ArgumentParser:
     p_guide.add_argument("topic")
     p_guide.set_defaults(func=cmd_guide)
 
+    p_diagram = sub.add_parser("diagram", help="write an SVG view of a CALM or Sysl file")
+    p_diagram.add_argument("kind", choices=("calm", "sysl"))
+    p_diagram.add_argument("file")
+    p_diagram.add_argument("-o", dest="output")
+    p_diagram.set_defaults(func=cmd_diagram)
+
     p_check = sub.add_parser("check", help="run one method checker")
-    p_check.add_argument("kind", choices=("story", "bdd", "boundaries", "points", "adr", "sysl", "calm", "phase", "guard", "wip"))
+
+    p_check.add_argument("kind", choices=("story", "bdd", "boundaries", "points", "adr", "sysl", "calm", "phase", "guard", "wip", "spec"))
     p_check.add_argument("target")
     p_check.add_argument("--outcome", default="")
     p_check.add_argument("--has-boundaries", action="store_true")

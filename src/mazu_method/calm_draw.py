@@ -1,0 +1,46 @@
+"""Draw a CALM document as SVG. The JSON remains the source. The picture is a view."""
+
+from __future__ import annotations
+
+import html
+import json
+
+
+def draw(text: str) -> str:
+    data = json.loads(text or "{}")
+    nodes = data.get("nodes") or []
+    width = max(240, 180 * max(len(nodes), 1) + 40)
+    height = 220
+    parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
+        '<rect width="100%" height="100%" fill="#f7f1e8"/>',
+    ]
+    positions = {}
+    for index, node in enumerate(nodes):
+        if not isinstance(node, dict):
+            continue
+        unique = str(node.get("unique-id") or f"n{index}")
+        x = 30 + index * 180
+        y = 40
+        positions[unique] = (x, y)
+        label = html.escape(str(node.get("name") or unique))
+        kind = html.escape(str(node.get("node-type") or ""))
+        parts.append(f'<rect x="{x}" y="{y}" width="140" height="64" rx="14" fill="#fffaf6" stroke="#e4d9cc"/>')
+        parts.append(f'<text x="{x + 12}" y="{y + 28}" font-size="14" fill="#2c2830">{label}</text>')
+        parts.append(f'<text x="{x + 12}" y="{y + 48}" font-size="11" fill="#6f6676">{kind} · {html.escape(unique)}</text>')
+    for rel in data.get("relationships") or []:
+        if not isinstance(rel, dict):
+            continue
+        for name, body in rel.items():
+            if not isinstance(body, dict):
+                continue
+            source = positions.get(body.get("source"))
+            dest = positions.get(body.get("destination"))
+            if not source or not dest:
+                continue
+            x1, y1 = source[0] + 140, source[1] + 32
+            x2, y2 = dest[0], dest[1] + 32
+            parts.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#b9a99a" stroke-width="2"/>')
+            parts.append(f'<text x="{(x1 + x2) / 2}" y="{y1 - 6}" font-size="11" fill="#6f6676">{html.escape(name)}</text>')
+    parts.append("</svg>")
+    return "".join(parts)
