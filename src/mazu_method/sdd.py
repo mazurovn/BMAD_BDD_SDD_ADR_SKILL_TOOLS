@@ -35,6 +35,32 @@ _STOP = frozenset(
         "that",
         "these",
         "those",
+        # Russian function words that must not become lone concepts.
+        "и",
+        "в",
+        "во",
+        "на",
+        "с",
+        "со",
+        "к",
+        "по",
+        "для",
+        "от",
+        "до",
+        "из",
+        "у",
+        "о",
+        "об",
+        "про",
+        "это",
+        "эта",
+        "этот",
+        "чтобы",
+        "как",
+        "же",
+        "ли",
+        "бы",
+        "не",
     }
 )
 
@@ -87,6 +113,18 @@ _FAMILIES: tuple[frozenset[str], ...] = (
             "pip",
             "npm",
             "wheel",
+            # RU: зависимость / пакет / библиотека (case forms).
+            "зависимость",
+            "зависимости",
+            "зависимостью",
+            "зависимостей",
+            "пакет",
+            "пакета",
+            "пакеты",
+            "пакетов",
+            "библиотека",
+            "библиотеки",
+            "библиотек",
         }
     ),
     frozenset(
@@ -105,12 +143,98 @@ _FAMILIES: tuple[frozenset[str], ...] = (
             "download",
             "downloading",
             "downloaded",
+            # RU: новая / добавить.
+            "новая",
+            "новую",
+            "новый",
+            "новое",
+            "новые",
+            "новых",
+            "новым",
+            "добавить",
+            "добавление",
+            "добавляет",
+            "добавлять",
+            "добавления",
+            "установить",
+            "установка",
+            "устанавливать",
         }
     ),
     frozenset({"schema", "schemas", "contract", "contracts", "openapi", "proto", "protobuf"}),
     frozenset({"change", "changing", "changed", "modify", "modifying", "modified", "alter", "altering", "edit", "editing", "edited", "update", "updating", "updated"}),
     frozenset({"public", "published", "api", "cli", "command", "commands"}),
-    frozenset({"delete", "deleting", "deleted", "remove", "removing", "removed", "wipe", "wiping", "erase", "erasing"}),
+    # Delete / disable / skip a gate: POLICY Never "deleting a check to go green".
+    frozenset(
+        {
+            "delete",
+            "deleting",
+            "deleted",
+            "remove",
+            "removing",
+            "removed",
+            "wipe",
+            "wiping",
+            "erase",
+            "erasing",
+            "disable",
+            "disabling",
+            "disabled",
+            "skip",
+            "skipping",
+            "skipped",
+            # RU: удалить / удаление.
+            "удалить",
+            "удаление",
+            "удаления",
+            "удаляет",
+            "удалять",
+            "удалил",
+            "удалили",
+            "стереть",
+            "стирать",
+            "отключить",
+            "отключение",
+            "пропустить",
+            "пропуск",
+        }
+    ),
+    # Check / test / gate family: "delete the failing test" covers Never "delete a check".
+    frozenset(
+        {
+            "check",
+            "checks",
+            "checking",
+            "test",
+            "tests",
+            "testing",
+            "assert",
+            "assertion",
+            "assertions",
+            "gate",
+            "gates",
+            "pytest",
+            "unittest",
+            # RU: проверка / тест.
+            "проверка",
+            "проверку",
+            "проверки",
+            "проверкой",
+            "проверок",
+            "тест",
+            "теста",
+            "тесты",
+            "тестов",
+            "тестом",
+            "гейт",
+            "гейта",
+            "гейты",
+        }
+    ),
+    # EN morphology: merging ↔ merge; layers ↔ layer.
+    frozenset({"merge", "merging", "merged", "combine", "combining", "combined"}),
+    frozenset({"layer", "layers"}),
+    frozenset({"architecture", "architectures"}),
     frozenset({"store", "history", "mazu-data", "backlog"}),
 )
 
@@ -120,7 +244,8 @@ for _family in _FAMILIES:
     for _word in _family:
         _CANON[_word] = _rep
 
-_TOKEN_RE = re.compile(r"[a-z0-9]+(?:[-_][a-z0-9]+)*", re.IGNORECASE)
+# Latin + Cyrillic tokens (hyphen/underscore compounds kept).
+_TOKEN_RE = re.compile(r"[a-zA-Zа-яА-ЯёЁ0-9]+(?:[-_][a-zA-Zа-яА-ЯёЁ0-9]+)*")
 
 
 def normalize(boundaries: dict | None) -> dict[str, list[str]]:

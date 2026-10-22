@@ -159,7 +159,14 @@ python3 cli/mazu.py edit story US-001 --description "…"   # alias
 
 ## tools
 
-`python3 cli/mazu.py tools` печатает команду, владельца и гейт.
+`python3 cli/mazu.py tools` печатает команду, владельца и гейт. В таблице есть строка и на саму команду `tools`.
+
+Для вызова из модели та же поверхность лежит в схемах:
+
+- `tools/openai.json` — функция `mazu_tools` (и остальные `mazu_*`)
+- `tools/gigachat.json` — функция `mazu_tools` в массиве `functions`
+
+Имена в схемах соответствуют глаголам CLI (`mazu_show` → `show`). `edit` — алиас `set` (`mazu_set`); `serve` — отдельная схема `mazu_serve`, если она есть в файле. Таблица `tools` и схемы держат один полный набор подкоманд: ни одна сторона не должна быть строгим суперсетом без строки или функции на другой.
 
 `python3 cli/mazu.py guide topics` (или `guide` без аргумента) печатает список секций Manual. Неизвестная тема — ненулевой код.
 

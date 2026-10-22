@@ -160,12 +160,18 @@ def cmd_add(args: argparse.Namespace) -> None:
         "ask_first": _split(args.ask_first),
         "never": _split(args.never),
     }
+    parent = (args.parent or "").strip() or None
+    if parent:
+        data = load()
+        if not any(i.get("id") == parent for i in data.get("items") or []):
+            print(f"FAIL EPIC-2 parent {parent} not found")
+            raise SystemExit(1)
     item = add_item(
         args.kind,
         args.title,
         description=args.description or "",
         points=args.points,
-        parent=args.parent,
+        parent=parent,
         acceptance=ac,
         boundaries=boundaries,
         status=args.status,
@@ -320,8 +326,15 @@ def cmd_set(args: argparse.Namespace) -> None:
             item["boundaries"] = next_b
     item["updated_at"] = now()
     save(data)
+    roles = []
+    if args.acceptance is not None:
+        roles.append("bdd")
+    if boundary_touched:
+        roles.append("sdd")
+    if any(value is not None for value in (args.title, args.description, args.points)):
+        roles.append("po")
     print(f"set {args.id}", file=sys.stderr)
-    print("role hint: acceptance → bdd; boundaries → sdd; points → po", file=sys.stderr)
+    print(f"role hint: {', '.join(roles)}", file=sys.stderr)
     print(args.id)
 
 
@@ -410,11 +423,15 @@ def cmd_log(args: argparse.Namespace) -> None:
 def cmd_sprint(args: argparse.Namespace) -> None:
     data = load()
     if args.action == "new":
+        goal = (args.goal or "").strip()
+        if not goal:
+            print("FAIL SPRINT-1 goal is empty")
+            raise SystemExit(1)
         sid = f"S{len(data['sprints']) + 1}"
         data["sprints"].append(
             {
                 "id": sid,
-                "goal": args.goal or "",
+                "goal": goal,
                 "status": "planned",
                 "created_at": now(),
             }
@@ -1329,6 +1346,18 @@ def cmd_tools(_args: argparse.Namespace) -> None:
         ("doctor", "release", "none", "required files exist"),
         ("check", "qa and architect", "method", "bdd, boundaries, points, adr, sysl, calm, phase, guard"),
         ("workflow", "bmad lead", "epics or sprint", "create-epics-and-stories and sprint-planning"),
+        # Completeness: every top-level subcommand from `mazu -h` gets a row.
+        ("list", "any role", "none", "filter backlog by kind status sprint"),
+        ("show", "any role", "none", "print one item as JSON"),
+        ("trace", "po and sm", "none", "idea/epic cycle and children"),
+        ("tools", "any role", "none", "this table of commands owners gates"),
+        ("probe", "release", "exit 0", "run every shipped CLI and store the result"),
+        ("intake", "analyst and po", "none", "labeled notes into idea epic story spec diagrams"),
+        ("release", "release", "exit 0", "audit pytest doctor sysl calm self-demo pack"),
+        ("upstream", "integrator", "exit 0", "pinned openspec calm bmad binary"),
+        ("openspec", "sdd author", "exit 0", "propose apply archive via upstream"),
+        ("diagram", "architect", "check sysl/calm", "SVG view of a CALM or Sysl file"),
+        ("chat", "any role", "none", "map /opsx chat text onto CLI verbs"),
     ]
     print(f"{'COMMAND':<16} {'OWNER':<28} {'GATE':<18} WHAT")
     for command, owner, gate, what in rows:

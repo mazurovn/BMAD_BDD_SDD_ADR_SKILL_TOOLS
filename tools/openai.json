@@ -687,6 +687,202 @@
           ]
         }
       }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_trace",
+        "description": "Show the cycle of one item and its children",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_probe",
+        "description": "Run every shipped CLI and store the result",
+        "parameters": {
+          "type": "object",
+          "properties": {}
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_intake",
+        "description": "Turn labeled notes into ideas, epics, stories, a spec, and diagrams",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_upstream",
+        "description": "Run a pinned OpenSpec, CALM, or BMAD binary",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "tool": {
+              "type": "string",
+              "enum": [
+                "openspec",
+                "calm",
+                "bmad",
+                "sysl",
+                "specify",
+                "cucumber",
+                "adr"
+              ]
+            },
+            "args": {
+              "type": "string",
+              "description": "remaining argv after the tool name"
+            }
+          },
+          "required": [
+            "tool"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_diagram",
+        "description": "Write an SVG view of a CALM or Sysl file",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "calm",
+                "sysl"
+              ]
+            },
+            "file": {
+              "type": "string"
+            },
+            "output": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "file"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_chat",
+        "description": "Map /opsx chat text onto CLI verbs",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "text"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_edit",
+        "description": "Alias of mazu_set: update story fields via CLI",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "story"
+              ]
+            },
+            "id": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "points": {
+              "type": "integer"
+            },
+            "acceptance": {
+              "type": "string"
+            },
+            "always": {
+              "type": "string"
+            },
+            "ask_first": {
+              "type": "string"
+            },
+            "never": {
+              "type": "string"
+            },
+            "boundaries_mode": {
+              "type": "string",
+              "enum": [
+                "merge",
+                "replace"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "id"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_serve",
+        "description": "Interactive pastel dashboard on localhost",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            }
+          }
+        }
+      }
     }
   ]
 }

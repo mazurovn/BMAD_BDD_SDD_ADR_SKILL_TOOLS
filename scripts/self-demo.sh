@@ -4,6 +4,12 @@
 set -eu
 cd "$(dirname "$0")/.."
 
+# Remember the operator's active project so release/self-demo does not leave kit-self selected.
+PREV_ACTIVE=""
+if [ -f mazu-data/active-project ]; then
+  PREV_ACTIVE=$(tr -d '\n' < mazu-data/active-project)
+fi
+
 # Isolate: only reset the kit-self project. Leave sibling projects alone.
 rm -rf mazu-data/projects/kit-self
 # Disposable OpenSpec change name — do not delete the tracked openspec/changes/self-demo.
@@ -74,4 +80,10 @@ python3 cli/mazu.py dashboard >/tmp/self-demo-dash.txt
 mkdir -p docs/demo
 cp mazu-data/projects/kit-self/dashboard.html docs/demo/self-dashboard.html
 cp mazu-data/projects/kit-self/store.json docs/demo/kit-self-store.json
-echo "SELF_DEMO_OK idea=$IDEA epic=$EPIC"
+
+# Restore the previous active project when it still exists (do not leave kit-self selected).
+if [ -n "$PREV_ACTIVE" ] && [ "$PREV_ACTIVE" != "kit-self" ] && [ -d "mazu-data/projects/$PREV_ACTIVE" ]; then
+  python3 cli/mazu.py project use "$PREV_ACTIVE" >/dev/null
+fi
+
+echo "SELF_DEMO_OK idea=$IDEA epic=$EPIC active=$(tr -d '\n' < mazu-data/active-project)"
