@@ -19,7 +19,7 @@ python3 -m pip install -r requirements-dev.txt
 python3 -m pytest -q
 ```
 
-`python3 cli/mazu.py doctor` prints `pytest: available` or `pytest: missing`. Release and `python3 cli/mazu.py audit` expect a working pytest for the full gate set. Doctor also requires vendored `upstream/py` (specify_cli) and exits non-zero if it is absent.
+`python3 cli/mazu.py doctor` prints `pytest: available` or a multi-line install hint and **exits non-zero** when pytest is missing on the same interpreter as the CLI. Release runs `python3 -m pytest` next after audit; a fresh VM without `requirements-dev.txt` fails closed at doctor or at the pytest gate with the same install hint. Doctor also requires vendored `upstream/py` (specify_cli) and exits non-zero if it is absent.
 
 ## Specify (`upstream/py`)
 

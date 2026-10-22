@@ -18,7 +18,7 @@ bin/sysl validate diagrams/sysl/example.sysl
 bin/calm validate --architecture diagrams/calm/example.calm.json --format json
 ```
 
-`doctor` печатает `ok`, `pytest: available|missing`, `specify: upstream/py present`. Если `upstream/py` нет — код выхода 1.
+`doctor` печатает `ok`, `python: <path>`, `pytest: available` или подсказку `pip install -r requirements-dev.txt`, `specify: upstream/py present`. Нет pytest на этом интерпретаторе — код выхода 1 (как при отсутствии `upstream/py`).
 
 ## `upstream/py` (размер и лицензии)
 

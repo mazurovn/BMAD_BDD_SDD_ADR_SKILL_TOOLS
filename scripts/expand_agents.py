@@ -1,8 +1,17 @@
 #!/usr/bin/env python3
 """Write a full operating card for every role."""
+from __future__ import annotations
+
+import argparse
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+
+_WIPE_WARN = (
+    "WARNING: expand_agents.py overwrites agents/*.md and can wipe hand-written policy. "
+    "Re-run only with --force after reviewing diffs."
+)
 
 
 def bullets(items):
@@ -399,12 +408,31 @@ AGENTS = [
 ]
 
 
-def main():
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Regenerate agents/*.md from embedded tables")
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="allow overwrite of existing agent files (may wipe hand policy)",
+    )
+    args = parser.parse_args(argv)
+    targets = [ROOT / "agents" / d["file"] for d in AGENTS]
+    existing = [p for p in targets if p.exists()]
+    if existing and not args.force:
+        print(_WIPE_WARN, file=sys.stderr)
+        print(
+            f"refuse: {len(existing)} agent file(s) already exist; pass --force to overwrite",
+            file=sys.stderr,
+        )
+        return 1
+    if args.force and existing:
+        print(_WIPE_WARN, file=sys.stderr)
     for d in AGENTS:
         path = ROOT / "agents" / d["file"]
         path.write_text(render(d), encoding="utf-8")
         print(d["file"], len(path.read_text(encoding="utf-8").splitlines()))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

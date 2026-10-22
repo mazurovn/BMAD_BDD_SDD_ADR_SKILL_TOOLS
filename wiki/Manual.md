@@ -144,9 +144,24 @@ Points только 1, 2, 3, 5, 8, 13, 21. Иное CLI не запишет. 13 
 
 Код выхода 0 значит PASS. Иначе FAIL и ненулевой код. Агент не говорит «готово», если код не ноль.
 
+## story-edit
+
+После `add story` роли не правят JSON в `mazu-data/`. Поля дописывают через CLI:
+
+```bash
+python3 cli/mazu.py set story US-001 --acceptance "Given … When … Then … | …"
+python3 cli/mazu.py set story US-001 --always "…" --ask-first "…" --never "…"
+python3 cli/mazu.py set story US-001 --points 5
+python3 cli/mazu.py edit story US-001 --description "…"   # alias
+```
+
+`--boundaries-mode merge` (по умолчанию) добавляет Always/Ask First/Never. `replace` сбрасывает Always и Ask First из переданных флагов; Never всегда объединяется и пустой `--never ""` Never не стирает. Смена `--acceptance` при статусе `review` или `done` даёт EDIT-1. Статус меняет только `move`. Подсказка ролей: acceptance → bdd; boundaries → sdd; points → po. Дальше `check bdd`, `check boundaries`, `gate ready`.
+
 ## tools
 
 `python3 cli/mazu.py tools` печатает команду, владельца и гейт.
+
+`python3 cli/mazu.py guide topics` (или `guide` без аргумента) печатает список секций Manual. Неизвестная тема — ненулевой код.
 
 Полный перечень методов в коде:
 

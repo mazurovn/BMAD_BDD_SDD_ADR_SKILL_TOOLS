@@ -510,17 +510,26 @@
       "type": "function",
       "function": {
         "name": "mazu_guide",
-        "description": "Print one Manual section",
+        "description": "Print one Manual section; use topic topics (or omit) to list sections",
         "parameters": {
           "type": "object",
           "properties": {
             "topic": {
-              "type": "string"
+              "type": "string",
+              "description": "Manual ## heading, or topics/list/help to list"
             }
-          },
-          "required": [
-            "topic"
-          ]
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_tools",
+        "description": "Print MAZU CLI commands with owners and gates (same as: python3 cli/mazu.py tools)",
+        "parameters": {
+          "type": "object",
+          "properties": {}
         }
       }
     },
@@ -592,6 +601,59 @@
             },
             "context": {
               "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "id"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_set",
+        "description": "Update story acceptance, boundaries, points, title, or description via CLI (alias: edit)",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "story"
+              ]
+            },
+            "id": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "points": {
+              "type": "integer"
+            },
+            "acceptance": {
+              "type": "string"
+            },
+            "always": {
+              "type": "string"
+            },
+            "ask_first": {
+              "type": "string"
+            },
+            "never": {
+              "type": "string"
+            },
+            "boundaries_mode": {
+              "type": "string",
+              "enum": [
+                "merge",
+                "replace"
+              ]
             }
           },
           "required": [

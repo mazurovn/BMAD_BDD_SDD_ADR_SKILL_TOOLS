@@ -1,8 +1,17 @@
 #!/usr/bin/env python3
 """Rewrite skills, agents, and the thin wiki into operating procedures."""
+from __future__ import annotations
+
+import argparse
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+
+_WIPE_WARN = (
+    "WARNING: expand_docs.py overwrites skills/*/SKILL.md and can wipe hand-written policy. "
+    "Re-run only with --force after reviewing diffs."
+)
 
 
 def bullets(items: list[str]) -> str:
@@ -1075,13 +1084,32 @@ SKILLS = [
 ]
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Regenerate skills/*/SKILL.md from embedded tables")
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="allow overwrite of existing skill files (may wipe hand policy)",
+    )
+    args = parser.parse_args(argv)
+    targets = [ROOT / "skills" / data["name"] / "SKILL.md" for data in SKILLS]
+    existing = [p for p in targets if p.exists()]
+    if existing and not args.force:
+        print(_WIPE_WARN, file=sys.stderr)
+        print(
+            f"refuse: {len(existing)} skill file(s) already exist; pass --force to overwrite",
+            file=sys.stderr,
+        )
+        return 1
+    if args.force and existing:
+        print(_WIPE_WARN, file=sys.stderr)
     for data in SKILLS:
         path = ROOT / "skills" / data["name"] / "SKILL.md"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(skill(data), encoding="utf-8")
         print(data["name"], len(path.read_text(encoding="utf-8").splitlines()))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

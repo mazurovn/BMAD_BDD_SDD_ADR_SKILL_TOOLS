@@ -31,7 +31,7 @@ from mazu_method.bdd import acceptance_issues
 from mazu_method.bmad import phase_issues
 from mazu_method.calm_check import issues as calm_issues
 from mazu_method.estimation import hours_total, points_issue
-from mazu_method.sdd import boundary_issues, guard
+from mazu_method.sdd import boundary_issues, guard, merge as merge_boundaries
 from mazu_method.sysl_check import issues as sysl_issues
 from mazu_method.workflows import epic_tree_issues, sprint_plan_issues
 from mazu_method.openspec import issues as spec_issues
@@ -242,6 +242,87 @@ def cmd_fill(args: argparse.Namespace) -> None:
             print(f"FAIL {issue}")
         raise SystemExit(1)
     print(f"PASS adr {args.id}")
+
+
+def cmd_set(args: argparse.Namespace) -> None:
+    """Update story fields via CLI (no hand-edit of mazu-data JSON). Alias: edit."""
+    if args.kind != "story":
+        raise SystemExit("set/edit supports story only")
+    mutating = any(
+        [
+            args.title is not None,
+            args.description is not None,
+            args.points is not None,
+            args.acceptance is not None,
+            args.always is not None,
+            args.ask_first is not None,
+            args.never is not None,
+        ]
+    )
+    if not mutating:
+        raise SystemExit(
+            "provide at least one of --title --description --points --acceptance "
+            "--always --ask-first --never"
+        )
+    data = load()
+    item = find(data, args.id)
+    if item.get("kind") != "story":
+        raise SystemExit(f"{args.id} is not a story")
+    if args.acceptance is not None and item.get("status") in ("done", "review"):
+        raise SystemExit(
+            f"EDIT-1 refuse: cannot change acceptance while status is {item['status']}; move back first"
+        )
+    if args.title is not None:
+        title = args.title.strip()
+        if not title:
+            raise SystemExit("title required")
+        item["title"] = title
+    if args.description is not None:
+        item["description"] = args.description
+    if args.points is not None:
+        if int(args.points) not in FIB:
+            raise SystemExit(f"points must be one of {FIB}")
+        item["points"] = int(args.points)
+    if args.acceptance is not None:
+        item["acceptance"] = [line.strip() for line in args.acceptance.split("|") if line.strip()]
+    boundary_touched = any(v is not None for v in (args.always, args.ask_first, args.never))
+    if boundary_touched:
+        mode = (args.boundaries_mode or "merge").strip().lower()
+        if mode not in ("merge", "replace"):
+            raise SystemExit("--boundaries-mode must be merge or replace")
+        incoming = {
+            "always": _split(args.always) if args.always is not None else [],
+            "ask_first": _split(args.ask_first) if args.ask_first is not None else [],
+            "never": _split(args.never) if args.never is not None else [],
+        }
+        # Empty --never "" is a no-op (not a wipe).
+        if args.never is not None and not incoming["never"]:
+            incoming["never"] = []
+        current = item.get("boundaries") or {"always": [], "ask_first": [], "never": []}
+        if mode == "merge":
+            # Only merge levels the caller actually passed.
+            extra = {level: incoming[level] for level in ("always", "ask_first", "never") if getattr(args, "ask_first" if level == "ask_first" else level) is not None}
+            item["boundaries"] = merge_boundaries(current, extra)
+        else:
+            # replace: Always/Ask First replaced when passed; Never still unions.
+            next_b = {
+                "always": list(current.get("always") or []),
+                "ask_first": list(current.get("ask_first") or []),
+                "never": list(current.get("never") or []),
+            }
+            if args.always is not None:
+                next_b["always"] = incoming["always"]
+            if args.ask_first is not None:
+                next_b["ask_first"] = incoming["ask_first"]
+            # Never always unions; empty --never "" is a no-op wipe refusal.
+            if args.never is not None and incoming["never"]:
+                next_b = merge_boundaries(next_b, {"never": incoming["never"]})
+            item["boundaries"] = next_b
+    item["updated_at"] = now()
+    save(data)
+    print(f"set {args.id}", file=sys.stderr)
+    print("role hint: acceptance → bdd; boundaries → sdd; points → po", file=sys.stderr)
+    print(args.id)
 
 
 def cmd_list(args: argparse.Namespace) -> None:
@@ -531,12 +612,19 @@ def cmd_doctor(_args: argparse.Namespace) -> None:
         raise SystemExit(1)
     print(f"ok: {len(required)} required sources present")
     print(f"cli: {Path(__file__).resolve()}")
+    print(f"python: {sys.executable}")
     try:
         import pytest  # noqa: F401
 
         print("pytest: available")
     except ImportError:
-        print("pytest: missing (install: python3 -m pip install -r requirements-dev.txt)")
+        hint = (
+            "pytest: missing — release/tests need it on THIS interpreter.\n"
+            f"  install: {sys.executable} -m pip install -r requirements-dev.txt\n"
+            "  then:    python3 cli/mazu.py doctor"
+        )
+        print(hint)
+        raise SystemExit(1)
     specify_site = root / "upstream" / "py" / "lib"
     if specify_site.exists() and any(specify_site.rglob("specify_cli*")):
         print("specify: upstream/py present")
@@ -1220,6 +1308,8 @@ def cmd_tools(_args: argparse.Namespace) -> None:
         ("add", "role that owns the kind", "gate ready after a story", "record idea epic story task requirement adr"),
         ("evidence --run", "qa", "gate done", "run a command; store only if exit 0"),
         ("fill adr", "adr keeper", "check adr", "write Decision/Consequences via CLI"),
+        ("set story", "sdd/bdd/po by field", "check bdd/boundaries", "attach acceptance/boundaries/points after add"),
+        ("edit story", "alias of set story", "same as set", "same code path as set story"),
         ("audit", "release", "exit 0", "scripts/audit.py through the CLI"),
         ("gate ready", "po and sm", "blocks ready", "parent, points 1-8, acceptance, boundaries"),
         ("gate done", "qa", "blocks done", "ready gate plus command-verified evidence"),
@@ -1245,21 +1335,36 @@ def cmd_tools(_args: argparse.Namespace) -> None:
         print(f"{command:<16} {owner:<28} {gate:<18} {what}")
 
 
-def cmd_guide(args: argparse.Namespace) -> None:
+def _guide_topics() -> list[str]:
     manual = (KIT / "wiki" / "Manual.md").read_text(encoding="utf-8")
     parts = re.split(r"\n(?=## )", manual)
-    want = args.topic.strip().lower()
-    names = []
+    names: list[str] = []
+    for part in parts:
+        first = part.splitlines()[0]
+        if not first.startswith("## "):
+            continue
+        names.append(first[3:].strip().lower())
+    return names
+
+
+def cmd_guide(args: argparse.Namespace) -> None:
+    names = _guide_topics()
+    want = (args.topic or "").strip().lower()
+    if not want or want in ("topics", "list", "help"):
+        print("topics: " + ", ".join(names))
+        return
+    manual = (KIT / "wiki" / "Manual.md").read_text(encoding="utf-8")
+    parts = re.split(r"\n(?=## )", manual)
     for part in parts:
         first = part.splitlines()[0]
         if not first.startswith("## "):
             continue
         name = first[3:].strip().lower()
-        names.append(name)
         if name == want:
             print(part.strip())
             return
-    raise SystemExit("unknown topic. choose: " + ", ".join(names))
+    print("unknown topic. choose: " + ", ".join(names), file=sys.stderr)
+    raise SystemExit(1)
 
 
 
@@ -1611,11 +1716,18 @@ def cmd_release(args: argparse.Namespace) -> None:
     report = []
     for command in gates:
         proc = subprocess.run(command, cwd=KIT, text=True, capture_output=True)
-        lines = (proc.stdout or proc.stderr).strip().splitlines()
+        out = ((proc.stdout or "") + (proc.stderr or "")).strip()
+        lines = out.splitlines()
         line = lines[-1][:200] if lines else ""
         print(f"{proc.returncode} {' '.join(command[1:])} {line}")
         report.append({"command": command, "code": proc.returncode, "line": line})
         if proc.returncode != 0:
+            if command[1:3] == ["-m", "pytest"] or "No module named pytest" in out:
+                print(
+                    "hint: install pytest for this interpreter before release:\n"
+                    f"  {sys.executable} -m pip install -r requirements-dev.txt",
+                    file=sys.stderr,
+                )
             raise SystemExit(1)
     version = args.version
     dest = KIT / "dist" / f"mazu-adgile-{version}.zip"
@@ -1706,6 +1818,30 @@ def build_parser() -> argparse.ArgumentParser:
     p_fill.add_argument("--context", default="")
     p_fill.set_defaults(func=cmd_fill)
 
+    def _add_set_flags(p: argparse.ArgumentParser) -> None:
+        p.add_argument("kind", choices=("story",))
+        p.add_argument("id")
+        p.add_argument("--title", default=None)
+        p.add_argument("--description", default=None)
+        p.add_argument("--points", type=int, default=None)
+        p.add_argument("--acceptance", default=None, help="Given/When/Then blocks separated by | (replaces)")
+        p.add_argument("--always", default=None)
+        p.add_argument("--ask-first", dest="ask_first", default=None)
+        p.add_argument("--never", default=None)
+        p.add_argument(
+            "--boundaries-mode",
+            dest="boundaries_mode",
+            choices=("merge", "replace"),
+            default="merge",
+            help="merge appends (default); replace resets Always/Ask First when passed; Never always unions",
+        )
+        p.set_defaults(func=cmd_set)
+
+    p_set = sub.add_parser("set", help="update story fields via CLI (no hand JSON edit)")
+    _add_set_flags(p_set)
+    p_edit = sub.add_parser("edit", help="alias for set story")
+    _add_set_flags(p_edit)
+
     p_list = sub.add_parser("list", help="list artifacts")
     p_list.add_argument("--kind", choices=KINDS)
     p_list.add_argument("--status", choices=STATUSES)
@@ -1793,7 +1929,12 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("audit", help="run scripts/audit.py").set_defaults(func=cmd_audit)
     sub.add_parser("tools", help="commands, owners, and gates").set_defaults(func=cmd_tools)
     p_guide = sub.add_parser("guide", help="print one section of the operating manual")
-    p_guide.add_argument("topic")
+    p_guide.add_argument(
+        "topic",
+        nargs="?",
+        default="topics",
+        help="Manual ## section name, or topics/list/help to list sections",
+    )
     p_guide.set_defaults(func=cmd_guide)
 
     p_probe = sub.add_parser("probe", help="run every shipped CLI and store the result")
