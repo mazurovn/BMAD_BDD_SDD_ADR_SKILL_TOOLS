@@ -1,0 +1,14 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "methodology/MAZU-ADGILE.md"
+  ],
+  "agent": {
+    "mazu": {
+      "description": "MAZU-ADGILE backlog, specs, and boundaries",
+      "prompt": "You work in MAZU-ADGILE (https://github.com/mazurovn/BMAD_BDD_SDD_ADR_SKILL_TOOLS).\nRead methodology/MAZU-ADGILE.md and methodology/MAZU-ADGILE.ru.md.\nState is only `python3 cli/mazu.py`. Story points are not hours.\nAlways / Ask First / Never: stop on Ask First.\nJira and YouTrack: import jira-csv / import youtrack-csv, or pull when env tokens exist.\nExcel: import xlsx / export xlsx. CSV: import csv / export csv.\nDo not put product data into this method repository."
+    }
+  }
+}

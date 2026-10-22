@@ -1,17 +1,21 @@
 # Harnesses
 
-Any agent that can read a file can use this repo.
+Any agent that can read a file and run `python3 cli/mazu.py` can use this repo.
 
-1. Read [ONBOARDING.md](../ONBOARDING.md).
-2. Read the skill under `skills/<name>/SKILL.md` for the job.
-3. Read the role under `agents/`.
-4. Run `python3 cli/mazu.py` for state. Do not keep a second backlog in chat.
-
-| Harness | Config |
+| Harness | What it reads |
 |---|---|
-| Claude | configs/claude/skills.json and `.claude/skills` via `scripts/install.sh` |
-| Cursor | configs/cursor/rules.md |
-| Codex / other | AGENTS.md |
-| Grok | configs/grok/prompt.md plus the four bots in agents/catalog.json |
+| Claude Code | `CLAUDE.md`, `skills/` |
+| Codex | `AGENTS.md`, `configs/codex/PROMPT.md` |
+| Qwen Code | `QWEN.md` and `AGENTS.md` |
+| OpenCode | `opencode.json`, `.opencode/agent/mazu.md`, `AGENTS.md` |
+| Kimi CLI | `AGENTS.md`, `configs/kimi/PROMPT.md` |
+| GPT | `configs/gpt/PROMPT.md`, `tools/openai.json` |
+| DeepSeek | `configs/deepseek/PROMPT.md`, `tools/openai.json` |
+| GigaChat | `configs/gigachat/PROMPT.md`, `tools/gigachat.json` |
+| GigaCode | `configs/gigacode/PROMPT.md` (paste; no verified project filename) |
+| Grok | `configs/grok/prompt.md` |
+| Grok bot | `configs/grok-bot/PROMPT.md`, `agents/catalog.json` |
 
-Subagents are the six files in `agents/`. They are prompts, not separate runtimes.
+Tool loop: `skills/tool-calling/SKILL.md`.
+
+Roles: eleven files in `agents/`. The four Grok bots stay the expert bots. The other roles are prompts.

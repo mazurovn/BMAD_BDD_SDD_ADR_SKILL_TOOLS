@@ -1,6 +1,7 @@
 # MAZU-ADGILE
 
 Method for running BMAD, SDD, BDD, ADR, Sysl, CALM, and agile delivery as one loop.
+Russian walkthrough: [MAZU-ADGILE.ru.md](MAZU-ADGILE.ru.md).
 This repository is the method. It does not contain a product backlog.
 
 ## What you produce

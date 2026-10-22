@@ -25,11 +25,73 @@
     }
   ],
   "subagents": [
-    {"name": "MAZU-Analyst", "file": "agents/analyst.md", "phase": "analysis"},
-    {"name": "MAZU-PO", "file": "agents/po.md", "phase": "planning"},
-    {"name": "MAZU-Architect", "file": "agents/architect.md", "phase": "solutioning"},
-    {"name": "MAZU-SM", "file": "agents/scrum-master.md", "phase": "delivery"},
-    {"name": "MAZU-Dev", "file": "agents/dev.md", "phase": "implementation"},
-    {"name": "MAZU-QA", "file": "agents/qa.md", "phase": "acceptance"}
+    {
+      "name": "MAZU-Analyst",
+      "file": "agents/analyst.md",
+      "phase": "analysis"
+    },
+    {
+      "name": "MAZU-PO",
+      "file": "agents/po.md",
+      "phase": "planning"
+    },
+    {
+      "name": "MAZU-Architect",
+      "file": "agents/architect.md",
+      "phase": "solutioning"
+    },
+    {
+      "name": "MAZU-SM",
+      "file": "agents/scrum-master.md",
+      "phase": "delivery"
+    },
+    {
+      "name": "MAZU-Dev",
+      "file": "agents/dev.md",
+      "phase": "implementation"
+    },
+    {
+      "name": "MAZU-QA",
+      "file": "agents/qa.md",
+      "phase": "acceptance"
+    },
+    {
+      "name": "MAZU-Integrator",
+      "file": "agents/integrator.md",
+      "phase": "connectors"
+    },
+    {
+      "name": "MAZU-Skill-Creator",
+      "file": "agents/skill-creator.md",
+      "phase": "method"
+    },
+    {
+      "name": "MAZU-Researcher",
+      "file": "agents/researcher.md",
+      "phase": "sources"
+    },
+    {
+      "name": "MAZU-Writer",
+      "file": "agents/writer.md",
+      "phase": "docs"
+    },
+    {
+      "name": "MAZU-Release",
+      "file": "agents/release.md",
+      "phase": "audit"
+    }
+  ],
+  "harnesses": [
+    "claude",
+    "codex",
+    "qwen-code",
+    "opencode",
+    "kimi",
+    "gpt",
+    "deepseek",
+    "gigachat",
+    "gigacode",
+    "grok",
+    "grok-bot"
   ]
 }

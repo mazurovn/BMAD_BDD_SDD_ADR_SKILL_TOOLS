@@ -1,0 +1,4 @@
+Issue key,Issue Type,Summary,Status,Story Points,Description
+ABC-1,Epic,Import backlog,To Do,,Bring an export into MAZU
+ABC-2,Story,Map columns,In Progress,3,Keep the external key
+ABC-3,Bug,Bad point value,Done,4,4 is not Fibonacci and must be dropped

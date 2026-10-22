@@ -1,0 +1,196 @@
+{
+  "functions": [
+    {
+      "name": "mazu_init",
+      "description": "Create the local backlog store",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "mazu_add",
+      "description": "Add an idea, epic, story, task, requirement, or ADR",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "idea",
+              "epic",
+              "story",
+              "task",
+              "requirement",
+              "adr"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "points": {
+            "type": "integer"
+          },
+          "parent": {
+            "type": "string"
+          },
+          "acceptance": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "title"
+        ]
+      }
+    },
+    {
+      "name": "mazu_list",
+      "description": "List backlog items",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "mazu_move",
+      "description": "Move an item to a board column",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "backlog",
+              "ready",
+              "in-progress",
+              "review",
+              "done"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ]
+      }
+    },
+    {
+      "name": "mazu_log",
+      "description": "Log hours spent. Not story points.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "hours": {
+            "type": "number"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "hours"
+        ]
+      }
+    },
+    {
+      "name": "mazu_import",
+      "description": "Import CSV or xlsx from Jira, YouTrack, Excel, or a plain table",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "csv",
+              "jira-csv",
+              "youtrack-csv",
+              "xlsx"
+            ]
+          },
+          "file": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "file"
+        ]
+      }
+    },
+    {
+      "name": "mazu_export",
+      "description": "Export the active backlog to csv or xlsx",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "csv",
+              "xlsx"
+            ]
+          },
+          "file": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "file"
+        ]
+      }
+    },
+    {
+      "name": "mazu_dashboard",
+      "description": "Write the dashboard",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "mazu_connectors",
+      "description": "Show whether Jira and YouTrack tokens are set",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "mazu_skill_new",
+      "description": "Create a skill skeleton",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    }
+  ]
+}

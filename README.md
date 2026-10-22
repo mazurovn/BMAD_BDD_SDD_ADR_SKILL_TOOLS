@@ -18,9 +18,11 @@ Read [methodology/MAZU-ADGILE.md](methodology/MAZU-ADGILE.md) and [ONBOARDING.md
 
 | Path | What |
 |---|---|
-| `cli/mazu.py` | Backlog, sprints, hours, Kanban, dashboard |
-| `skills/` | Procedures the agents follow |
-| `agents/` | Six subagent prompts + bot catalog |
+| `cli/mazu.py` | Projects, backlog, sprints, hours, Kanban, dashboard, CSV/xlsx, Jira/YouTrack |
+| `skills/` | Procedures, including skill-creator and backlog connectors |
+| `agents/` | Eleven roles plus the four Grok expert bots |
+| `tools/` | OpenAI tool schema and GigaChat functions |
+| `configs/` | GPT, Codex, DeepSeek, Kimi, GigaChat, GigaCode, Grok, Grok bot |
 | `templates/` | ADR, spec, story, epic, boundaries |
 | `diagrams/sysl` | Sysl behavior spec |
 | `diagrams/calm` | FINOS CALM structure spec |
