@@ -320,8 +320,15 @@ def cmd_set(args: argparse.Namespace) -> None:
             item["boundaries"] = next_b
     item["updated_at"] = now()
     save(data)
+    roles = []
+    if args.acceptance is not None:
+        roles.append("bdd")
+    if boundary_touched:
+        roles.append("sdd")
+    if any(value is not None for value in (args.title, args.description, args.points)):
+        roles.append("po")
     print(f"set {args.id}", file=sys.stderr)
-    print("role hint: acceptance → bdd; boundaries → sdd; points → po", file=sys.stderr)
+    print(f"role hint: {', '.join(roles)}", file=sys.stderr)
     print(args.id)
 
 
