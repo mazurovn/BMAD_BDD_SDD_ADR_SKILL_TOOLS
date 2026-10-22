@@ -54,7 +54,7 @@ sh scripts/self-demo.sh
 4. `gate ready ID`. Отказ означает, что карточка ещё не готова. Её не кладут в спринт.
 5. `sprint new --goal "..."` и `sprint add --id ID --sprint S1`.
 6. Работа: `move ID in-progress`, `log ID ЧАСЫ --note "..."`.
-7. Улика — дословный вывод команды, не пересказ: `evidence ID "текст"`.
+7. Улика — прогон команды: `evidence ID --run КОМАНДА` (exit 0). Пересказ «тесты прошли» `gate done` не примет.
 8. `gate done ID`, затем `move ID done`.
 9. Изменение спеки: `openspec propose ИМЯ --intent "..."`, потом `bin/openspec validate ИМЯ --strict`. В требовании должно быть MUST или SHALL.
 

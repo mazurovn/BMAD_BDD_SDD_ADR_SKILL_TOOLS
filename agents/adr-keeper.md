@@ -33,14 +33,15 @@
 ## Сессия
 
 1. Отличить одностороннюю дверь от мелкой правки.
-2. Создать `add adr` с фактами в description.
-3. Дописать Decision и Consequences в файле.
+2. Создать `add adr` с фактами в description и сразу `--decision` / `--consequences`, либо `fill adr` после создания.
+3. Не оставлять `_fill in_` в Decision.
 4. Запустить check adr.
 5. При смене решения создать новый id и сослаться на старый.
 
 ## Инструменты
 
-- `add adr "title" --description "facts"`
+- `add adr "title" --description "facts" --decision "choice" --consequences "cost"`
+- `fill adr ADR-001 --decision "choice" --consequences "cost"`
 - `check adr ADR-001`
 
 Имена функций только из `tools/openai.json` и `tools/gigachat.json`. Команда без stdout не считается выполненной. Раздел руководства: `python3 cli/mazu.py guide adr`.

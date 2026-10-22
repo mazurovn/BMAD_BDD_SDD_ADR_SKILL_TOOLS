@@ -49,8 +49,17 @@ def test_battle_story_lifecycle(tmp_path):
     run(["move", "US-002", "review"], tmp_path)
     early = run(["gate", "done", "US-002"], tmp_path, check=False)
     assert early.returncode == 1
-    run(["evidence", "US-002", "happy path observed"], tmp_path)
-    run(["evidence", "US-002", "empty title exits non-zero"], tmp_path)
+    false_claim = run(["evidence", "US-002", "pytest passed all tests"], tmp_path, check=False)
+    assert false_claim.returncode != 0
+    assert "requires a real command" in (false_claim.stdout + false_claim.stderr)
+    failing_run = run(
+        ["evidence", "US-002", "--run", sys.executable, "-c", "raise SystemExit(1)"],
+        tmp_path,
+        check=False,
+    )
+    assert failing_run.returncode != 0
+    run(["evidence", "US-002", "--run", sys.executable, "-c", "print('happy path observed')"], tmp_path)
+    run(["evidence", "US-002", "--run", sys.executable, "-c", "print('empty title exits non-zero')"], tmp_path)
     run(["gate", "done", "US-002"], tmp_path)
     run(["check", "sysl", str(ROOT / "diagrams/sysl/example.sysl")], tmp_path)
     run(["check", "calm", str(ROOT / "diagrams/calm/example.calm.json")], tmp_path)

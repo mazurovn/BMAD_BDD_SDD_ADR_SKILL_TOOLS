@@ -23,6 +23,15 @@ def ready_issues(item: dict) -> list[str]:
     return issues
 
 
+def evidence_verified(entry: dict | str) -> bool:
+    """Natural-language claims are not proof. Only command-verified evidence counts."""
+    if not isinstance(entry, dict):
+        return False
+    if entry.get("verified") is True and int(entry.get("exit", 1)) == 0:
+        return True
+    return False
+
+
 def done_issues(item: dict) -> list[str]:
     issues = ready_issues(item)
     acceptance = [line for line in item.get("acceptance") or [] if str(line).strip()]
@@ -31,6 +40,13 @@ def done_issues(item: dict) -> list[str]:
         issues.append("BDD-4 no evidence")
     elif len(evidence) < len(acceptance):
         issues.append("BDD-4 fewer evidence notes than acceptance lines")
+    else:
+        unverified = [i for i, row in enumerate(evidence, 1) if not evidence_verified(row)]
+        if unverified:
+            issues.append(
+                "BDD-4 evidence is not command-verified (use: evidence ID --run COMMAND); "
+                f"bad lines {unverified}"
+            )
     return issues
 
 

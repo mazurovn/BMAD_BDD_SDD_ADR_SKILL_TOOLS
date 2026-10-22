@@ -12,4 +12,11 @@ python3 cli/mazu.py dashboard
 
 Optional: `bash scripts/install.sh` copies skills into `.claude/skills` and `.agents/skills` in this clone.
 
-Tests: `python3 -m pytest -q` if pytest is installed, or run `python3 tests/test_mazu.py` only through pytest because the tests use pytest fixtures.
+Tests need pytest on the same interpreter as the CLI:
+
+```bash
+python3 -m pip install -r requirements-dev.txt
+python3 -m pytest -q
+```
+
+`python3 cli/mazu.py doctor` prints `pytest: available` or `pytest: missing`. Release and `python3 cli/mazu.py audit` expect a working pytest for the full gate set.

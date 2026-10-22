@@ -22,14 +22,7 @@ US_SYSL=$(add_story "Sysl принимает пример модели" 3 "sysl 
 US_SPEC=$(add_story "Specify печатает свою версию" 2 "specify version runs")
 US_ADR=$(add_story "adr-tools показывает команды" 1 "adr help runs")
 python3 cli/mazu.py add requirement "Бинарники и скрипты лежат в репозитории" --parent "$EPIC" --description "bin and upstream, no download"
-ADR=$(python3 cli/mazu.py add adr "Держать CLI внутри репозитория" --description "A checkout must run the CLIs without a package download.")
-python3 - << PY
-from pathlib import Path
-path = Path("mazu-data/projects/kit-self/adr/${ADR}.md")
-text = path.read_text(encoding="utf-8")
-text = text.replace("## Decision\n_fill in_", "## Decision\nKeep the CLIs in bin and upstream.", 1)
-path.write_text(text, encoding="utf-8")
-PY
+ADR=$(python3 cli/mazu.py add adr "Держать CLI внутри репозитория" --description "A checkout must run the CLIs without a package download." --decision "Keep the CLIs in bin and upstream." --consequences "- Positive: offline doctor and release work\n- Negative: binaries must stay pinned in-repo")
 python3 cli/mazu.py check adr "$ADR"
 python3 cli/mazu.py sprint new --goal "Показать прогон всех CLI на доске kit-self"
 for id in $US_OS $US_CALM $US_BMAD $US_CUC $US_SYSL $US_SPEC $US_ADR; do
@@ -44,12 +37,7 @@ prove() {
   shift
   python3 cli/mazu.py move "$id" in-progress
   python3 cli/mazu.py log "$id" 0.2 --note "$*"
-  "$@" > /tmp/prove-out.txt 2>&1
-  text=$(cat /tmp/prove-out.txt)
-  if [ -z "$text" ]; then
-    text="exit 0 $*"
-  fi
-  python3 cli/mazu.py evidence "$id" "$text"
+  python3 cli/mazu.py evidence "$id" --run "$@"
   python3 cli/mazu.py move "$id" review
   python3 cli/mazu.py gate done "$id"
   python3 cli/mazu.py move "$id" done

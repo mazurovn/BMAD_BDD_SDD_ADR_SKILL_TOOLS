@@ -31,9 +31,9 @@ ADR пишут, когда выбор будет дорого менять: хр
 
 ## Процедура
 
-1. Создать карточку: `python3 cli/mazu.py add adr "название" --description "факты контекста"`.
-2. Открыть `mazu-data/adr/ADR-00N.md` и заменить `_fill in_` в Decision и дополнить Context, если он пуст.
-3. Заполнить Consequences: плюс, минус, что сделать следом.
+1. Создать карточку через CLI: `python3 cli/mazu.py add adr "название" --description "факты контекста" --decision "выбор" --consequences "- Positive: …\n- Negative: …"`.
+2. Если Decision ещё `_fill in_`, дописать только через CLI: `python3 cli/mazu.py fill adr ADR-001 --decision "…" --consequences "…"`.
+3. Не править Decision руками в обход CLI: state changes go through `cli/mazu.py`.
 4. Запустить `python3 cli/mazu.py check adr ADR-001`. Пока Decision или Context пустые, будет FAIL ADR-2.
 5. Принятое решение переводят в `done` только после того, как check проходит. Новое решение — новый id, в контексте назван старый.
 

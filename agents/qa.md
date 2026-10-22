@@ -41,7 +41,7 @@
 ## Инструменты
 
 - `show ID`
-- `evidence ID "текст улики"`
+- `evidence ID --run КОМАНДА` (улика только при exit 0)
 - `gate done ID`
 - `move ID done`
 

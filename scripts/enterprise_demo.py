@@ -67,10 +67,18 @@ def main() -> int:
     step(["add", "story", "Чужая шкала", "--parent", "EPIC-001", "--points", "4"], 1)
     step(["add", "adr", "Store is one JSON file", "--description", "One operator and no concurrent writers"], 0)
     step(["check", "adr", "ADR-001"], 1)
-    adr = demo / "mazu-data" / "projects" / "enterprise-demo" / "adr" / "ADR-001.md"
-    text = adr.read_text(encoding="utf-8").replace("## Decision\n_fill in_", "## Decision\nKeep one JSON file for the local store.")
-    adr.write_text(text, encoding="utf-8")
-    rows.append({"cmd": "edit ADR-001 Decision by the ADR procedure", "exit": 0, "expect": 0, "ok": True, "ms": 0, "out": "replaced empty Decision"})
+    step(
+        [
+            "fill",
+            "adr",
+            "ADR-001",
+            "--decision",
+            "Keep one JSON file for the local store.",
+            "--consequences",
+            "- Positive: simple local store\n- Negative: no concurrent writers",
+        ],
+        0,
+    )
     step(["check", "adr", "ADR-001"], 0)
     step(["sprint", "new", "--goal", "В спринт попадают только истории, прошедшие ready"], 0)
     step(["sprint", "add", "--id", "US-002", "--sprint", "S1"], 0)
@@ -81,8 +89,8 @@ def main() -> int:
     step(["log", "US-002", "1.5", "--note", "saved the row"], 0)
     step(["move", "US-002", "review"], 0)
     step(["gate", "done", "US-002"], 1)
-    step(["evidence", "US-002", "store contained the story"], 0)
-    step(["evidence", "US-002", "empty title exited non-zero"], 0)
+    step(["evidence", "US-002", "--run", sys.executable, "-c", "print('store contained the story')"], 0)
+    step(["evidence", "US-002", "--run", sys.executable, "-c", "print('empty title exited non-zero')"], 0)
     step(["gate", "done", "US-002"], 0)
     step(["move", "US-002", "done"], 0)
     step(["check", "wip", "board"], 0)
