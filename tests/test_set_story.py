@@ -88,6 +88,13 @@ def test_role_hint_names_only_touched_field_owners(tmp_path):
     assert mixed.stderr.splitlines()[-1] == "role hint: bdd, sdd, po"
 
 
+def test_no_mutable_fields_prints_no_role_hint(tmp_path):
+    _story(tmp_path)
+    r = _run(tmp_path, "set", "story", "US-001")
+    assert r.returncode != 0
+    assert "role hint:" not in r.stderr
+
+
 def test_empty_never_is_noop_and_edit_alias(tmp_path):
     _story(tmp_path)
     before = json.loads(_run(tmp_path, "show", "US-001").stdout)["boundaries"]["never"]
