@@ -5,61 +5,61 @@
 - Команд: 49
 - Совпало с ожидаемым кодом выхода: 49
 - Не совпало: 0
-- Сумма времени CLI, мс: 2561.5
+- Сумма времени CLI, мс: 2710.4
 - Карточек в store: 11
 - Спринтов: 1
 - Записей времени: 1
 
 | Команда | Код | Ожидали | мс | Итог |
 |---|---:|---:|---:|---|
-| `init` | 0 | 0 | 56.3 | ok |
-| `project new enterprise-demo` | 0 | 0 | 55.4 | ok |
-| `add idea Оператор видит отказ гейта до того, как история попала в спринт` | 0 | 0 | 54.9 | ok |
-| `add epic Гейт ready обязателен --parent IDEA-001` | 0 | 0 | 55.2 | ok |
-| `add requirement Когда Then нельзя проверить, gate ready завершается с ошибкой --parent EPIC-001` | 0 | 0 | 54.3 | ok |
-| `add story Плохой сценарий --parent EPIC-001 --points 3 --acceptance Given a user When they save Then works well --never Commit secrets` | 0 | 0 | 54.2 | ok |
-| `gate ready US-001` | 1 | 1 | 54.0 | ok |
-| `add story Сохранить карточку --parent EPIC-001 --points 5 --acceptance Given a user When they save Then the store has the story | Given an empty title When they save Then the command exits non-zero --always Keep the store valid --ask-first new dependency --never Commit secrets` | 0 | 0 | 54.8 | ok |
-| `add story Показать отказ --parent EPIC-001 --points 3 --acceptance Given a failed check When the operator opens the board Then the story is not in the sprint --never Commit secrets` | 0 | 0 | 54.4 | ok |
-| `check bdd US-002` | 0 | 0 | 54.3 | ok |
-| `check boundaries US-002` | 0 | 0 | 53.5 | ok |
-| `check points US-002` | 0 | 0 | 54.0 | ok |
-| `gate ready US-002` | 0 | 0 | 53.8 | ok |
-| `gate ready US-003` | 0 | 0 | 54.2 | ok |
-| `workflow epics --idea IDEA-001 --epic EPIC-001` | 1 | 1 | 53.9 | ok |
-| `add story Слишком крупная --parent EPIC-001 --points 13 --acceptance Given a slice When it is still 13 Then it stays out of ready --never Commit secrets` | 0 | 0 | 55.0 | ok |
-| `gate ready US-004` | 1 | 1 | 53.9 | ok |
-| `add story Чужая шкала --parent EPIC-001 --points 4` | 1 | 1 | 53.9 | ok |
-| `add adr Store is one JSON file --description One operator and no concurrent writers` | 0 | 0 | 54.3 | ok |
-| `check adr ADR-001` | 1 | 1 | 55.0 | ok |
+| `init` | 0 | 0 | 58.0 | ok |
+| `project new enterprise-demo` | 0 | 0 | 57.1 | ok |
+| `add idea Оператор видит отказ гейта до того, как история попала в спринт` | 0 | 0 | 57.1 | ok |
+| `add epic Гейт ready обязателен --parent IDEA-001` | 0 | 0 | 57.3 | ok |
+| `add requirement Когда Then нельзя проверить, gate ready завершается с ошибкой --parent EPIC-001` | 0 | 0 | 58.0 | ok |
+| `add story Плохой сценарий --parent EPIC-001 --points 3 --acceptance Given a user When they save Then works well --never Commit secrets` | 0 | 0 | 57.8 | ok |
+| `gate ready US-001` | 1 | 1 | 57.4 | ok |
+| `add story Сохранить карточку --parent EPIC-001 --points 5 --acceptance Given a user When they save Then the store has the story | Given an empty title When they save Then the command exits non-zero --always Keep the store valid --ask-first new dependency --never Commit secrets` | 0 | 0 | 57.0 | ok |
+| `add story Показать отказ --parent EPIC-001 --points 3 --acceptance Given a failed check When the operator opens the board Then the story is not in the sprint --never Commit secrets` | 0 | 0 | 56.8 | ok |
+| `check bdd US-002` | 0 | 0 | 56.6 | ok |
+| `check boundaries US-002` | 0 | 0 | 56.1 | ok |
+| `check points US-002` | 0 | 0 | 56.4 | ok |
+| `gate ready US-002` | 0 | 0 | 58.5 | ok |
+| `gate ready US-003` | 0 | 0 | 60.9 | ok |
+| `workflow epics --idea IDEA-001 --epic EPIC-001` | 1 | 1 | 56.2 | ok |
+| `add story Слишком крупная --parent EPIC-001 --points 13 --acceptance Given a slice When it is still 13 Then it stays out of ready --never Commit secrets` | 0 | 0 | 56.7 | ok |
+| `gate ready US-004` | 1 | 1 | 56.1 | ok |
+| `add story Чужая шкала --parent EPIC-001 --points 4` | 1 | 1 | 56.0 | ok |
+| `add adr Store is one JSON file --description One operator and no concurrent writers` | 0 | 0 | 56.8 | ok |
+| `check adr ADR-001` | 1 | 1 | 56.3 | ok |
 | `edit ADR-001 Decision by the ADR procedure` | 0 | 0 | 0 | ok |
-| `check adr ADR-001` | 0 | 0 | 58.3 | ok |
-| `sprint new --goal В спринт попадают только истории, прошедшие ready` | 0 | 0 | 54.1 | ok |
-| `sprint add --id US-002 --sprint S1` | 0 | 0 | 54.1 | ok |
-| `sprint add --id US-003 --sprint S1` | 0 | 0 | 54.1 | ok |
-| `workflow sprint --sprint S1` | 0 | 0 | 54.1 | ok |
-| `gate sprint S1` | 0 | 0 | 53.8 | ok |
-| `move US-002 in-progress` | 0 | 0 | 54.1 | ok |
-| `log US-002 1.5 --note saved the row` | 0 | 0 | 55.3 | ok |
-| `move US-002 review` | 0 | 0 | 53.8 | ok |
-| `gate done US-002` | 1 | 1 | 54.8 | ok |
-| `evidence US-002 store contained the story` | 0 | 0 | 54.7 | ok |
-| `evidence US-002 empty title exited non-zero` | 0 | 0 | 54.8 | ok |
-| `gate done US-002` | 0 | 0 | 54.0 | ok |
-| `move US-002 done` | 0 | 0 | 54.2 | ok |
-| `check wip board` | 0 | 0 | 53.4 | ok |
-| `check phase implementation --outcome Оператор видит отказ гейта` | 1 | 1 | 56.0 | ok |
-| `check phase implementation --outcome Оператор видит отказ гейта --has-boundaries --has-check` | 0 | 0 | 54.9 | ok |
-| `check guard commit secrets --never commit secrets` | 1 | 1 | 53.9 | ok |
-| `check guard keep store valid --always keep store valid` | 0 | 0 | 55.8 | ok |
-| `check sysl /tmp/bmad-repo/diagrams/sysl/example.sysl` | 0 | 0 | 53.0 | ok |
-| `check sysl /tmp/bmad-repo/diagrams/sysl/backlog.sysl` | 0 | 0 | 53.2 | ok |
-| `check calm /tmp/bmad-repo/diagrams/calm/example.calm.json` | 0 | 0 | 53.3 | ok |
-| `check calm /tmp/bmad-repo/diagrams/calm/backlog.calm.json` | 0 | 0 | 54.5 | ok |
-| `import jira-csv /tmp/bmad-repo/examples/jira.csv` | 0 | 0 | 59.3 | ok |
-| `dashboard` | 0 | 0 | 54.5 | ok |
-| `connectors` | 0 | 0 | 53.1 | ok |
-| `pull jira --jql project = DEMO` | 1 | 1 | 53.1 | ok |
+| `check adr ADR-001` | 0 | 0 | 56.7 | ok |
+| `sprint new --goal В спринт попадают только истории, прошедшие ready` | 0 | 0 | 56.9 | ok |
+| `sprint add --id US-002 --sprint S1` | 0 | 0 | 58.2 | ok |
+| `sprint add --id US-003 --sprint S1` | 0 | 0 | 58.2 | ok |
+| `workflow sprint --sprint S1` | 0 | 0 | 57.2 | ok |
+| `gate sprint S1` | 0 | 0 | 57.2 | ok |
+| `move US-002 in-progress` | 0 | 0 | 56.9 | ok |
+| `log US-002 1.5 --note saved the row` | 0 | 0 | 57.0 | ok |
+| `move US-002 review` | 0 | 0 | 56.5 | ok |
+| `gate done US-002` | 1 | 1 | 56.6 | ok |
+| `evidence US-002 store contained the story` | 0 | 0 | 57.1 | ok |
+| `evidence US-002 empty title exited non-zero` | 0 | 0 | 56.8 | ok |
+| `gate done US-002` | 0 | 0 | 56.7 | ok |
+| `move US-002 done` | 0 | 0 | 57.8 | ok |
+| `check wip board` | 0 | 0 | 57.6 | ok |
+| `check phase implementation --outcome Оператор видит отказ гейта` | 1 | 1 | 56.9 | ok |
+| `check phase implementation --outcome Оператор видит отказ гейта --has-boundaries --has-check` | 0 | 0 | 58.0 | ok |
+| `check guard commit secrets --never commit secrets` | 1 | 1 | 60.3 | ok |
+| `check guard keep store valid --always keep store valid` | 0 | 0 | 57.0 | ok |
+| `check sysl /tmp/bmad-repo/diagrams/sysl/example.sysl` | 0 | 0 | 58.8 | ok |
+| `check sysl /tmp/bmad-repo/diagrams/sysl/backlog.sysl` | 0 | 0 | 62.3 | ok |
+| `check calm /tmp/bmad-repo/diagrams/calm/example.calm.json` | 0 | 0 | 59.5 | ok |
+| `check calm /tmp/bmad-repo/diagrams/calm/backlog.calm.json` | 0 | 0 | 57.6 | ok |
+| `import jira-csv /tmp/bmad-repo/examples/jira.csv` | 0 | 0 | 62.8 | ok |
+| `dashboard` | 0 | 0 | 59.9 | ok |
+| `connectors` | 0 | 0 | 58.0 | ok |
+| `pull jira --jql project = DEMO` | 1 | 1 | 58.8 | ok |
 | `GET http://127.0.0.1:8767/` | 0 | 0 | 0 | ok |
 
 ## Что команды ответили
@@ -67,7 +67,7 @@
 ### init
 
 ```
-initialized /tmp/mazu-enterprise-demo/mazu-data
+initialized /tmp/pytest-of-root/pytest-10/test_enterprise_demo0/demo/mazu-data
 ```
 
 ### project new enterprise-demo
@@ -342,7 +342,7 @@ imported 3 from jira-csv
 ```
 # MAZU dashboard
 
-Generated: 2026-10-22T14:06:14Z
+Generated: 2026-10-22T14:13:22Z
 
 ## By status
 - backlog: 7

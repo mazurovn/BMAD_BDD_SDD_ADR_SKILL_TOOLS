@@ -417,6 +417,7 @@ def cmd_doctor(_args: argparse.Namespace) -> None:
         root / "src" / "mazu_method" / "openspec.py",
         root / "src" / "mazu_method" / "calm_draw.py",
         root / "src" / "mazu_method" / "sysl_draw.py",
+        root / "src" / "mazu_method" / "openspec_flow.py",
         root / "wiki" / "Manual.md",
         root / "wiki" / "Rules.md",
         root / "wiki" / "Team.md",
@@ -1198,6 +1199,107 @@ def cmd_workflow(args: argparse.Namespace) -> None:
 
 
 
+
+def cmd_openspec(args: argparse.Namespace) -> None:
+    from mazu_method import openspec_flow as flow
+
+    root = Path.cwd()
+    action = args.action
+    try:
+        if action == "explore":
+            path = flow.explore(root, args.name, args.intent or "")
+            print(path)
+            return
+        if action == "propose":
+            path = flow.propose(root, args.name, args.intent or "")
+            issues = flow.validate(path)
+            print(path)
+            if issues:
+                for issue in issues:
+                    print(f"FAIL {issue}")
+                raise SystemExit(1)
+            print("PASS propose")
+            return
+        path = flow.change_dir(root, args.name)
+        if action == "validate":
+            issues = flow.validate(path)
+            if issues:
+                for issue in issues:
+                    print(f"FAIL {issue}")
+                raise SystemExit(1)
+            print("PASS validate")
+            return
+        if action == "update":
+            print(flow.update(root, args.name, args.revision or args.intent or ""))
+            print("PASS update")
+            return
+        if action == "sync":
+            print(flow.sync(root, args.name))
+            print("PASS sync")
+            return
+        if action == "apply":
+            issues = flow.validate(path)
+            if issues:
+                for issue in issues:
+                    print(f"FAIL {issue}")
+                raise SystemExit(1)
+            created = []
+            for task in flow.tasks(path):
+                if task["done"] or "story:" in task["title"]:
+                    continue
+                before = {item["id"] for item in load()["items"]} if store_path().exists() else set()
+                if not store_path().exists():
+                    cmd_init(argparse.Namespace())
+                    before = set()
+                cmd_add(argparse.Namespace(
+                    kind="story", title=task["title"], description=f"OpenSpec task {task['id']}",
+                    points=3, parent=None, status="backlog",
+                    acceptance=f"Given task {task['id']} When it is done Then {task['title']}",
+                    always=None, ask_first=None, never="Commit secrets",
+                ))
+                after = {item["id"] for item in load()["items"]}
+                new_ids = sorted(after - before)
+                if not new_ids:
+                    raise SystemExit("OPENSPEC-7 apply did not create a story")
+                flow.link_task(path, task["id"], new_ids[-1])
+                created.append(f"{task['id']} -> {new_ids[-1]}")
+            print("PASS apply")
+            for line in created:
+                print(line)
+            return
+        if action == "complete":
+            flow.complete(path, args.task, args.evidence or "")
+            print(f"PASS complete {args.task}")
+            return
+        if action == "archive":
+            dest = flow.archive(root, args.name, now()[:10])
+            print(dest)
+            print("PASS archive")
+            return
+    except (ValueError, FileExistsError, FileNotFoundError, RuntimeError) as exc:
+        raise SystemExit(str(exc)) from exc
+    raise SystemExit(f"unknown openspec action {action}")
+
+
+def cmd_chat(args: argparse.Namespace) -> None:
+    text = " ".join(args.text).strip()
+    print(f"chat: {text}")
+    raw = text[len("/opsx:"):] if text.startswith("/opsx:") else text
+    parts = raw.split()
+    if not parts:
+        raise SystemExit("chat command is empty")
+    action = parts[0]
+    known = {"propose", "apply", "archive", "explore", "update", "sync", "validate", "complete"}
+    if action not in known:
+        raise SystemExit(f"unknown chat command {action}")
+    name = parts[1] if len(parts) > 1 else ""
+    rest = " ".join(parts[2:])
+    print(f"cli: openspec {action} {name}")
+    print(f"function: mazu_method.openspec_flow.{action if action != 'complete' else 'complete'}")
+    ns = argparse.Namespace(action=action, name=name, intent=rest, revision=rest, task=parts[2] if len(parts) > 2 else "", evidence=" ".join(parts[3:]))
+    cmd_openspec(ns)
+
+
 def cmd_diagram(args: argparse.Namespace) -> None:
     raw = Path(args.file).read_text(encoding="utf-8")
     svg = draw_calm(raw) if args.kind == "calm" else draw_sysl(raw)
@@ -1309,6 +1411,19 @@ def build_parser() -> argparse.ArgumentParser:
     p_guide = sub.add_parser("guide", help="print one section of the operating manual")
     p_guide.add_argument("topic")
     p_guide.set_defaults(func=cmd_guide)
+
+    p_os = sub.add_parser("openspec", help="OpenSpec propose, apply, archive")
+    p_os.add_argument("action", choices=("propose", "validate", "apply", "complete", "archive", "explore", "update", "sync"))
+    p_os.add_argument("name")
+    p_os.add_argument("--intent", default="")
+    p_os.add_argument("--revision", default="")
+    p_os.add_argument("--task", default="")
+    p_os.add_argument("--evidence", default="")
+    p_os.set_defaults(func=cmd_openspec)
+
+    p_chat = sub.add_parser("chat", help="map /opsx:propose and the other opsx commands onto the CLI")
+    p_chat.add_argument("text", nargs="+")
+    p_chat.set_defaults(func=cmd_chat)
 
     p_diagram = sub.add_parser("diagram", help="write an SVG view of a CALM or Sysl file")
     p_diagram.add_argument("kind", choices=("calm", "sysl"))

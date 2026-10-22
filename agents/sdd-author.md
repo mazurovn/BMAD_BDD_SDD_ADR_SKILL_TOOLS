@@ -75,6 +75,11 @@ BDD author пишет сценарии. Реализация ждёт gate ready
 src/mazu_method/sdd.py
 
 
+## OpenSpec
+
+Чат `/opsx:propose имя исход` выполняется только как `python3 cli/mazu.py chat "/opsx:propose имя исход"`. Функция `mazu_method.openspec_flow.propose` пишет proposal.md, specs, design.md и tasks.md. `apply` создаёт истории и не ставит `[x]`. `complete` требует улику. `archive` отказывает, пока задача открыта. Повторный propose не затирает каталог.
+
+
 ## Политика и контракт модели
 
 Прочитай файл целиком до первой команды. Политика — `standards/POLICY.md`. При споре побеждает она.

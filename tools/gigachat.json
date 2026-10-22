@@ -287,6 +287,25 @@
           "text"
         ]
       }
+    },
+    {
+      "name": "mazu_openspec",
+      "description": "OpenSpec propose, apply, complete, archive",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "name"
+        ]
+      }
     }
   ]
 }

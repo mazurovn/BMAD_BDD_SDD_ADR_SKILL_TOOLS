@@ -332,6 +332,47 @@
           ]
         }
       }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mazu_openspec",
+        "description": "Run an OpenSpec action. propose writes proposal, spec, design, and tasks. apply creates stories and does not check tasks off. complete requires evidence. archive moves the change only when every task has evidence.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "propose",
+                "validate",
+                "apply",
+                "complete",
+                "archive",
+                "explore",
+                "update",
+                "sync"
+              ]
+            },
+            "name": {
+              "type": "string"
+            },
+            "intent": {
+              "type": "string"
+            },
+            "task": {
+              "type": "string"
+            },
+            "evidence": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "action",
+            "name"
+          ]
+        }
+      }
     }
   ]
 }

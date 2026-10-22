@@ -54,12 +54,13 @@ REQUIRED = [
     "src/mazu_method/openspec.py",
     "src/mazu_method/calm_draw.py",
     "src/mazu_method/sysl_draw.py",
+    "src/mazu_method/openspec_flow.py",
 ]
 SKILLS = [
     "bmad", "sdd", "bdd", "adr", "agile-delivery", "product-ideas",
     "requirements", "sysl", "calm", "skill-creator", "backlog-connectors",
     "tool-calling", "projects", "create-epics-and-stories", "sprint-planning",
-    "lazy-senior", "architecture", "estimation",
+    "lazy-senior", "architecture", "estimation", "openspec",
 ]
 ROLES = [
     "analyst.md", "po.md", "bmad-lead.md", "architect.md",
@@ -68,7 +69,7 @@ ROLES = [
     "calm-modeler.md", "scrum-master.md", "dev.md", "lazy-senior.md", "qa.md",
     "integrator.md", "skill-creator.md", "researcher.md", "writer.md", "release.md",
 ]
-HELP_WORDS = ["project", "import", "export", "pull", "connectors", "skill", "dashboard", "serve", "check", "workflow", "gate"]
+HELP_WORDS = ["project", "import", "export", "pull", "connectors", "skill", "dashboard", "serve", "check", "workflow", "gate", "openspec", "chat", "diagram"]
 
 
 def fail(errors: list[str], message: str) -> None:
