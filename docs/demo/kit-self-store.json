@@ -16,8 +16,8 @@
         "ask_first": [],
         "never": []
       },
-      "created_at": "2026-10-22T14:47:41Z",
-      "updated_at": "2026-10-22T14:47:41Z"
+      "created_at": "2026-10-22T14:49:39Z",
+      "updated_at": "2026-10-22T14:49:39Z"
     },
     {
       "id": "EPIC-001",
@@ -34,8 +34,8 @@
         "ask_first": [],
         "never": []
       },
-      "created_at": "2026-10-22T14:47:41Z",
-      "updated_at": "2026-10-22T14:47:41Z"
+      "created_at": "2026-10-22T14:49:39Z",
+      "updated_at": "2026-10-22T14:49:39Z"
     },
     {
       "id": "US-001",
@@ -60,12 +60,12 @@
           "download a package"
         ]
       },
-      "created_at": "2026-10-22T14:47:41Z",
-      "updated_at": "2026-10-22T14:47:43Z",
+      "created_at": "2026-10-22T14:49:40Z",
+      "updated_at": "2026-10-22T14:49:42Z",
       "evidence": [
         {
           "text": "1.14.3",
-          "at": "2026-10-22T14:47:43Z"
+          "at": "2026-10-22T14:49:41Z"
         }
       ]
     },
@@ -92,12 +92,12 @@
           "download a package"
         ]
       },
-      "created_at": "2026-10-22T14:47:41Z",
-      "updated_at": "2026-10-22T14:47:44Z",
+      "created_at": "2026-10-22T14:49:40Z",
+      "updated_at": "2026-10-22T14:49:43Z",
       "evidence": [
         {
           "text": "{\n    \"jsonSchemaValidationOutputs\": [],\n    \"spectralSchemaValidationOutputs\": [],\n    \"hasErrors\": false,\n    \"hasWarnings\": false\n}",
-          "at": "2026-10-22T14:47:44Z"
+          "at": "2026-10-22T14:49:42Z"
         }
       ]
     },
@@ -124,12 +124,12 @@
           "download a package"
         ]
       },
-      "created_at": "2026-10-22T14:47:41Z",
-      "updated_at": "2026-10-22T14:47:45Z",
+      "created_at": "2026-10-22T14:49:40Z",
+      "updated_at": "2026-10-22T14:49:43Z",
       "evidence": [
         {
           "text": "6.12.4",
-          "at": "2026-10-22T14:47:44Z"
+          "at": "2026-10-22T14:49:43Z"
         }
       ]
     },
@@ -156,12 +156,12 @@
           "download a package"
         ]
       },
-      "created_at": "2026-10-22T14:47:41Z",
-      "updated_at": "2026-10-22T14:47:45Z",
+      "created_at": "2026-10-22T14:49:40Z",
+      "updated_at": "2026-10-22T14:49:44Z",
       "evidence": [
         {
-          "text": "...\n\n1 scenario (1 passed)\n3 steps (3 passed)\n0m 0.008s (0m 0.001s executing your code)",
-          "at": "2026-10-22T14:47:45Z"
+          "text": "...\n\n1 scenario (1 passed)\n3 steps (3 passed)\n0m 0.009s (0m 0.001s executing your code)",
+          "at": "2026-10-22T14:49:44Z"
         }
       ]
     },
@@ -188,12 +188,12 @@
           "download a package"
         ]
       },
-      "created_at": "2026-10-22T14:47:41Z",
-      "updated_at": "2026-10-22T14:47:46Z",
+      "created_at": "2026-10-22T14:49:40Z",
+      "updated_at": "2026-10-22T14:49:45Z",
       "evidence": [
         {
           "text": "exit 0 bin/sysl validate diagrams/sysl/example.sysl",
-          "at": "2026-10-22T14:47:46Z"
+          "at": "2026-10-22T14:49:44Z"
         }
       ]
     },
@@ -220,12 +220,12 @@
           "download a package"
         ]
       },
-      "created_at": "2026-10-22T14:47:41Z",
-      "updated_at": "2026-10-22T14:47:46Z",
+      "created_at": "2026-10-22T14:49:40Z",
+      "updated_at": "2026-10-22T14:49:45Z",
       "evidence": [
         {
           "text": "███████╗██████╗ ███████╗ ██████╗██╗███████╗██╗   ██╗              \n              ██╔════╝██╔══██╗██╔════╝██╔════╝██║██╔════╝╚██╗ ██╔╝              \n              ███████╗██████╔╝█████╗  ██║     ██║█████╗   ╚████╔╝               \n              ╚════██║██╔═══╝ ██╔══╝  ██║     ██║██╔══╝    ╚██╔╝                \n              ███████║██║     ███████╗╚██████╗██║██║        ██║                 \n              ╚══════╝╚═╝     ╚══════╝ ╚═════╝╚═╝╚═╝        ╚═╝                 \n                                                                                \n               GitHub Spec Kit - Spec-Driven Development Toolkit                \n\n╭────────────────────────── Specify CLI Information ───────────────────────────╮\n│                                                                              │\n│     CLI Version    1.2.3                                                     │\n│                                                                              │\n│          Python    3.12.15                                                   │\n│        Platform    Linux                                                     │\n│    Architecture    x86_64                                                    │\n│      OS Version    #1 SMP Tue Jul 21 13:56:45 UTC 2026                       │\n│         OpenSSL    OpenSSL 3.5.9 29 Sep 2026                                 │\n│                                                                              │\n╰──────────────────────────────────────────────────────────────────────────────╯",
-          "at": "2026-10-22T14:47:46Z"
+          "at": "2026-10-22T14:49:45Z"
         }
       ]
     },
@@ -252,12 +252,12 @@
           "download a package"
         ]
       },
-      "created_at": "2026-10-22T14:47:41Z",
-      "updated_at": "2026-10-22T14:47:47Z",
+      "created_at": "2026-10-22T14:49:40Z",
+      "updated_at": "2026-10-22T14:49:46Z",
       "evidence": [
         {
           "text": "usage: adr help COMMAND [ARG] ...\nCOMMAND is one of: \n  upgrade-repository\n  help\n  new\n  init\n  config\n  list\n  generate\n  link\nRun 'adr help COMMAND' for help on a specific command.",
-          "at": "2026-10-22T14:47:47Z"
+          "at": "2026-10-22T14:49:45Z"
         }
       ]
     },
@@ -276,8 +276,8 @@
         "ask_first": [],
         "never": []
       },
-      "created_at": "2026-10-22T14:47:41Z",
-      "updated_at": "2026-10-22T14:47:41Z"
+      "created_at": "2026-10-22T14:49:40Z",
+      "updated_at": "2026-10-22T14:49:40Z"
     },
     {
       "id": "ADR-001",
@@ -294,8 +294,8 @@
         "ask_first": [],
         "never": []
       },
-      "created_at": "2026-10-22T14:47:41Z",
-      "updated_at": "2026-10-22T14:47:41Z"
+      "created_at": "2026-10-22T14:49:40Z",
+      "updated_at": "2026-10-22T14:49:40Z"
     }
   ],
   "sprints": [
@@ -303,7 +303,7 @@
       "id": "S1",
       "goal": "Показать прогон всех CLI на доске kit-self",
       "status": "planned",
-      "created_at": "2026-10-22T14:47:41Z"
+      "created_at": "2026-10-22T14:49:40Z"
     }
   ],
   "time_logs": [
@@ -311,43 +311,43 @@
       "item": "US-001",
       "hours": 0.2,
       "note": "bin/openspec --version",
-      "at": "2026-10-22T14:47:43Z"
+      "at": "2026-10-22T14:49:41Z"
     },
     {
       "item": "US-002",
       "hours": 0.2,
       "note": "bin/calm validate --architecture diagrams/calm/example.calm.json --format json",
-      "at": "2026-10-22T14:47:43Z"
+      "at": "2026-10-22T14:49:42Z"
     },
     {
       "item": "US-003",
       "hours": 0.2,
       "note": "bin/bmad --version",
-      "at": "2026-10-22T14:47:44Z"
+      "at": "2026-10-22T14:49:43Z"
     },
     {
       "item": "US-004",
       "hours": 0.2,
       "note": "bin/cucumber examples/bdd/gate.feature --require examples/bdd/steps.js",
-      "at": "2026-10-22T14:47:45Z"
+      "at": "2026-10-22T14:49:43Z"
     },
     {
       "item": "US-005",
       "hours": 0.2,
       "note": "bin/sysl validate diagrams/sysl/example.sysl",
-      "at": "2026-10-22T14:47:45Z"
+      "at": "2026-10-22T14:49:44Z"
     },
     {
       "item": "US-006",
       "hours": 0.2,
       "note": "bin/specify version",
-      "at": "2026-10-22T14:47:46Z"
+      "at": "2026-10-22T14:49:45Z"
     },
     {
       "item": "US-007",
       "hours": 0.2,
       "note": "bin/adr help",
-      "at": "2026-10-22T14:47:47Z"
+      "at": "2026-10-22T14:49:45Z"
     }
   ],
   "links": [],
@@ -356,55 +356,55 @@
       "name": "openspec",
       "code": 0,
       "line": "1.14.3",
-      "at": "2026-10-22T14:47:48Z"
+      "at": "2026-10-22T14:49:46Z"
     },
     {
       "name": "calm",
       "code": 0,
       "line": "1.65.0",
-      "at": "2026-10-22T14:47:48Z"
+      "at": "2026-10-22T14:49:47Z"
     },
     {
       "name": "bmad",
       "code": 0,
       "line": "6.12.4",
-      "at": "2026-10-22T14:47:48Z"
+      "at": "2026-10-22T14:49:47Z"
     },
     {
       "name": "cucumber",
       "code": 0,
       "line": "13.3.0",
-      "at": "2026-10-22T14:47:49Z"
+      "at": "2026-10-22T14:49:47Z"
     },
     {
       "name": "sysl",
       "code": 0,
       "line": "sysl v0.792.0 linux/amd64",
-      "at": "2026-10-22T14:47:49Z"
+      "at": "2026-10-22T14:49:47Z"
     },
     {
       "name": "specify",
       "code": 0,
       "line": "███████╗██████╗ ███████╗ ██████╗██╗███████╗██╗   ██╗              ",
-      "at": "2026-10-22T14:47:49Z"
+      "at": "2026-10-22T14:49:48Z"
     },
     {
       "name": "adr",
       "code": 0,
       "line": "usage: adr help COMMAND [ARG] ...",
-      "at": "2026-10-22T14:47:49Z"
+      "at": "2026-10-22T14:49:48Z"
     },
     {
       "name": "calm-validate",
       "code": 0,
       "line": "{",
-      "at": "2026-10-22T14:47:50Z"
+      "at": "2026-10-22T14:49:48Z"
     },
     {
       "name": "sysl-validate",
       "code": 0,
       "line": "",
-      "at": "2026-10-22T14:47:50Z"
+      "at": "2026-10-22T14:49:48Z"
     }
   ]
 }

@@ -6,12 +6,14 @@ import os
 import zipfile
 from pathlib import Path
 
-SKIP_DIR = {".git", "mazu-data", "__pycache__", ".pytest_cache", "dist"}
+SKIP_ANYWHERE = {".git", "__pycache__", ".pytest_cache", "mazu-data"}
 
 
 def include(root: Path, path: Path) -> bool:
     rel = path.relative_to(root)
-    if any(part in SKIP_DIR for part in rel.parts):
+    if rel.parts[0] == "dist":
+        return False
+    if any(part in SKIP_ANYWHERE for part in rel.parts):
         return False
     if rel.as_posix() in {"upstream/node/node", "upstream/node/node.xz"}:
         return False
@@ -25,7 +27,12 @@ def write_zip(root: Path, dest: Path) -> int:
     count = 0
     with zipfile.ZipFile(dest, "w", compression=zipfile.ZIP_DEFLATED) as book:
         for dirpath, dirnames, filenames in os.walk(root):
-            dirnames[:] = sorted(name for name in dirnames if name not in SKIP_DIR)
+            rel_dir = Path(dirpath).relative_to(root)
+            dirnames[:] = [
+                name
+                for name in sorted(dirnames)
+                if name not in SKIP_ANYWHERE and not (rel_dir == Path(".") and name == "dist")
+            ]
             for name in sorted(filenames):
                 path = Path(dirpath) / name
                 if not include(root, path):

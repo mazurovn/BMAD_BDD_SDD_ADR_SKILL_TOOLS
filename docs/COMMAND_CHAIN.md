@@ -31,8 +31,8 @@
 | `adr filled` | `check adr ADR-001` | `adr.issues` | 0 | 0 | ok |
 | `sysl` | `check sysl /tmp/bmad-repo/diagrams/sysl/backlog.sysl` | `sysl_check.issues` | 0 | 0 | ok |
 | `calm` | `check calm /tmp/bmad-repo/diagrams/calm/backlog.calm.json` | `calm_check.issues` | 0 | 0 | ok |
-| `sysl svg` | `diagram sysl /tmp/bmad-repo/diagrams/sysl/backlog.sysl -o /tmp/pytest-of-root/pytest-20/test_command_chain0/chain/sysl.svg` | `sysl_draw.draw` | 0 | 0 | ok |
-| `calm svg` | `diagram calm /tmp/bmad-repo/diagrams/calm/backlog.calm.json -o /tmp/pytest-of-root/pytest-20/test_command_chain0/chain/calm.svg` | `calm_draw.draw` | 0 | 0 | ok |
+| `sysl svg` | `diagram sysl /tmp/bmad-repo/diagrams/sysl/backlog.sysl -o /tmp/pytest-of-root/pytest-21/test_command_chain0/chain/sysl.svg` | `sysl_draw.draw` | 0 | 0 | ok |
+| `calm svg` | `diagram calm /tmp/bmad-repo/diagrams/calm/backlog.calm.json -o /tmp/pytest-of-root/pytest-21/test_command_chain0/chain/calm.svg` | `calm_draw.draw` | 0 | 0 | ok |
 
 ## Ответы
 
@@ -42,7 +42,7 @@
 chat: /opsx:explore gate-visible Оператор видит отказ гейта
 cli: openspec explore gate-visible
 function: mazu_method.openspec_flow.explore
-/tmp/pytest-of-root/pytest-20/test_command_chain0/chain/openspec/explore/gate-visible.md
+/tmp/pytest-of-root/pytest-21/test_command_chain0/chain/openspec/explore/gate-visible.md
 ```
 
 ### /opsx:propose gate-visible
@@ -51,7 +51,7 @@ function: mazu_method.openspec_flow.explore
 chat: /opsx:propose gate-visible Оператор видит отказ гейта
 cli: openspec propose gate-visible
 function: mazu_method.openspec_flow.propose
-/tmp/pytest-of-root/pytest-20/test_command_chain0/chain/openspec/changes/gate-visible
+/tmp/pytest-of-root/pytest-21/test_command_chain0/chain/openspec/changes/gate-visible
 PASS propose
 ```
 
@@ -64,7 +64,7 @@ PASS validate
 ### propose again
 
 ```
-OPENSPEC-4 change already exists: /tmp/pytest-of-root/pytest-20/test_command_chain0/chain/openspec/changes/gate-visible
+OPENSPEC-4 change already exists: /tmp/pytest-of-root/pytest-21/test_command_chain0/chain/openspec/changes/gate-visible
 ```
 
 ### /opsx:apply
@@ -73,7 +73,7 @@ OPENSPEC-4 change already exists: /tmp/pytest-of-root/pytest-20/test_command_cha
 chat: /opsx:apply gate-visible
 cli: openspec apply gate-visible
 function: mazu_method.openspec_flow.apply
-initialized /tmp/pytest-of-root/pytest-20/test_command_chain0/chain/mazu-data
+initialized /tmp/pytest-of-root/pytest-21/test_command_chain0/chain/mazu-data
 US-001
 US-002
 PASS apply
@@ -117,14 +117,14 @@ PASS complete 1.2
 chat: /opsx:archive gate-visible
 cli: openspec archive gate-visible
 function: mazu_method.openspec_flow.archive
-/tmp/pytest-of-root/pytest-20/test_command_chain0/chain/openspec/changes/archive/2026-10-22-gate-visible
+/tmp/pytest-of-root/pytest-21/test_command_chain0/chain/openspec/changes/archive/2026-10-22-gate-visible
 PASS archive
 ```
 
 ### archive files
 
 ```
-/tmp/pytest-of-root/pytest-20/test_command_chain0/chain/openspec/changes/archive/2026-10-22-gate-visible
+/tmp/pytest-of-root/pytest-21/test_command_chain0/chain/openspec/changes/archive/2026-10-22-gate-visible
 ```
 
 ### bdd pass
@@ -198,11 +198,11 @@ PASS
 ### sysl svg
 
 ```
-/tmp/pytest-of-root/pytest-20/test_command_chain0/chain/sysl.svg
+/tmp/pytest-of-root/pytest-21/test_command_chain0/chain/sysl.svg
 ```
 
 ### calm svg
 
 ```
-/tmp/pytest-of-root/pytest-20/test_command_chain0/chain/calm.svg
+/tmp/pytest-of-root/pytest-21/test_command_chain0/chain/calm.svg
 ```
