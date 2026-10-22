@@ -1,0 +1,22 @@
+# Sysl model of the MAZU CLI itself. No product data.
+MazuCli:
+    !type Story:
+        id <: string
+        title <: string
+        points <: int
+        status <: string
+    /items:
+        POST:
+            Store a backlog item
+            return Story
+        GET:
+            List items
+            return sequence of Story
+    /dashboard:
+        GET:
+            Render markdown and HTML from the store
+            return string
+
+Operator:
+    Use:
+        MazuCli <- Operator

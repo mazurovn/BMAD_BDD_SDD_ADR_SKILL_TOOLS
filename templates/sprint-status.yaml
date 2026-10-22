@@ -1,0 +1,5 @@
+# Generated shape. The CLI store is the source of truth.
+# Statuses: backlog | ready | in-progress | review | done
+development_status:
+  epic-1: backlog
+  1-1-example: backlog

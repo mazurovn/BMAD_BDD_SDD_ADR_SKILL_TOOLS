@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mazurovn/BMAD_BDD_SDD_ADR_SKILL_TOOLS/schemas/store.schema.json",
+  "title": "MAZU store",
+  "type": "object",
+  "required": ["version", "items", "sprints", "time_logs"],
+  "properties": {
+    "version": {"type": "integer"},
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "title", "status"],
+        "properties": {
+          "id": {"type": "string"},
+          "kind": {"enum": ["idea", "epic", "story", "task", "requirement", "adr"]},
+          "title": {"type": "string"},
+          "description": {"type": "string"},
+          "status": {"enum": ["backlog", "ready", "in-progress", "review", "done"]},
+          "points": {"type": ["integer", "null"], "enum": [1, 2, 3, 5, 8, 13, 21, null]},
+          "parent": {"type": ["string", "null"]},
+          "sprint": {"type": ["string", "null"]},
+          "acceptance": {"type": "array", "items": {"type": "string"}},
+          "boundaries": {
+            "type": "object",
+            "properties": {
+              "always": {"type": "array", "items": {"type": "string"}},
+              "ask_first": {"type": "array", "items": {"type": "string"}},
+              "never": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        }
+      }
+    },
+    "sprints": {"type": "array"},
+    "time_logs": {"type": "array"}
+  }
+}

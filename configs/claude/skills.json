@@ -1,1 +1,14 @@
-{"skillsPath":"./skills"}
+{
+  "skillsPath": "./skills",
+  "skills": [
+    "bmad",
+    "sdd",
+    "bdd",
+    "adr",
+    "agile-delivery",
+    "product-ideas",
+    "requirements",
+    "sysl",
+    "calm"
+  ]
+}

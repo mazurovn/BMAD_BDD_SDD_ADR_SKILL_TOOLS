@@ -1,0 +1,35 @@
+{
+  "methodology": "MAZU-ADGILE",
+  "repo": "https://github.com/mazurovn/BMAD_BDD_SDD_ADR_SKILL_TOOLS",
+  "note": "Prompt agents for any harness. They do not contain project data. Grok bots listed below were created as project-agnostic experts; this file is the portable source.",
+  "grok_bots": [
+    {
+      "name": "BMAD Expert",
+      "id": "b995f4ac-8a1f-4c1c-a65a-1bc0a32f7064",
+      "skill": "skills/bmad/SKILL.md"
+    },
+    {
+      "name": "SDD Spec Expert",
+      "id": "cd4155e6-1e28-4e19-8871-f9350940449e",
+      "skill": "skills/sdd/SKILL.md"
+    },
+    {
+      "name": "ADR Decision Expert",
+      "id": "aa7dc0cc-4c19-4c2b-9a8f-a00852985bd5",
+      "skill": "skills/adr/SKILL.md"
+    },
+    {
+      "name": "BDD Acceptance Expert",
+      "id": "16411c10-eeb9-45c7-8908-1cf7dac72326",
+      "skill": "skills/bdd/SKILL.md"
+    }
+  ],
+  "subagents": [
+    {"name": "MAZU-Analyst", "file": "agents/analyst.md", "phase": "analysis"},
+    {"name": "MAZU-PO", "file": "agents/po.md", "phase": "planning"},
+    {"name": "MAZU-Architect", "file": "agents/architect.md", "phase": "solutioning"},
+    {"name": "MAZU-SM", "file": "agents/scrum-master.md", "phase": "delivery"},
+    {"name": "MAZU-Dev", "file": "agents/dev.md", "phase": "implementation"},
+    {"name": "MAZU-QA", "file": "agents/qa.md", "phase": "acceptance"}
+  ]
+}
