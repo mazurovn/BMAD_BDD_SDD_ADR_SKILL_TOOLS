@@ -1,29 +1,84 @@
 ---
 name: sprint-planning
-description: Plan a sprint from ready stories, or run the same board as Kanban without a sprint.
+description: Собирает спринт только из историй, которые уже проходят ready, и считает velocity по done.
 ---
 
-# Sprint planning
+# sprint-planning
 
-This is the local form of the BMAD workflow sprint-planning.
+Планирование не переводит points в часы. Цель спринта — одна фраза. В спринт попадает история, которая уже готова к работе. Velocity после закрытия — сумма points только тех историй этого спринта, которые в статусе done.
 
-## Scrum
+## Ответственность
 
-1. `python3 cli/mazu.py board` and keep only stories in `ready`.
-2. `sprint new --goal "one sentence"`.
-3. `sprint add --id US-001 --sprint S1` for each chosen story. A backlog story becomes `ready` when added.
-4. Capacity is a conversation, not a formula. Points are complexity. Do not convert them to hours during planning.
-5. `dashboard` shows velocity only for stories in that sprint whose status is `done`.
+Владелец: Scrum master.
+Код, который проверяет результат: `src/mazu_method/workflows.py`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
 
-## Kanban
+## Когда открывать
 
-Skip `sprint add`. Move cards with `move ID in-progress`. Suggested limit: two stories in `in-progress`.
+- Команда выбрала Scrum и готова назвать цель.
+- Надо проверить, не попала ли в спринт неготовая история.
 
-## During the sprint
+## Когда не открывать
 
-Dev moves `ready → in-progress → review` and logs hours.
-QA moves `review → done` only when every acceptance line has evidence.
-The interactive board is `python3 cli/mazu.py serve`.
+- Договорились о Kanban. Спринт не создают, работают через `move` и `check wip`.
+- Истории ещё без сценариев. Сначала create-epics-and-stories.
 
-## Rules
-Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.
+## Входы, без которых процедуру не начинают
+
+- Цель одной фразой.
+- Список id, каждый из которых проходит `gate ready`.
+
+## Процедура
+
+1. Посмотреть кандидатов: `python3 cli/mazu.py list --status ready`.
+2. Создать спринт: `python3 cli/mazu.py sprint new --goal "одна фраза"`.
+3. Добавить истории: `python3 cli/mazu.py sprint add --id US-001 --sprint S1`. История из backlog при этом становится ready только как статус колонки. Гейт это не заменяет.
+4. Проверить план: `python3 cli/mazu.py workflow sprint --sprint S1`.
+5. Продублировать жёсткий гейт: `python3 cli/mazu.py gate sprint S1`.
+
+## Гейты и гардрейлы
+
+- Пустая цель — FAIL SPRINT-1.
+- История без границ, сценария, родителя или с points 13+ роняет весь план.
+- Velocity печатается после PASS и не включает незакрытые истории.
+
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
+
+## Делать
+
+- Спорить о ёмкости словами. Не формулой points × часы.
+- Оставлять за бортом историю, которая не прошла ready, даже если она «почти».
+
+## Не делать
+
+- Не класть в один спринт две цели.
+- Не считать эпик в velocity.
+- Не двигать чужой проект. Проверить `project list` до `sprint new`.
+
+## Контроль качества
+
+- Оба команды, workflow и gate, дают PASS.
+- В dashboard цель спринта совпадает с тем, что назвал человек.
+
+## Как выглядит провал
+
+- SPRINT-1 goal is empty.
+- SPRINT-1 sprint has no stories.
+- Любой FAIL ready внутри отчёта истории.
+
+## Передача
+
+После PASS разработчик берёт одну историю в in-progress. QA не участвует, пока нет review.
+
+## Пример команд
+
+```bash
+python3 cli/mazu.py sprint new --goal "Ship the save"
+python3 cli/mazu.py sprint add --id US-001 --sprint S1
+python3 cli/mazu.py workflow sprint --sprint S1
+python3 cli/mazu.py gate sprint S1
+```
+
+## Применение инструментов
+
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.

@@ -1,28 +1,76 @@
 ---
 name: skill-creator
-description: Create a new MAZU skill skeleton with frontmatter, procedure, commands, and boundaries.
+description: Добавляет процедуру, только если её будут повторять и её ещё нет.
 ---
 
-# Skill creator
+# Новый скилл
 
-## When
+Скилл — это повторяемая процедура со входами, гейтом и запретами. Новое имя для старой работы засоряет набор. Чужой репозиторий внутрь не копируют: правило и код пишут своими словами, источник упоминают в docs/SOURCES.md.
 
-A repeated procedure is not covered by an existing skill.
+## Ответственность
 
-## Procedure
+Владелец: Skill creator.
+Код, который проверяет результат: `cli/mazu.py`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
 
-1. Read two nearby skills so the new one matches their shape.
-2. Run `python3 cli/mazu.py skill new <slug> --title "..." --description "When to use this skill."`
-3. Fill When, Procedure, Commands, and Boundaries in `skills/<slug>/SKILL.md`.
-4. Add a role under `agents/` only if a person would hold that job.
-5. Add the file to `scripts/audit.py` only if the kit cannot run without it.
-6. Run `python3 scripts/audit.py`.
+## Когда открывать
 
-## Boundaries
+- Одна и та же последовательность команд понадобилась второй раз и не покрыта текущим скиллом.
 
-Always: YAML frontmatter with `name` and `description`.
-Ask First: change an existing skill's public procedure.
-Never: copy a third-party repository into this one. Link it from docs/SOURCES.md.
+## Когда не открывать
 
-## Rules
-Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.
+- Разовая просьба.
+- Хочется завести роль под один проект клиента.
+
+## Входы, без которых процедуру не начинают
+
+- Имя латиницей, короткое описание, отличие от ближайшего существующего скилла.
+
+## Процедура
+
+1. Прочитать `skills/` и сказать, почему ни один файл не подходит.
+2. Создать каркас: `python3 cli/mazu.py skill new имя --title "..." --description "..."`.
+3. Заменить каркас разделами этого файла: ответственность, когда не открывать, процедура, гейты, делать, не делать, контроль, провал, передача, пример команд.
+4. Если процедура проверяется кодом, добавить функцию в `src/mazu_method/` и команду или использовать уже существующий `check`.
+5. Прогнать `python3 scripts/audit.py`. Ненулевой код значит, что скилл добавлять в таком виде нельзя.
+
+## Гейты и гардрейлы
+
+- Файл без frontmatter name и description аудит не примет.
+- Скилл короче рабочей процедуры не считается готовым. В нём обязательны разделы запретов и команд.
+
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
+
+## Делать
+
+- Ссылаться на идентификаторы правил из wiki/Rules.md.
+- Добавлять тест, если появилось новое поведение CLI.
+
+## Не делать
+
+- Не копировать дерево чужого проекта.
+- Не заводить второй скилл с тем же гейтом под новым именем.
+
+## Контроль качества
+
+- audit печатает PASS.
+- Пример команд из скилла реально выполняется или честно помечен как требующий токена.
+
+## Как выглядит провал
+
+- Скилл из одних лозунгов без команды.
+- Дубль agile-delivery под именем delivery-2.
+
+## Передача
+
+Новый скилл упоминают в wiki/Harnesses.md в таблице «какой скилл открыть» и в configs/claude/skills.json, если список там полный.
+
+## Пример команд
+
+```bash
+python3 cli/mazu.py skill new handoff --title "Handoff" --description "How one role gives work to the next"
+```
+
+## Применение инструментов
+
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.

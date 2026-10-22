@@ -1,34 +1,82 @@
 ---
 name: architecture
-description: Split architecture into business, enterprise, and solution layers, then record the expensive choice.
+description: Не даёт смешать способности, владение системами и контракт спринта в один рисунок.
 ---
 
-# Architecture
+# Три слоя архитектуры
 
-Three people, three questions. Do not merge them into one diagram unless the person asked for an overview sheet, and even then label the layers.
+Три вопроса задают три роли. Бизнес-архитектор говорит, какие способности есть и чего система не делает. Энтерпрайз-архитектор говорит, какая система чем владеет и какое решение живёт годы. Архитектор решения пишет контракт, по которому другие команды строят этот спринт. Председатель только выбирает, кто говорит.
 
-## Business
+## Ответственность
 
-Which capabilities exist, which value stream they serve, and what is outside the system.
-No classes. No libraries. Output is a short capability list and the non-goals.
+Владелец: Architecture chair.
+Код, который проверяет результат: `src/mazu_method/sdd.py`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
 
-## Enterprise
+## Когда открывать
 
-Which system owns which data and decision, which choice must still be true in years, and where the team boundary is.
-No sprint-level class design.
+- Просьба «нарисуй архитектуру» без указания, какой из трёх вопросов задан.
+- Один документ одновременно содержит способности, границы компаний и классы.
 
-## Solution
+## Когда не открывать
 
-The contract other teams build against this sprint: interfaces, data, failures, and what slice counts as done.
-Detailed enough to open a story. Not a substitute for the developer.
+- Вопрос уже узкий: только вызовы. Это Sysl. Только коробки. Это CALM. Только выбор. Это ADR.
 
-## Then
+## Входы, без которых процедуру не начинают
 
-An expensive choice becomes an ADR.
-Behavior goes to Sysl. Structure goes to CALM.
-The chair in agents/architect.md decides which layer speaks. Mixing layers without that call breaks BOUND-2.
+- Исход от PO. Без исхода архитектуру не начинают.
+- Понимание горизонта: этот спринт или несколько лет.
 
-Rules: ARCH-1 … ARCH-5.
+## Процедура
 
-## Rules
-Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.
+1. Назвать один слой. Если человек просит все три, сделать три подписанных раздела, а не одну схему.
+2. Бизнес-слой: список способностей и не-целей. Без классов и библиотек.
+3. Энтерпрайз-слой: владелец данных и граница команды. Дорогой выбор записать ADR.
+4. Слой решения: интерфейсы, данные, отказы. Поведение в Sysl, состав в CALM, оба через `check`.
+5. Остановить смешение правилом BOUND-2. Команда guard используется, если действие формулируется как «объединить слои».
+
+## Гейты и гардрейлы
+
+- Нет исхода — нет рисунка. Сначала product-ideas.
+- Смешение слоёв без явной просьбы на обзорный лист — остановка.
+- Даже обзорный лист подписывает три слоя отдельно.
+
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
+
+## Делать
+
+- Звать ровно одну роль-автора на проход.
+- Требовать ADR на одностороннюю дверь.
+
+## Не делать
+
+- Не выбирать библиотеку в бизнес-слое.
+- Не проектировать внутренности сервиса в энтерпрайз-слое.
+- Не подменять разработчика контрактом: контракт открывает историю, а не пишет её код.
+
+## Контроль качества
+
+- В ответе назван один слой и одна следующая роль.
+- Изменённые Sysl и CALM прошли check.
+
+## Как выглядит провал
+
+- Один рисунок, где capability и class стоят вперемешку.
+- Контракт без отказа: не сказано, что видит вызывающий при ошибке.
+- Новая связь без ADR, хотя откатить её дорого.
+
+## Передача
+
+Контракт, который можно нарезать, уходит в create-epics-and-stories. Код уходит к dev только после ready.
+
+## Пример команд
+
+```bash
+python3 cli/mazu.py check sysl diagrams/sysl/backlog.sysl
+python3 cli/mazu.py check calm diagrams/calm/backlog.calm.json
+python3 cli/mazu.py guide architecture
+```
+
+## Применение инструментов
+
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.

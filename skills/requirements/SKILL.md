@@ -1,41 +1,78 @@
 ---
 name: requirements
-description: Write a requirement that a story can trace to. Use EARS-style wording when a rule must be unambiguous.
+description: Пишет проверяемое требование и не путает его с задачей.
 ---
 
-# Requirements
+# Требования
 
-## Forms
+Требование говорит, что система делает при условии. Задача говорит, какой шаг сделать. Требование без условия и реакции нельзя проверить, поэтому оно не готово к спецификации.
 
-User story (value):
+## Ответственность
 
-```
-As a <role>
-I want <capability>
-so that <outcome>
-```
+Владелец: PO и SDD author.
+Код, который проверяет результат: `src/mazu_method/bdd.py`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
 
-EARS (rule):
+## Когда открывать
 
-```
-When <trigger>, the system shall <response>.
-While <state>, the system shall <response>.
-If <unwanted event>, then the system shall <response>.
-```
+- Есть эпик и нужно зафиксировать поведение до историй.
+- Формулировка звучит как «должен быть удобным».
 
-## Trace
+## Когда не открывать
+
+- Уже есть вертикальный срез и Then. Дальше это история, не ещё одно требование.
+- Выбор уже дорогой. Это ADR, не REQ.
+
+## Входы, без которых процедуру не начинают
+
+- Условие и наблюдаемая реакция.
+- Родитель-эпик.
+
+## Процедура
+
+1. Переписать фразу в вид: когда происходит X, система делает Y.
+2. Записать: `python3 cli/mazu.py add requirement "когда X, система Y" --parent EPIC-001`.
+3. Если реакцию нельзя увидеть, остановиться. Не записывать требование-комплимент.
+4. Перенести проверяемые требования в спецификацию и в acceptance историй.
+5. Не ставить points на requirement. Points появятся на истории.
+
+## Гейты и гардрейлы
+
+- Нет наблюдаемой реакции — запись не создают.
+- Требование не проходит `gate ready`: этот гейт только для story. Не пытаться им закрыть REQ.
+
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
+
+## Делать
+
+- Держать одно требование на одну реакцию.
+- Ссылаться на эпик через parent.
+
+## Не делать
+
+- Не писать решение внутри требования, если способ ещё не выбран.
+- Не копировать требование в десять историй без нарезки.
+
+## Контроль качества
+
+- `list --kind requirement` показывает parent у каждой строки.
+- Каждое требование можно превратить в Then без новых догадок.
+
+## Как выглядит провал
+
+- Реакция «работает хорошо».
+- Требование без эпика, и через неделю никто не знает, чей это исход.
+
+## Передача
+
+Набор требований забирает SDD author в спецификацию и BDD author в сценарии.
+
+## Пример команд
 
 ```bash
-python3 cli/mazu.py add requirement "Dashboard shows points and hours separately" \
-  --parent EPIC-001 \
-  --description "When the dashboard renders, the system shall show story points and logged hours in different fields."
+python3 cli/mazu.py add requirement "Когда у истории нет Then, gate ready завершается с ошибкой" --parent EPIC-001
 ```
 
-Stories reference the requirement id in `--description` or as `--parent` when the parent is the requirement instead of an epic. Prefer epic as parent and name the requirement id in the description so the tree stays epic → story.
+## Применение инструментов
 
-## Quality bar
-
-A requirement is not ready if the reader cannot tell whether a build meets it. Rewrite until a Then line is possible.
-
-## Rules
-Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.

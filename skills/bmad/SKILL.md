@@ -1,47 +1,83 @@
 ---
-name: bmad-method
-description: Run MAZU-ADGILE through BMAD-style phases. Use for an idea, a change, epics, stories, or "what next".
+name: bmad
+description: Держит порядок анализ, планирование, проектирование, реализация и не пускает работу дальше без факта.
 ---
 
-# BMAD method
+# BMAD: четыре фазы
 
-Upstream reference (do not vendor): [bmad-code-org/BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD), MIT.
+BMAD в этом наборе — не установка чужого пакета, а порядок решений. Анализ называет исход. Планирование режет его на проверяемые части. Проектирование фиксирует дорогой выбор. Реализация трогает код только после этого. Скилл нужен, когда просьба звучит как «просто сделай», а исход, границы или проверка ещё не названы.
 
-## When to use
+## Ответственность
 
-The request is bigger than a one-line edit: new capability, unclear scope, or several stories.
+Владелец: BMAD lead.
+Код, который проверяет результат: `src/mazu_method/bmad.py`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
 
-## Roles
+## Когда открывать
 
-| Role | Does | Does not |
-|---|---|---|
-| Analyst | brief, options, risks | commit architecture |
-| PO | outcome, priority, epic slice | write code |
-| Architect | decisions, ADR, boundaries | invent product value |
-| SM | sprint, board, blockers, points vs hours | change the decision |
-| Dev | implement one story against the spec | widen scope |
-| QA | Given/When/Then and evidence | mark done without a check |
+- Новая инициатива, у которой ещё нет одной фразы исхода.
+- Команда хочет перескочить из идеи в код.
+- Нужно решить, какая роль говорит следующей.
 
-## Phases
+## Когда не открывать
 
-1. **Analysis.** Capture an idea: `python3 cli/mazu.py add idea "<title>" --description "..."`.
-2. **Planning.** Write a spec from [templates/spec.md](../../templates/spec.md). Add requirements: `add requirement`.
-3. **Solutioning.** Record each hard choice as ADR. Slice epics, then stories with Fibonacci points and acceptance lines.
-4. **Readiness.** A story is ready only if it has a parent epic, points in {1,2,3,5,8,13,21}, at least one acceptance line, and boundaries (Always / Ask First / Never). If any are missing, stop.
-5. **Implementation.** `sprint new`, `sprint add`, `move` through `ready → in-progress → review → done`. Log hours with `log`. Points are not hours.
+- История уже прошла `gate ready` и разработчик делает один срез. Тогда открывают lazy-senior и agile-delivery.
+- Вопрос только про синтаксис Sysl или CALM. Тогда открывают соответствующий скилл.
 
-## Workflow map (BMAD v6 names, local commands)
+## Входы, без которых процедуру не начинают
 
-| Upstream workflow | Local action |
-|---|---|
-| create-epics-and-stories | `add epic` then `add story --parent EPIC-00N` |
-| sprint-planning | `sprint new` + `sprint add` |
-| sprint-status | `board` and `dashboard` |
-| decision record | `add adr` (writes `mazu-data/adr/ADR-00N.md`) |
+- Текст просьбы человека.
+- Активный проект: `python3 cli/mazu.py project list`. Если проектов несколько, сначала `project use`.
 
-## Output
+## Процедура
 
-Leave the store, the ADR file, and `mazu-data/dashboard.md` updated. Do not invent project facts that are not in the store or the user's message.
+1. Назвать фазу одним словом: analysis, planning, solutioning или implementation.
+2. Записать идею, если её нет: `python3 cli/mazu.py add idea "исход одной фразой" --description "проблема"`.
+3. Проверить, можно ли идти дальше: `python3 cli/mazu.py check phase planning --outcome "исход"`. Для solutioning добавить `--has-boundaries`. Для implementation добавить ещё `--has-check`.
+4. Если команда печатает FAIL BMAD-1, не открывать следующую фазу. Вернуться к недостающему факту.
+5. Передать работу роли этой фазы и назвать её файл в `agents/`.
 
-## Rules
-Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.
+## Гейты и гардрейлы
+
+- `check phase` завершается нулём только когда факты фазы на месте.
+- Пропуск фазы допустим лишь если исход уже одной фразой, границы записаны и проверка названа. Это говорят явно, а не подразумевают.
+
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
+
+## Делать
+
+- Держать один вопрос роли за проход.
+- Писать состояние только командами CLI.
+- Называть правило BMAD-1, когда останавливаетесь.
+
+## Не делать
+
+- Не выбирать базу данных на фазе анализа.
+- Не ставить `done`.
+- Не описывать бэклог в ответе так, будто он уже записан.
+
+## Контроль качества
+
+- В ответе есть имя фазы и следующая команда.
+- Если был `check phase`, приведён его код выхода.
+
+## Как выглядит провал
+
+- FAIL BMAD-1 outcome is missing — нет исхода, эпик не создают.
+- FAIL BMAD-1 boundaries are missing — рано проектировать.
+- FAIL BMAD-1 the check is missing — рано писать код.
+
+## Передача
+
+Анализ уходит к analyst. Планирование к PO и скиллу create-epics-and-stories. Проектирование к председателю архитектуры. Реализация к dev и QA.
+
+## Пример команд
+
+```bash
+python3 cli/mazu.py add idea "Человек видит, какая история готова" --description "Сейчас готовность держат в переписке"
+python3 cli/mazu.py check phase planning --outcome "Человек видит, какая история готова"
+```
+
+## Применение инструментов
+
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.

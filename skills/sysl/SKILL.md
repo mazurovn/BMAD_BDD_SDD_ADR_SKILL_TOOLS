@@ -1,33 +1,81 @@
 ---
 name: sysl
-description: Describe a system as a Sysl specification so sequence and integration views can be generated later.
+description: Проверяет текстовую модель вызовов. Картинка не требуется и не считается источником.
 ---
 
-# Sysl
+# Sysl: поведение
 
-Upstream: [anz-bank/sysl](https://github.com/anz-bank/sysl), Apache-2.0. This kit does not ship the Sysl compiler. It ships a spec style and an example.
+Sysl отвечает, кто кого вызывает и что возвращает. Если нужны только коробки и связи, это CALM, не этот скилл. Если программы, которая рисует Sysl, нет на машине, файл всё равно оставляют и прямо говорят, что рисунок не строился.
 
-## When
+## Ответственность
 
-You need endpoints, types, and who calls whom — before or beside a CALM diagram.
+Владелец: Sysl modeler.
+Код, который проверяет результат: `src/mazu_method/sysl_check.py`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
 
-## Minimum spec
+## Когда открывать
 
-See [diagrams/sysl/backlog.sysl](../../diagrams/sysl/backlog.sysl).
+- Появился или изменился вызов между частями системы.
+- Надо проверить уже лежащий пример перед сдачей набора.
 
-## Rules
+## Когда не открывать
 
-- One application block per deployable or actor.
-- Name the endpoint and the return type.
-- Do not paste secrets or environment-specific hosts.
-- If behavior changes, update the `.sysl` file in the same change as the ADR.
+- Нужно показать, кто владеет данными на годы. Это enterprise architect и CALM.
+- Нужно решить, какой выбор дорогой. Сначала ADR, потом правка файла в том же шаге.
 
-## Render
+## Входы, без которых процедуру не начинают
 
-If `sysl` is installed locally:
+- Имя приложения, путь эндпоинта, тип возврата.
+- Уверенность, что в тексте нет паролей, ключей и боевых адресов.
+
+## Процедура
+
+1. Открыть существующий файл или создать рядом с проектом, не внутри чужого бэклога.
+2. Нужны блок приложения на нулевом отступе, строка эндпоинта с `/`, слово return и тип через `<:`.
+3. Запустить `python3 cli/mazu.py check sysl путь/к/файлу.sysl`.
+4. Исправить каждый SYSL-2. Команда не дописывает файл сама.
+5. Если поведение изменилось вместе с решением, в том же изменении обновить ADR.
+
+## Гейты и гардрейлы
+
+- Пустой файл, нет приложения, нет эндпоинта, нет return или нет типа — FAIL.
+- Строка, похожая на пароль или ключ, — FAIL SYSL-2 secret-like text.
+
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
+
+## Делать
+
+- Держать один блок на приложение или актора.
+- Проверять примеры набора: `diagrams/sysl/example.sysl` и `diagrams/sysl/backlog.sysl`.
+
+## Не делать
+
+- Не считать PNG источником. Источник — текст.
+- Не описывать этим файлом только состав без вызовов.
+- Не класть секрет, чтобы «пример был реалистичным».
+
+## Контроль качества
+
+- `check sysl` печатает PASS.
+- В ответе человеку сказано, строилась ли картинка. Если нет, это названо.
+
+## Как выглядит провал
+
+- SYSL-2 no application block.
+- SYSL-2 no endpoint.
+- SYSL-2 return has no type.
+
+## Передача
+
+PASS по изменённому поведению вместе с ADR забирает solution architect. Состав системы этим скиллом не закрывают.
+
+## Пример команд
 
 ```bash
-sysl sd --output out.png diagrams/sysl/backlog.sysl
+python3 cli/mazu.py check sysl diagrams/sysl/example.sysl
+python3 cli/mazu.py check sysl diagrams/sysl/backlog.sysl
 ```
 
-If it is not installed, keep the `.sysl` as the source of truth and say the diagram was not rendered.
+## Применение инструментов
+
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.

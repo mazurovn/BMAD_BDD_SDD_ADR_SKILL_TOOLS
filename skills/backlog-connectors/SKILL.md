@@ -1,42 +1,84 @@
 ---
 name: backlog-connectors
-description: Import and export backlogs from CSV, Excel, Jira, and YouTrack without pretending a live connection exists.
+description: Читает CSV, Jira, YouTrack и Excel. Без токена не притворяется, что синхронизация прошла.
 ---
 
-# Backlog connectors
+# Импорт бэклога
 
-## No account required
+Файл — факт. Отсутствующий токен — остановка, не пустой успех. Импорт сохраняет внешний ключ и не подменяет им локальный id. Оценка вне ряда Фибоначчи не округляется до points и не становится часами.
 
-| Source | Command |
-|---|---|
-| CSV | `python3 cli/mazu.py import csv FILE` |
-| Jira CSV export | `import jira-csv FILE` |
-| YouTrack CSV export | `import youtrack-csv FILE` |
-| Excel xlsx, first sheet | `import xlsx FILE` |
-| Out | `export csv FILE` or `export xlsx FILE` |
+## Ответственность
 
-Columns, any mix: Summary, Title, Name, Issue Type, Type, Status, State, Story Points, Estimation, Issue Key, Issue Id, Id, Description. Delimiter comma, semicolon, or tab.
+Владелец: Integrator.
+Код, который проверяет результат: `cli/mazu.py`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
 
-## Tokens
+## Когда открывать
 
-`python3 cli/mazu.py connectors` prints whether env is present. It does not print secrets.
+- Есть выгрузка CSV или xlsx.
+- Человек просит живой Jira или YouTrack.
 
-- Jira: `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_TOKEN`, then `pull jira --jql "project = ABC"`.
-- YouTrack: `YOUTRACK_URL`, `YOUTRACK_TOKEN`, then `pull youtrack --jql "project: ABC"`.
+## Когда не открывать
 
-If a variable is missing, the command exits and names the CSV path. That is not a successful import.
+- Нужно придумать истории, которых нет в файле.
+- Нужно записать бэклог клиента в репозиторий метода.
 
-Other trackers come in through their CSV or xlsx export and the same columns. There is no per-product plugin until an API has been checked against a real response.
+## Входы, без которых процедуру не начинают
 
-## Mapping
+- Путь к файлу или явные переменные окружения.
+- Активный проект. См. скилл projects.
 
-Epic stays an epic. Story and Feature become stories. Bug and Task become tasks. Unknown types become stories. To Do, Open, In Progress, Review, and Done map onto the five columns. Anything else stays `backlog`. Points are kept only when they are Fibonacci. Other estimates are dropped. They are not converted into hours.
+## Процедура
 
-## Boundaries
+1. Для файла выбрать вид: `import csv`, `import jira-csv`, `import youtrack-csv` или `import xlsx`.
+2. Запустить команду и прочитать число записей в stdout. Не выдумывать ключи.
+3. Для живого трекера сначала `python3 cli/mazu.py connectors`. Команда говорит, заданы ли переменные, и не печатает их значения.
+4. Если токена нет, остановиться и предложить файл. Не говорить «синхронизировано».
+5. Если токен есть: `pull jira --jql "..."` или `pull youtrack --jql "..."`. Успех — только код выхода 0.
 
-Always: keep the original key in `external_id`.
-Ask First: overwrite an existing project store.
-Never: invent issues that were not in the file or the API response.
+## Гейты и гардрейлы
 
-## Rules
-Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.
+- Нет токена — ненулевой код и текст, что нужен CSV.
+- Чужая оценка не становится points.
+- Повторный импорт не должен тихо плодить дубли без внешнего ключа. Если ключ есть, это видно в `show` как external_id.
+
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
+
+## Делать
+
+- Называть источник в ответе: файл или pull.
+- После импорта прогнать `list` и показать первые id.
+
+## Не делать
+
+- Не вставлять токен в репозиторий, в вики и в ответ.
+- Не округлять 4 story points до 5.
+- Не объявлять двустороннюю синхронизацию. Этот набор умеет забрать и выгрузить файл, не вести живую пару.
+
+## Контроль качества
+
+- `show` импортированной карточки содержит source и external_id, если они были в файле.
+- Код выхода pull приложен к слову «забрал», если оно сказано.
+
+## Как выглядит провал
+
+- connectors показывает no, а ответ говорит, что задачи обновлены.
+- В store попали points, которых не было в ряде.
+- Импорт прошёл не в тот project.
+
+## Передача
+
+Импортированные истории без сценария и границ не ready. Их забирает BDD и SDD, не спринт.
+
+## Пример команд
+
+```bash
+python3 cli/mazu.py project use alpha
+python3 cli/mazu.py import jira-csv examples/jira.csv
+python3 cli/mazu.py connectors
+python3 cli/mazu.py export xlsx /tmp/backlog.xlsx
+```
+
+## Применение инструментов
+
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.

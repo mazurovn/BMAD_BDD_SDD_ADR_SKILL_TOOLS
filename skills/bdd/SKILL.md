@@ -1,34 +1,85 @@
 ---
-name: bdd-acceptance
-description: Write acceptance as Given / When / Then and attach it to a story.
+name: bdd
+description: Проверяет, что у истории есть Given, When и Then, который можно провалить.
 ---
 
-# BDD acceptance
+# BDD: наблюдаемая приёмка
 
-## Format
+Сценарий — не описание реализации. Given задаёт контекст, When одно действие, Then состояние, которое можно увидеть или проверить. Сценарий, который нельзя провалить, не защищает работу.
 
-One scenario per line group, stored in the story `acceptance` array. Separate scenarios with `|` on the CLI.
+## Ответственность
 
-```
-Given <context>
-When <action>
-Then <observable result>
-```
+Владелец: BDD author пишет, QA закрывает.
+Код, который проверяет результат: `src/mazu_method/bdd.py`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
 
-## Rules
+## Когда открывать
 
-- The Then line is something a person or a test can check. No "works well".
-- Cover the happy path and one failure or empty case before calling the story ready.
-- Do not hide implementation steps ("call function X") unless the story is a technical enabler. Say so in the title.
-- Points measure complexity. They are not the Then clause.
+- Историю надо перевести к ready.
+- Then звучит как оценка: «работает хорошо», «ok», «норм».
+- QA собирается закрыть карточку.
 
-## CLI
+## Когда не открывать
+
+- Нужно оценить сложность. Это estimation и agile-delivery.
+- Нужно решить, писать ли новый модуль. Это lazy-senior.
+
+## Входы, без которых процедуру не начинают
+
+- Один срез, который можно проверить целиком.
+- Хотя бы один счастливый путь и один отказ или пустой вход до статуса ready.
+
+## Процедура
+
+1. Написать сценарии и разделить их символом `|`.
+2. Передать их в `--acceptance` при создании или убедиться, что они уже в карточке через `show ID`.
+3. Запустить `python3 cli/mazu.py check bdd ID`.
+4. Исправить каждый FAIL BDD-1. Расплывчатый Then код отвергает словами not observable.
+5. На закрытии записать улику на каждый сценарий: `python3 cli/mazu.py evidence ID "pytest tests/test_x.py passed"`, затем `gate done ID`.
+
+## Гейты и гардрейлы
+
+- `check bdd` требует Given, When и Then в каждом сценарии.
+- `gate done` требует не меньше улик, чем сценариев.
+- Отсутствие улики оставляет карточку в review. Это решение QA, не разработчика.
+
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
+
+## Делать
+
+- Называть в Then конкретное состояние store, файла или ответа команды.
+- Держать технический срез честно: слово enabler стоит в названии, а не прячется внутри Then.
+
+## Не делать
+
+- Не прятать вызов внутренней функции в Then, если историю читает человек вне команды.
+- Не переписывать сценарий так, чтобы красный прогон стал зелёным.
+- Не принимать «works on my machine» за улику.
+
+## Контроль качества
+
+- Число улик не меньше числа строк acceptance.
+- Есть сценарий отказа или пустого входа.
+
+## Как выглядит провал
+
+- BDD-1 Given/When/Then is missing.
+- BDD-1 Then is not observable.
+- BDD-4 fewer evidence notes than acceptance lines.
+
+## Передача
+
+Сценарии, которые прошли `check bdd`, забирает PO для `gate ready` вместе с points и границами. Закрытие забирает только QA.
+
+## Пример команд
 
 ```bash
-python3 cli/mazu.py add story "Sign in" --parent EPIC-001 --points 3 \
-  --acceptance "Given a known user | When they submit valid credentials | Then the session starts | Given unknown credentials | When they submit | Then no session starts and the reason is generic"
+python3 cli/mazu.py add story "Save" --parent EPIC-001 --points 3 \
+  --acceptance "Given a user When they save Then the store has the story | Given an empty title When they save Then the command exits non-zero" \
+  --always "Keep the store valid" --never "Commit secrets"
+python3 cli/mazu.py check bdd US-001
 ```
 
-## Review
+## Применение инструментов
 
-QA does not move a story to `done` until each acceptance line has evidence: a command output, a test name, or an explicit human check recorded in the description.
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.

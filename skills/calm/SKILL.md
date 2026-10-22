@@ -1,34 +1,81 @@
 ---
 name: calm
-description: Describe architecture as a FINOS CALM JSON document (nodes and relationships).
+description: Проверяет JSON узлов и связей. Идентификатор узла стабилен.
 ---
 
-# CALM
+# CALM: состав
 
-Upstream: [finos/architecture-as-code](https://github.com/finos/architecture-as-code) and [calm.finos.org](https://calm.finos.org/). Apache-2.0. This kit ships a valid-shaped example, not the CALM CLI.
+CALM отвечает, из каких частей система состоит и кто с кем связан. Он не заменяет Sysl: в нём нет контракта вызова. Идентификатор unique-id не меняют из-за красивой подписи.
 
-## When
+## Ответственность
 
-You need a machine-readable picture of components and connections. Use Sysl when you also need endpoint behavior. Use both when both matter.
+Владелец: CALM modeler.
+Код, который проверяет результат: `src/mazu_method/calm_check.py`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
 
-## Minimum document
+## Когда открывать
 
-See [diagrams/calm/backlog.calm.json](../../diagrams/calm/backlog.calm.json).
+- Появилась часть системы или связь между частями.
+- Надо проверить примеры набора перед сдачей.
 
-Required:
-- `nodes[]` with `unique-id` and `node-type`
-- `relationships[]` with `interacts` or `connects` (`source`, `destination`)
+## Когда не открывать
 
-## Rules
+- Нужно описать тело ответа эндпоинта. Это Sysl.
+- Нужно выбрать, делать ли связь вообще. Сначала ADR, если выбор дорогой.
 
-- One node per component or actor. Stable `unique-id`.
-- Do not put secrets, customer names, or project data in this repository's examples.
-- If a relationship changes, update the CALM file in the same change as the ADR.
+## Входы, без которых процедуру не начинают
 
-## Check
+- Список частей с постоянными id и типами узлов.
+- Связи interacts или connects с концами, которые есть среди id.
+
+## Процедура
+
+1. Взять за образец `diagrams/calm/example.calm.json`, не копируя чужие данные клиента.
+2. Проверить, что каждый source и destination существует как unique-id.
+3. Запустить `python3 cli/mazu.py check calm путь/к/файлу.json`.
+4. Исправить CALM-2 и CALM-3. Неизвестный тип связи и висячий конец — ошибки.
+5. Если связь изменилась из-за решения, обновить ADR в том же шаге.
+
+## Гейты и гардрейлы
+
+- Документ обязан быть JSON-объектом со списком nodes.
+- Секрет в любом строковом поле — FAIL CALM-4.
+- Дубль unique-id — FAIL CALM-2.
+
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
+
+## Делать
+
+- Хранить имя отдельно от id. Имя можно сменить, id нет.
+- Проверять `diagrams/calm/example.calm.json` и `diagrams/calm/backlog.calm.json`.
+
+## Не делать
+
+- Не записывать поведение эндпоинта в описание узла вместо Sysl.
+- Не класть имя клиента и боевой адрес.
+
+## Контроль качества
+
+- `check calm` печатает PASS.
+- Каждая новая связь упомянута в ADR, если она дорогая.
+
+## Как выглядит провал
+
+- CALM-3 not json.
+- CALM-3 destination ... is not a node.
+- CALM-2 duplicate unique-id.
+
+## Передача
+
+PASS по составу забирает enterprise architect, если вопрос про владение, или solution architect, если вопрос про контракт этого спринта.
+
+## Пример команд
 
 ```bash
-python3 -c "import json; json.load(open('diagrams/calm/backlog.calm.json'))"
+python3 cli/mazu.py check calm diagrams/calm/example.calm.json
+python3 cli/mazu.py check calm diagrams/calm/backlog.calm.json
 ```
 
-Rendering needs the FINOS CALM CLI, which is optional. The JSON is the source of truth either way.
+## Применение инструментов
+
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.

@@ -1,21 +1,79 @@
 ---
 name: projects
-description: Keep more than one local backlog under mazu-data/projects without mixing them.
+description: Держит отдельные store и не даёт импорту смешать два бэклога.
 ---
 
-# Projects
+# Несколько проектов
+
+Один каталог `mazu-data/` может держать несколько бэклогов. Активное имя лежит в `mazu-data/active-project`. Команды add, import, sprint, gate и serve пишут только в активный. Путаница двух проектов не лечится последующей сортировкой.
+
+## Ответственность
+
+Владелец: Integrator и любой автор перед записью.
+Код, который проверяет результат: `cli/mazu.py`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
+
+## Когда открывать
+
+- Появляется второй продукт или второй клиентский бэклог.
+- Перед импортом файла непонятно, куда лягут строки.
+
+## Когда не открывать
+
+- Проект один и store уже в `mazu-data/store.json`. Переключать некуда.
+
+## Входы, без которых процедуру не начинают
+
+- Короткое имя латиницей без пробелов.
+- Уверенность, что это не репозиторий метода: `mazu-data/` не коммитят.
+
+## Процедура
+
+1. Посмотреть: `python3 cli/mazu.py project list`. Звёздочка — активный.
+2. Создать: `python3 cli/mazu.py project new имя`. Повтор не затирает существующий store.
+3. Переключить: `python3 cli/mazu.py project use имя`. Неизвестное имя завершается ошибкой.
+4. Только после этого импортировать или добавлять карточки.
+5. В ответе человеку назвать активный проект.
+
+## Гейты и гардрейлы
+
+- `project use` на неизвестное имя не создаёт пустой проект молча.
+- Импорт без `project use` при нескольких проектах — ошибка роли, даже если CLI записал в активный.
+
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
+
+## Делать
+
+- Проверять список перед каждым импортом.
+- Держать клиентские данные только в `mazu-data/projects/`.
+
+## Не делать
+
+- Не коммитить store.
+- Не складывать два трекера в один проект, если человек просил разделить.
+
+## Контроль качества
+
+- Первая строка ответа содержит имя активного проекта.
+- `project list` согласован с тем, куда легли новые id.
+
+## Как выглядит провал
+
+- Строки Jira оказались в учебном store.
+- Повторный `project new` восприняли как очистку. Он ничего не стирает.
+
+## Передача
+
+После переключения работают обычные скиллы. Они не знают про второй проект, пока активен выбранный.
+
+## Пример команд
 
 ```bash
 python3 cli/mazu.py project new alpha
 python3 cli/mazu.py project list
 python3 cli/mazu.py project use alpha
-python3 cli/mazu.py add story "First slice" --points 3
-python3 cli/mazu.py dashboard
 ```
 
-`project use` switches `mazu-data/active-project`. Each project has its own store, ADR folder, and dashboard. With no pointer, the CLI uses `mazu-data/store.json`.
+## Применение инструментов
 
-`mazu-data/` is gitignored. Do not commit a client backlog into the method repository.
-
-## Rules
-Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.

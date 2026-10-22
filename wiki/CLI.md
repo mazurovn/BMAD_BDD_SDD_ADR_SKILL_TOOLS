@@ -47,6 +47,24 @@ python3 cli/mazu.py <команда>
 
 `doctor` проверяет, что обязательные файлы метода на месте.
 
+## Проверки, которые нельзя заменить словами
+
+`check bdd ID` проверяет Given, When, Then.
+`check boundaries ID` проверяет, что границы не пустые.
+`check points ID` печатает points и часы рядом и не складывает их.
+`check adr ID` читает файл решения и отвергает пустой Decision.
+`check sysl ФАЙЛ` и `check calm ФАЙЛ` проверяют схемы в `diagrams/`.
+`check phase ИМЯ` не пускает в фазу без факта. Для implementation нужны `--outcome`, `--has-boundaries` и `--has-check`.
+`check guard "действие" --ask "..." --never "..."` останавливает Ask First и отказывает Never.
+`check wip board` считает истории в `in-progress`. Больше двух — отказ.
+
+`gate ready ID` и `gate done ID` собирают эти проверки. `move ID ready` и `move ID done` вызывают те же проверки и не двигают карточку, если есть FAIL. Промежуточные колонки `in-progress` и `review` двигаются без этого гейта: их держит лимит и ревью.
+
+`workflow epics --idea IDEA --epic EPIC` проверяет дерево.
+`workflow sprint --sprint S1` проверяет цель и каждую историю.
+
+`tools` печатает владельца каждой команды. `guide ТЕМА` печатает раздел `wiki/Manual.md`.
+
 ## Идентификаторы
 
 `IDEA`, `EPIC`, `US`, `TASK`, `REQ`, `ADR` плюс номер. Спринты: `S1`, `S2`. Внешний ключ трекера лежит в `external_id` и не подменяет локальный id.

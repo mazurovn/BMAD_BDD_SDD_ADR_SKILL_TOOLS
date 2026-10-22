@@ -1,30 +1,81 @@
 ---
 name: product-ideas
-description: Capture an idea and promote it to an epic only when the outcome is clear.
+description: Формулирует проблему и один исход. Не выбирает технологию.
 ---
 
-# Ideas and epics
+# Идея и эпик
 
-## Capture
+Идея отвечает, какую работу человек нанимает продукт сделать. Эпик берёт один исход из этой идеи. Пока исход не умещается в одну фразу, нарезка историй будет списком хотелок.
+
+## Ответственность
+
+Владелец: Analyst и PO.
+Код, который проверяет результат: `src/mazu_method/bmad.py`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
+
+## Когда открывать
+
+- Просьба широкая: «сделай систему», «улучши процесс».
+- Есть несколько исходов, и их пытаются спрятать в один эпик.
+
+## Когда не открывать
+
+- Исход уже ясен и нужны сценарии. Это BDD.
+- Нужно спроектировать модули. Это architecture.
+
+## Входы, без которых процедуру не начинают
+
+- Кто страдает и что меняется в его работе, если выйдет первая версия.
+- Явный список того, что в эту версию не входит.
+
+## Процедура
+
+1. Сформулировать проблему и исход в двух предложениях. Если не выходит, остановиться.
+2. Записать идею: `python3 cli/mazu.py add idea "исход" --description "проблема"`.
+3. Записать один эпик: `python3 cli/mazu.py add epic "исход" --parent IDEA-001`.
+4. Проверить фазу: `python3 cli/mazu.py check phase planning --outcome "исход"`.
+5. Отдать id эпика в create-epics-and-stories. Не писать истории в этом скилле, если срезы ещё неясны.
+
+## Гейты и гардрейлы
+
+- Нет одной фразы — нет эпика.
+- Второй исход — второй эпик, а не абзац в описании первого.
+
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
+
+## Делать
+
+- Называть, что останется снаружи.
+- Держать ценность отдельно от способа реализации.
+
+## Не делать
+
+- Не выбирать фреймворк, базу и структуру папок.
+- Не ставить points на идею и эпик.
+- Не обещать срок из points.
+
+## Контроль качества
+
+- `show IDEA-001` содержит исход, который человек может повторить своими словами.
+- У эпика parent указывает на эту идею.
+
+## Как выглядит провал
+
+- Исход из двух несвязанных результатов.
+- Описание состоит из списка технологий.
+- Эпик без родителя. Workflow epics это поймает.
+
+## Передача
+
+PO забирает эпик в create-epics-and-stories. Архитекторов не зовут, пока нет исхода.
+
+## Пример команд
 
 ```bash
-python3 cli/mazu.py add idea "Allow agents to share one backlog format" \
-  --description "Problem: each harness stores work differently. Outcome: one JSON store plus markdown specs."
+python3 cli/mazu.py add idea "Оператор видит неготовые истории" --description "Готовность сейчас в чате"
+python3 cli/mazu.py add epic "Гейт ready виден командой" --parent IDEA-001
 ```
 
-An idea is not a commitment. Status stays `backlog` until someone writes the outcome in one sentence.
+## Применение инструментов
 
-## Promote
-
-```bash
-python3 cli/mazu.py add epic "One backlog file" --parent IDEA-001 \
-  --description "A new user can init, add a story, and open the HTML dashboard without extra services."
-```
-
-## Do not
-
-- Do not turn a tool wishlist into an epic.
-- Do not put project-specific customer data in this repository. Ideas here are about the method, or they live in the consumer project's `mazu-data/` which is gitignored.
-
-## Rules
-Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.

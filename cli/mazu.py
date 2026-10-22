@@ -216,6 +216,18 @@ def cmd_move(args: argparse.Namespace) -> None:
         raise SystemExit(f"status must be one of {STATUSES}")
     data = load()
     item = find(data, args.id)
+    if args.status == "ready":
+        issues = ready_issues(item)
+        if issues:
+            for issue in issues:
+                print(f"FAIL {issue}")
+            raise SystemExit(1)
+    if args.status == "done":
+        issues = done_issues(item)
+        if issues:
+            for issue in issues:
+                print(f"FAIL {issue}")
+            raise SystemExit(1)
     item["status"] = args.status
     item["updated_at"] = now()
     save(data)

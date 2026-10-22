@@ -1,32 +1,83 @@
 ---
-name: adr-records
-description: Record an architecture or process decision as an ADR. Use when a choice will be expensive to reverse.
+name: adr
+description: Создаёт и проверяет файл решения. Пустой Decision не считается принятым.
 ---
 
-# ADR
+# ADR: дорогой выбор
 
-## When to write one
+ADR пишут, когда выбор будет дорого менять: хранилище, публичная граница, форма потока, правило метода. Мелочь в ADR не кладут. Старый файл не удаляют, когда решение сменилось.
 
-A choice constrains later work: storage, interface, workflow, or a methodology rule. Skip ADRs for trivia.
+## Ответственность
 
-## Procedure
+Владелец: ADR keeper.
+Код, который проверяет результат: `src/mazu_method/adr.py`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
 
-1. `python3 cli/mazu.py add adr "<decision title>" --description "<context in one paragraph>"`
-2. Edit `mazu-data/adr/ADR-00N.md`. Fill Decision and Consequences. Leave Status as the store status.
-3. Status meanings:
-   - `backlog` / `ready` — proposed
-   - `in-progress` — under discussion
-   - `review` — waiting for acceptance
-   - `done` — accepted
-4. Supersede by adding a new ADR whose description names the old id. Do not delete the old file.
+## Когда открывать
 
-## Template
+- Дверь односторонняя: откат дороже, чем неделя работы.
+- Две истории спорят, и нужен один принятый выбор.
+- Меняется поведение Sysl или связь CALM.
 
-[templates/adr.md](../../templates/adr.md)
+## Когда не открывать
 
-## Rule
+- Выбор легко откатить на следующей задаче. Его пишут в описании истории.
+- Нужно описать приёмку. Это BDD.
 
-If two stories disagree, the accepted ADR wins until a newer accepted ADR says otherwise.
+## Входы, без которых процедуру не начинают
 
-## Rules
-Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.
+- Факты контекста, не лозунг.
+- Один выбранный вариант и последствия, включая плохие.
+
+## Процедура
+
+1. Создать карточку: `python3 cli/mazu.py add adr "название" --description "факты контекста"`.
+2. Открыть `mazu-data/adr/ADR-00N.md` и заменить `_fill in_` в Decision и дополнить Context, если он пуст.
+3. Заполнить Consequences: плюс, минус, что сделать следом.
+4. Запустить `python3 cli/mazu.py check adr ADR-001`. Пока Decision или Context пустые, будет FAIL ADR-2.
+5. Принятое решение переводят в `done` только после того, как check проходит. Новое решение — новый id, в контексте назван старый.
+
+## Гейты и гардрейлы
+
+- Четыре раздела обязательны: Status, Context, Decision, Consequences.
+- `_fill in_` не считается текстом решения.
+- Удаление старого файла запрещено правилом ADR-4.
+
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
+
+## Делать
+
+- Писать в Context только то, что можно проверить.
+- Называть, какие истории теперь проигрывают.
+
+## Не делать
+
+- Не принимать два конфликтующих ADR как оба действующие.
+- Не прятать секрет или имя клиента в файл.
+- Не заводить ADR на переименование переменной.
+
+## Контроль качества
+
+- `check adr` печатает PASS.
+- В Consequences есть цена, не только выгода.
+
+## Как выглядит провал
+
+- ADR-2 decision is empty.
+- ADR-2 context is empty.
+- ADR-2 missing consequences.
+
+## Передача
+
+Принятый ADR читают solution architect и dev до кода. Если поведение изменилось, следом правят Sysl. Если состав — CALM.
+
+## Пример команд
+
+```bash
+python3 cli/mazu.py add adr "Store is one JSON file" --description "One operator, no concurrent writers"
+python3 cli/mazu.py check adr ADR-001
+```
+
+## Применение инструментов
+
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.

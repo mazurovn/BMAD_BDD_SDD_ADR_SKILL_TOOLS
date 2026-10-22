@@ -1,21 +1,78 @@
 ---
 name: tool-calling
-description: Call MAZU through OpenAI-style tool schemas and GigaChat functions.
+description: Заставляет модель звать CLI по схемам и не отвечать до stdout.
 ---
 
-# Tool calling
+# Вызов инструментов
 
-- `tools/openai.json` — GPT, Codex, DeepSeek, Kimi, Grok, OpenCode, Qwen, when the harness speaks OpenAI tools.
-- `tools/gigachat.json` — GigaChat `functions`. Flat parameters. No union types.
+Имя функции берут из `tools/openai.json` или `tools/gigachat.json`. Рядом нет скрытого сервера: функция означает команду `python3 cli/mazu.py`. Пока stdout не прочитан, агент не знает, что получилось.
 
-## Loop
+## Ответственность
 
-1. Send the schema with the user message.
-2. If the model returns a function call, run `python3 cli/mazu.py` with those arguments. Do not answer as if the command ran.
-3. Send stdout back as the tool result.
-4. GigaChat: when `finish_reason` is `function_call`, return a message with role `function`.
+Владелец: Любая роль, которая трогает store.
+Код, который проверяет результат: `tools/openai.json`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
 
-Ask First still applies. A tool result does not cancel a boundary.
+## Когда открывать
 
-## Rules
-Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.
+- Модель в harness умеет function call.
+- Надо объяснить, почему нельзя просто пообещать запись в бэклог.
+
+## Когда не открывать
+
+- Человек явно просит только объяснить правило и не трогать store.
+
+## Входы, без которых процедуру не начинают
+
+- Схема из файла tools, не из памяти модели.
+- Аргументы, которые есть у соответствующей команды `--help`.
+
+## Процедура
+
+1. Найти функцию в схеме. Если имени нет, не вызывать выдуманное.
+2. Собрать команду CLI с теми же аргументами.
+3. Выполнить её в каталоге набора или проекта.
+4. Для GigaChat после finish_reason function_call вернуть результат отдельным сообщением роли function.
+5. В ответе человеку привести id и строку PASS или FAIL, если был гейт.
+
+## Гейты и гардрейлы
+
+- Нет схемы — нет вызова.
+- Ненулевой код не превращают в успех перефразированием.
+
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
+
+## Делать
+
+- Повторять команду в ответе, чтобы её можно было проверить.
+- Передавать только те поля, которые команда принимает.
+
+## Не делать
+
+- Не печатать токены, которые команда connectors скрывает.
+- Не вызывать pull повторно «на всякий случай», если первый завершился ошибкой из-за отсутствия токена.
+
+## Контроль качества
+
+- Каждому утверждению «записано» соответствует id из stdout.
+- Имя функции есть в JSON схемы.
+
+## Как выглядит провал
+
+- Ответ «добавил US-010», а `list` его не показывает.
+- Вызвана функция, которой нет в tools.
+
+## Передача
+
+Дальше работает скилл той роли, чью команду вызвали. Tool-calling сам работу не делает.
+
+## Пример команд
+
+```bash
+python3 cli/mazu.py tools
+python3 cli/mazu.py --help
+```
+
+## Применение инструментов
+
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.

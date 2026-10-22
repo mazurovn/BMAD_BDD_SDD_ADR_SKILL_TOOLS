@@ -1,28 +1,83 @@
 ---
 name: create-epics-and-stories
-description: Slice an idea into one epic and checkable stories with points, acceptance, and boundaries.
+description: Проверяет дерево идея → эпик → истории и не пускает крупную историю в ready.
 ---
 
-# Create epics and stories
+# create-epics-and-stories
 
-This is the local form of the BMAD workflow create-epics-and-stories.
+Это локальная форма одноимённого потока BMAD v6. Эпик — один исход, не отдел и не слой. История — вертикальный срез, который можно проверить целиком. Задача под историей points не получает.
 
-## Procedure
+## Ответственность
 
-1. One idea with a one-sentence outcome: `python3 cli/mazu.py add idea "..." --description "..."`.
-2. One epic for the first outcome, not for a department: `add epic "..." --parent IDEA-001`.
-3. Stories are vertical slices. Each story gets:
-   - `--parent EPIC-001`
-   - `--points` of 1, 2, 3, 5, or 8. Use 13 only to mark a split. Do not leave 21 in a sprint.
-   - `--acceptance` with at least one Given / When / Then. Separate scenarios with `|`.
-   - `--always`, `--ask-first`, `--never` when the story has a rule of its own.
-4. Tasks are optional steps under a story: `add task "..." --parent US-001`. Tasks do not get points.
-5. A story is not ready until parent, points, and acceptance exist. `move US-001 ready` is the SM's action after that check.
+Владелец: PO вместе с BMAD lead.
+Код, который проверяет результат: `src/mazu_method/workflows.py`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
 
-## Do not
+## Когда открывать
 
-Do not write hours into `--points`. Hours are `log` after work starts.
-Do not create an epic per technical layer.
+- Идея уже одной фразой, и её надо нарезать.
+- Есть набор историй, и надо проверить, что они висят на одном эпике.
 
-## Rules
-Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.
+## Когда не открывать
+
+- Исход ещё нельзя сказать одной фразой. Сначала product-ideas и фаза analysis.
+- Нужно только разложить уже ready истории по спринту. Это sprint-planning.
+
+## Входы, без которых процедуру не начинают
+
+- IDEA-id и EPIC-id.
+- Истории с родителем-эпиком, points, сценарием и границами.
+
+## Процедура
+
+1. Создать идею и эпик с `--parent`, если их нет.
+2. На каждую историю поставить родителя эпика, points от 1 до 8, acceptance и хотя бы одну границу.
+3. Запустить `python3 cli/mazu.py workflow epics --idea IDEA-001 --epic EPIC-001`.
+4. Каждый FAIL исправить в карточке. Команда не чинит данные сама.
+5. Только после PASS звать sprint-planning.
+
+## Гейты и гардрейлы
+
+- Эпик должен ссылаться на идею. История должна ссылаться на эпик.
+- История на 13 и 21 не проходит ready. Её режут до планирования.
+- Пустой эпик — FAIL EPIC-2 epic has no stories.
+
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
+
+## Делать
+
+- Резать так, чтобы у среза был свой Then.
+- Оставлять 13 как сигнал «ещё не разрезано», а не как план спринта.
+
+## Не делать
+
+- Не создавать эпик на команду или технологический слой.
+- Не вешать points на задачу.
+- Не вызывать workflow, подставив чужие id из другого проекта. Сначала `project use`.
+
+## Контроль качества
+
+- Stdout workflow начинается с PASS.
+- У каждой истории в `show` есть parent, points и acceptance.
+
+## Как выглядит провал
+
+- EPIC-1 epic is not attached to the idea.
+- EPIC-2 parent is missing.
+- BDD-2 acceptance is missing внутри отчёта истории.
+
+## Передача
+
+PASS отдают scrum master на sprint-planning. FAIL по границам отдают SDD author. FAIL по Then отдают BDD author.
+
+## Пример команд
+
+```bash
+python3 cli/mazu.py add idea "One outcome"
+python3 cli/mazu.py add epic "First slice" --parent IDEA-001
+python3 cli/mazu.py workflow epics --idea IDEA-001 --epic EPIC-001
+```
+
+## Применение инструментов
+
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.

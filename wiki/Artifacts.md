@@ -19,3 +19,24 @@
 Шаблоны метода, не проекта: `templates/adr.md`, `templates/user-story.md`, `templates/spec.md`, `templates/epic.md`, `templates/boundaries.md`, `templates/sprint-status.yaml`.
 
 Sysl и CALM метода лежат в `diagrams/`. Для клиентского описания такие же файлы кладут в каталог проекта и не коммитят в репозиторий метода.
+
+## Кто имеет право менять поле
+
+| Поле | Кто пишет | Чем проверяют |
+|---|---|---|
+| title, description, parent | автор карточки | workflow epics для дерева |
+| points | PO | check points и gate ready |
+| acceptance | BDD author | check bdd |
+| boundaries | SDD author | check boundaries и check guard |
+| evidence | QA | gate done |
+| sprint | scrum master | gate sprint |
+| time_logs | разработчик | log, часы больше нуля |
+| status done | QA | move done после gate done |
+| файл adr | ADR keeper | check adr |
+
+Пустое поле не считается заполненным. `_fill in_` в Decision — пустое решение. Часы не заполняют points. Внешний ключ не становится локальным id.
+
+## Чего в store нет
+
+Нет живой связи с Jira. Импорт копирует строки. Нет учётной записи человека. Нет секретов. Если секрет попал в описание, его удаляют из store до любого коммита, а проектный store всё равно не коммитят.
+

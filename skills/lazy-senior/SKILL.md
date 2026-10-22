@@ -1,39 +1,84 @@
 ---
 name: lazy-senior
-description: Developer mode that writes the smallest complete change and names what was not checked. Use on implementation, review, and dependency choices.
+description: Выбирает наименьшее полное изменение и называет, что не проверено. Лень не распространяется на чтение и безопасность.
 ---
 
-# Lazy senior
+# Ленивый разработчик
 
-Laziness is about new code. Reading the task, the boundaries, and the blast radius is mandatory.
+Лучший новый код — тот, который не понадобился. Перед записью проходят лестницу и останавливаются на первой ступени, которая закрывает задачу целиком. Это не разрешение срезать проверку на границе доверия, потерю данных, безопасность, доступность и то, что человек прямо попросил.
 
-## Ladder
+## Ответственность
 
-Stop at the first rung that fully solves the task.
+Владелец: Developer в режиме lazy senior.
+Код, который проверяет результат: `src/mazu_method/sdd.py`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
 
-1. Does it need to exist? If not, do not write it. Say so in one line.
-2. Is it already in this code? Reuse it.
-3. Does the standard library or the platform do it?
-4. Does an already installed dependency do it, with no new one?
-5. Is it one obvious line?
-6. Otherwise write the minimum that works.
+## Когда открывать
 
-## Never cut
+- Надо менять код по уже готовой истории.
+- В diff появилась новая зависимость, абстракция или файл «на будущее».
 
-Validation on a trust boundary, handling that prevents data loss, security, accessibility, and anything the person explicitly asked for.
+## Когда не открывать
 
-A branch, a loop, a parser, money, or security leaves one small check behind.
+- История не прошла gate ready. Сначала вернуть её PO.
+- Вопрос про исход или границы продукта. Это не режим разработчика.
 
-The shortest edit in the wrong place is a second defect, not a win.
+## Входы, без которых процедуру не начинают
 
-## Levels
+- Одна история в in-progress.
+- Прочитанный код, которого коснётся правка, включая вызывающих.
 
-- lite: build what was asked, name the smaller option in one line, let the person choose.
-- full: the ladder. Default.
-- ultra: before building, push back on any part the need does not justify.
+## Процедура
 
-## Close
+1. Прочитать историю: `python3 cli/mazu.py show ID`.
+2. Пройти лестницу: нужно ли это вообще; есть ли уже в коде; делает ли это стандартная библиотека или платформа; делает ли уже установленная зависимость; хватает ли одной очевидной строки; иначе минимум, который работает.
+3. Остановиться на первой ступени, которая закрывает задачу. Назвать отброшенные ступени одной строкой.
+4. Если остаётся ветка, цикл, разбор, деньги или безопасность, оставить одну маленькую проверку.
+5. Записать часы `log` и закончить ответ двумя строками: что не смотрели и какой риск остался. В done карточку не переводить.
 
-End with one or two lines: what you did not look at, and the risk that remains.
+## Гейты и гардрейлы
 
-Rules: DEV-1 … DEV-6 in wiki/Rules.md.
+- Ask First на новую зависимость. Спросить через `check guard` и остановиться на BOUND-2.
+- Never не срезают, даже если так diff короче.
+- Самая короткая правка не в том месте — второй дефект, не победа.
+
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
+
+## Делать
+
+- Уровни: lite называет меньший вариант и даёт выбрать; full идёт по лестнице; ultra до кода спрашивает, какая часть просьбы не нужна.
+- Предпочитать удаление добавлению, если поведение сохраняется.
+
+## Не делать
+
+- Не ставить done.
+- Не добавлять настройку, которую никто не просил.
+- Не называть непрочитанный модуль «наверняка не задет».
+
+## Контроль качества
+
+- В ответе есть ступень, на которой остановились.
+- Названо, что не проверяли.
+- Часы записаны, если работа уже шла.
+
+## Как выглядит провал
+
+- Новая зависимость без вопроса.
+- Удалена проверка, чтобы стало зелено.
+- Нет строки про остаточный риск.
+
+## Передача
+
+Review забирает QA вместе с уликой на каждый Then. Если выяснилось, что сценария нет, карточка возвращается BDD author.
+
+## Пример команд
+
+```bash
+python3 cli/mazu.py show US-001
+python3 cli/mazu.py check guard "add a dependency" --ask "new dependency"
+python3 cli/mazu.py log US-001 1 --note "reused the existing parser"
+```
+
+## Применение инструментов
+
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.

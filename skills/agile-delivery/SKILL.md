@@ -1,52 +1,85 @@
 ---
 name: agile-delivery
-description: Shape a backlog, split stories, plan a sprint, track a Kanban board, separate story points from hours.
+description: Ведёт колонки, лимит незавершённого, ready и done. Один и тот же код для Scrum и Kanban.
 ---
 
-# Agile delivery
+# Agile delivery: доска, резка, поток
 
-Practices aligned with packs such as agile-delivery-skills (backlog grooming, story splitting, sprint goals, blockers, definition of done). Implemented here as CLI commands plus this checklist.
+Иерархия одна: идея, эпик, история, задача. Колонки одни: backlog, ready, in-progress, review, done. Scrum добавляет спринт и цель. Kanban не назначает спринт и ограничивает незавершённое. Часы не закрывают историю.
 
-## Hierarchy
+## Ответственность
 
-`idea → epic → story → task`
+Владелец: Scrum master.
+Код, который проверяет результат: `src/mazu_method/agile.py`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
 
-- Epic: outcome, not a task list.
-- Story: one user-visible or one independently testable slice. Points required. Prefer 1–8. 13 means split. 21 means not ready.
-- Task: optional step under a story. No points.
+## Когда открывать
 
-## Splitting
+- Карточку надо двигать по доске.
+- В работе больше двух историй.
+- История на 13 или 21 претендует в спринт.
 
-Split by workflow step, business rule, or data variation. Do not split by technical layer (all-UI then all-API) unless an ADR says the slice cannot be vertical.
+## Когда не открывать
 
-## Scrum and Kanban
+- Нужно придумать исход. Это product-ideas.
+- Нужно выбрать границу систем. Это architecture.
 
-Both use the same statuses: `backlog`, `ready`, `in-progress`, `review`, `done`.
+## Входы, без которых процедуру не начинают
 
-- Scrum: `sprint new --goal "..."`, then `sprint add --id US-001 --sprint S1`. A sprint goal is one sentence.
-- Kanban: skip sprint assignment and read `python3 cli/mazu.py board`. Limit work in `in-progress` by agreement (default suggestion: 2 stories).
+- История с родителем.
+- Понимание, Scrum это или Kanban. Если человек не сказал, спросить до `sprint new`.
 
-## Points vs time
+## Процедура
 
-| | Story points | Hours |
-|---|---|---|
-| Question | how big / how uncertain | how long it actually took |
-| Command | `--points` | `log US-001 1.5 --note "..."` |
-| Use | planning, velocity | cost, retro |
+1. Посмотреть доску: `python3 cli/mazu.py board`.
+2. Проверить лимит: `python3 cli/mazu.py check wip board`. Больше двух историй в in-progress даёт AGILE-6.
+3. Перед ready: `python3 cli/mazu.py gate ready ID`.
+4. Двигать только на одну колонку: `python3 cli/mazu.py move ID in-progress`.
+5. Перед done: улики и `python3 cli/mazu.py gate done ID`. Done ставит QA, не автор кода.
 
-Velocity = sum of points of stories in that sprint with status `done`. The dashboard prints it. Do not convert points to hours.
+## Гейты и гардрейлы
 
-## Definition of ready
+- Ready: родитель, points 1–8, сценарий, границы.
+- Done: всё то же плюс улика на каждый сценарий.
+- WIP: не больше двух историй в in-progress, пока человек не записал другой предел.
 
-Parent set, points set, at least one acceptance scenario, boundaries set.
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
 
-## Definition of done
+## Делать
 
-Acceptance evidence recorded, status `done`, hours logged if someone wants cost (optional), dashboard regenerated.
+- Резать историю по шагу потока, правилу или варианту данных.
+- Держать задачу без points. Points живут на истории.
 
-## Retro prompt
+## Не делать
 
-After a sprint, read `dashboard` and answer: what blocked movement to done, which 13+ stories should have been split, whether hours and points diverged in a way that changes the next goal. Do not invent metrics that are not in `store.json`.
+- Не резать «сначала весь интерфейс, потом весь сервер» без ADR.
+- Не переводить points в часы на планировании.
+- Не закрывать карточку, потому что часы уже записаны.
 
-## Rules
-Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.
+## Контроль качества
+
+- `board` и `gate` согласованы: в ready нет истории, которая падает на gate ready.
+- Ретро смотрит только store: что не дошло до done, что надо было резать, где часы и points разошлись.
+
+## Как выглядит провал
+
+- AGILE-6 N stories in progress.
+- EPIC-2 points are too large to be ready.
+- ready gate applies to a story — гейт вызвали на эпик или задачу.
+
+## Передача
+
+Ready-истории забирает sprint-planning. Review забирает QA. Ретро читает dashboard, не память чата.
+
+## Пример команд
+
+```bash
+python3 cli/mazu.py board
+python3 cli/mazu.py check wip board
+python3 cli/mazu.py gate ready US-001
+python3 cli/mazu.py move US-001 in-progress
+```
+
+## Применение инструментов
+
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.

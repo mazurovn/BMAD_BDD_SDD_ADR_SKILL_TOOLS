@@ -31,7 +31,7 @@ def test_flow(tmp_path, monkeypatch):
             "--points",
             "3",
             "--acceptance",
-            "Given items exist | When I list | Then I see ids",
+            "Given items exist When I list Then I see ids",
             "--always",
             "keep store json valid",
             "--ask-first",
@@ -44,6 +44,7 @@ def test_flow(tmp_path, monkeypatch):
     mod.main(["sprint", "new", "--goal", "CLI works"])
     mod.main(["sprint", "add", "--id", "US-001", "--sprint", "S1"])
     mod.main(["log", "US-001", "1.5", "--note", "first slice"])
+    mod.main(["evidence", "US-001", "list printed the ids"])
     mod.main(["move", "US-001", "done"])
     data = json.loads((tmp_path / "mazu-data" / "store.json").read_text())
     assert data["items"][2]["points"] == 3

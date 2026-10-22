@@ -56,7 +56,7 @@ SKILLS = [
     "bmad", "sdd", "bdd", "adr", "agile-delivery", "product-ideas",
     "requirements", "sysl", "calm", "skill-creator", "backlog-connectors",
     "tool-calling", "projects", "create-epics-and-stories", "sprint-planning",
-    "lazy-senior", "architecture",
+    "lazy-senior", "architecture", "estimation",
 ]
 ROLES = [
     "analyst.md", "po.md", "bmad-lead.md", "architect.md",

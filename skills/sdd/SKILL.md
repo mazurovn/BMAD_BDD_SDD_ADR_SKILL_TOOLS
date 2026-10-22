@@ -1,39 +1,84 @@
 ---
-name: sdd-spec-driven
-description: Write a spec before implementation. Includes Always / Ask First / Never boundaries.
+name: sdd
+description: Пишет спецификацию, которая может отклонить лишний diff, и ставит границы Always, Ask First, Never.
 ---
 
-# Spec-driven development
+# SDD: спецификация до кода
 
-Inspired by GitHub Spec Kit phases (specify, plan, tasks, implement) and the Scrum Manager boundary pattern. This repo ships the procedure, not a copy of those projects.
+Спецификация — якорь. Сначала что и для кого, потом план, потом задачи, потом реализация. Если требование изменилось, правят спецификацию и список историй. Тихое расширение истории — дефект процесса, а не скорость.
 
-## Layers
+## Ответственность
 
-- Spec-first: write the spec, then build.
-- Spec-anchored: keep the spec next to the work and update it when the requirement changes.
-- This kit stops at spec-anchored. It does not treat the spec as generated source code.
+Владелец: SDD author.
+Код, который проверяет результат: `src/mazu_method/sdd.py`.
+Если вопрос принадлежит другой роли, этот скилл останавливается и называет её. Он не закрывает чужой гейт и не подменяет чужое решение.
 
-## Procedure
+## Когда открывать
 
-1. Copy [templates/spec.md](../../templates/spec.md) into `mazu-data/specs/<id>.md`.
-2. Fill goal, actors, out of scope, acceptance, and boundaries.
-3. Register it: `python3 cli/mazu.py add requirement "<title>" --description "see mazu-data/specs/..."`.
-4. Break the spec into stories only after the boundaries exist.
-5. Implement one story. If the requirement changed, update the spec first, then re-slice. Do not silently edit the decision.
+- Есть эпик и ещё нет файла спецификации.
+- История готова к ready, но границы только в голове.
+- Кто-то просит сделать «заодно» то, чего нет в спецификации.
 
-## Boundaries
+## Когда не открывать
 
-| Level | Meaning | Default in this kit |
-|---|---|---|
-| Always | do without asking | keep `store.json` valid; add a test or a check for new behavior; follow accepted ADRs |
-| Ask First | stop and ask | new dependency; schema change; public interface change; refactor outside the story |
-| Never | do not do | commit secrets; delete history or failing checks to go green; edit another project's data into this repo |
+- Нужно только записать решение о хранилище. Это ADR.
+- Нужно нарисовать состав системы. Это CALM.
 
-Put the three lists on the story with `--always`, `--ask-first`, `--never` (use `|` between items).
+## Входы, без которых процедуру не начинают
 
-## Done
+- Цель одной фразой и список того, что вне scope.
+- Шаблон `templates/spec.md`. Его копируют в `mazu-data/specs/`, не правят оригинал шаблона под один проект.
 
-The spec file exists, the requirement id exists, and every story names the spec.
+## Процедура
 
-## Rules
-Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.
+1. Скопировать шаблон в `mazu-data/specs/<имя>.md` и заполнить цель, акторов, вне scope, требования, приёмку, план, задачи, границы, улику.
+2. На каждую историю повесить границы флагами `--always`, `--ask-first`, `--never` при `add` или помнить, что пустые границы не пройдут `gate ready`.
+3. Проверить карточку: `python3 cli/mazu.py check boundaries ID`.
+4. Перед спорным действием спросить код: `python3 cli/mazu.py check guard "add a new dependency" --ask "new dependency" --never "commit secrets"`.
+5. Если guard вернул BOUND-2, остановиться и спросить человека. Если BOUND-3, отказаться.
+
+## Гейты и гардрейлы
+
+- Always делают без вопроса: валидный store, проверка нового поведения, соблюдение принятого ADR.
+- Ask First останавливает: новая зависимость, смена схемы, смена публичной команды, правка вне истории, смешение трёх слоёв архитектуры.
+- Never запрещено даже ради зелёного статуса: секреты, удаление истории store, удаление проверки, бэклог клиента в репозитории метода.
+
+Ненулевой код выхода — это отказ. Агент не пишет, что шаг пройден, пока в stdout нет `PASS`.
+
+## Делать
+
+- Писать требование так, чтобы его можно было сверить с diff.
+- Держать Never спецификации даже если история добавила свой список. Код `merge` не удаляет Never.
+- Называть идентификатор BOUND, когда останавливаетесь.
+
+## Не делать
+
+- Не начинать реализацию при открытом Ask First.
+- Не считать «сделай как считаешь нужным» снятием Never.
+- Не превращать спецификацию в сгенерированный исходник.
+
+## Контроль качества
+
+- В спецификации есть вне scope. Без него любая добавка выглядит нужной.
+- `check boundaries` для истории, которая претендует на ready, даёт PASS.
+
+## Как выглядит провал
+
+- FAIL BOUND-5 boundaries are missing.
+- Выход guard с текстом BOUND-2 stop and ask.
+- Выход guard с текстом BOUND-3 refuse.
+
+## Передача
+
+Готовая спецификация уходит BDD author на сценарии и solution architect на контракт. Реализацию не начинают.
+
+## Пример команд
+
+```bash
+python3 cli/mazu.py check guard "commit secrets in the repo" --never "commit secrets"
+python3 cli/mazu.py check boundaries US-001
+```
+
+## Применение инструментов
+
+Каждая команда выше — это `python3 cli/mazu.py ...` из корня набора. Схему вызова для модели берут из `tools/openai.json` или `tools/gigachat.json` и не выдумывают имя функции. Результат известен только после stdout.
