@@ -927,6 +927,7 @@ def render_html(data: dict, live: bool) -> str:
         "hours": {item["id"]: hours_for(data, item["id"]) for item in data["items"]},
         "blocked": blocked_map(data),
         "cycle": {item["id"]: cycle_row(item) for item in data["items"]},
+        "specs": spec_texts(),
         "calm": diagram_svg("calm"),
         "sysl": diagram_svg("sysl"),
     }
@@ -947,6 +948,7 @@ def snapshot(live: bool = True) -> dict:
         "hours": {item["id"]: hours_for(data, item["id"]) for item in data["items"]},
         "blocked": blocked_map(data),
         "cycle": {item["id"]: cycle_row(item) for item in data["items"]},
+        "specs": spec_texts(),
         "calm": diagram_svg("calm"),
         "sysl": diagram_svg("sysl"),
     }
@@ -1362,6 +1364,13 @@ def cmd_probe(_args: argparse.Namespace) -> None:
     save(data)
     if failed:
         raise SystemExit(1)
+
+
+def spec_texts() -> dict[str, str]:
+    folder = data_dir() / "specs"
+    if not folder.exists():
+        return {}
+    return {path.stem: path.read_text(encoding="utf-8") for path in sorted(folder.glob("*.md"))}
 
 
 def cycle_row(item: dict) -> list[dict]:
