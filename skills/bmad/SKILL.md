@@ -42,3 +42,6 @@ The request is bigger than a one-line edit: new capability, unclear scope, or se
 ## Output
 
 Leave the store, the ADR file, and `mazu-data/dashboard.md` updated. Do not invent project facts that are not in the store or the user's message.
+
+## Rules
+Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.

@@ -34,3 +34,6 @@ Put the three lists on the story with `--always`, `--ask-first`, `--never` (use 
 ## Done
 
 The spec file exists, the requirement id exists, and every story names the spec.
+
+## Rules
+Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.

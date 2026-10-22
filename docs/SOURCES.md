@@ -10,4 +10,5 @@ This repo does not vendor those trees. It implements the loop so it runs with Py
 | Sysl | https://github.com/anz-bank/sysl | Apache-2.0 | `.sysl` system spec |
 | FINOS CALM | https://github.com/finos/architecture-as-code | Apache-2.0 | architecture JSON |
 | ADR | Michael Nygard pattern | n/a | context / decision / consequences |
-| Boundaries | https://www.scrummanager.com/bok/index.php?title=Always_/_Ask_First_/_Never/en | n/a | Always / Ask First / Never |
+| Boundaries | Scrum Manager BoK, Always / Ask First / Never | n/a | three-level delegation rules |
+| Lazy senior ladder | https://github.com/DietrichGebert/ponytail | MIT | smallest complete change, never cut trust-boundary checks; our wording is in skills/lazy-senior |

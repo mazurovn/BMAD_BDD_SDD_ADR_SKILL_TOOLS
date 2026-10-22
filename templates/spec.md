@@ -1,5 +1,7 @@
 # Spec: Title
 
+Rules: SDD-1, SDD-3, BOUND-1, BOUND-2, BOUND-3.
+
 ## Goal
 ## Actors
 ## Out of scope

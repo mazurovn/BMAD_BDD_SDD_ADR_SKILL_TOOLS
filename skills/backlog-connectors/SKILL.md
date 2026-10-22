@@ -37,3 +37,6 @@ Epic stays an epic. Story and Feature become stories. Bug and Task become tasks.
 Always: keep the original key in `external_id`.
 Ask First: overwrite an existing project store.
 Never: invent issues that were not in the file or the API response.
+
+## Rules
+Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.

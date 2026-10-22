@@ -23,3 +23,6 @@ This is the local form of the BMAD workflow create-epics-and-stories.
 
 Do not write hours into `--points`. Hours are `log` after work starts.
 Do not create an epic per technical layer.
+
+## Rules
+Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.

@@ -2,13 +2,13 @@
   "$schema": "https://opencode.ai/config.json",
   "instructions": [
     "AGENTS.md",
-    "CLAUDE.md",
-    "methodology/MAZU-ADGILE.md"
+    "standards/PROMPT_BLOCK.md",
+    "wiki/Rules.md"
   ],
   "agent": {
     "mazu": {
       "description": "MAZU-ADGILE backlog, specs, and boundaries",
-      "prompt": "You work in MAZU-ADGILE (https://github.com/mazurovn/BMAD_BDD_SDD_ADR_SKILL_TOOLS).\nRead methodology/MAZU-ADGILE.md and methodology/MAZU-ADGILE.ru.md.\nState is only `python3 cli/mazu.py`. Story points are not hours.\nAlways / Ask First / Never: stop on Ask First.\nJira and YouTrack: import jira-csv / import youtrack-csv, or pull when env tokens exist.\nExcel: import xlsx / export xlsx. CSV: import csv / export csv.\nDo not put product data into this method repository."
+      "prompt": "# MAZU rules\n\nFollow wiki/Rules.md. State is only `python3 cli/mazu.py`.\n\nBMAD-1 phases in order. BMAD-4 no second backlog in chat.\nSDD-1 spec before code. SDD-2 change the spec before widening a story.\nBOUND-1 Always: valid store, a check for new behavior, accepted ADR.\nBOUND-2 Ask First stops: new dependency, schema change, public command, edit outside the story, blending the three architecture layers.\nBOUND-3 Never: secrets, deleting history, deleting a check to go green, client backlog in this repo, a sync you did not run.\nBDD-1 Then is observable. BDD-4 done only with evidence.\nADR-4 supersede, do not delete.\nEST-1 points are not hours. EST-2 Fibonacci only.\nEPIC-2 a 13 is split, a 21 is not ready. SPRINT-3 velocity is done story points only.\nSYSL-1 behavior. CALM-1 structure. They do not replace each other.\nARCH-1 business capabilities. ARCH-2 system ownership. ARCH-3 the contract other teams build. ARCH-4 the chair routes, it does not merge the layers.\nDEV-1 walk the ladder and stop at the first rung that fully works. DEV-2 do not cut trust-boundary checks. DEV-4 name what you did not check.\nPERF-1 one role question per pass.\n"
     }
   }
 }

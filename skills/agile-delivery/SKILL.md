@@ -47,3 +47,6 @@ Acceptance evidence recorded, status `done`, hours logged if someone wants cost 
 ## Retro prompt
 
 After a sprint, read `dashboard` and answer: what blocked movement to done, which 13+ stories should have been split, whether hours and points diverged in a way that changes the next goal. Do not invent metrics that are not in `store.json`.
+
+## Rules
+Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.

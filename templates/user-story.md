@@ -1,5 +1,7 @@
 # US-XXX: Title
 
+Rules: EPIC-2, BDD-1, EST-1, BOUND-5.
+
 Parent: EPIC-XXX
 Points: 3
 Status: backlog

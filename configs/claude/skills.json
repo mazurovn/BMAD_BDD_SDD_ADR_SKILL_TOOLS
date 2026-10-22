@@ -1,14 +1,22 @@
 {
   "skillsPath": "./skills",
   "skills": [
-    "bmad",
-    "sdd",
-    "bdd",
     "adr",
     "agile-delivery",
+    "architecture",
+    "backlog-connectors",
+    "bdd",
+    "bmad",
+    "calm",
+    "create-epics-and-stories",
+    "lazy-senior",
     "product-ideas",
+    "projects",
     "requirements",
+    "sdd",
+    "skill-creator",
+    "sprint-planning",
     "sysl",
-    "calm"
+    "tool-calling"
   ]
 }

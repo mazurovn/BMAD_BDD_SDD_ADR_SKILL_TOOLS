@@ -27,3 +27,6 @@ A choice constrains later work: storage, interface, workflow, or a methodology r
 ## Rule
 
 If two stories disagree, the accepted ADR wins until a newer accepted ADR says otherwise.
+
+## Rules
+Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.

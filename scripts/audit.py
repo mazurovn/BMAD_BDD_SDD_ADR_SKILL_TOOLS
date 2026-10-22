@@ -46,12 +46,14 @@ SKILLS = [
     "bmad", "sdd", "bdd", "adr", "agile-delivery", "product-ideas",
     "requirements", "sysl", "calm", "skill-creator", "backlog-connectors",
     "tool-calling", "projects", "create-epics-and-stories", "sprint-planning",
+    "lazy-senior", "architecture",
 ]
 ROLES = [
-    "analyst.md", "po.md", "architect.md", "scrum-master.md", "dev.md", "qa.md",
+    "analyst.md", "po.md", "bmad-lead.md", "architect.md",
+    "business-architect.md", "enterprise-architect.md", "solution-architect.md",
+    "adr-keeper.md", "sdd-author.md", "bdd-author.md", "sysl-modeler.md",
+    "calm-modeler.md", "scrum-master.md", "dev.md", "lazy-senior.md", "qa.md",
     "integrator.md", "skill-creator.md", "researcher.md", "writer.md", "release.md",
-    "bmad-lead.md", "sdd-author.md", "bdd-author.md", "adr-keeper.md",
-    "sysl-modeler.md", "calm-modeler.md",
 ]
 HELP_WORDS = ["project", "import", "export", "pull", "connectors", "skill", "dashboard", "serve"]
 

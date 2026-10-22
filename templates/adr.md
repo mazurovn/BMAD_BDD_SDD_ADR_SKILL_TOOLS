@@ -1,5 +1,7 @@
 # ADR-XXX: Title
 
+Rules: ADR-1, ADR-2, ADR-4.
+
 ## Status
 Proposed
 

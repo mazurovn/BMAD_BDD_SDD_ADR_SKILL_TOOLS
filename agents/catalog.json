@@ -26,89 +26,109 @@
   ],
   "subagents": [
     {
-      "name": "MAZU-Analyst",
-      "file": "agents/analyst.md",
-      "phase": "analysis"
-    },
-    {
-      "name": "MAZU-PO",
-      "file": "agents/po.md",
-      "phase": "planning"
-    },
-    {
-      "name": "MAZU-Architect",
-      "file": "agents/architect.md",
-      "phase": "solutioning"
-    },
-    {
-      "name": "MAZU-SM",
-      "file": "agents/scrum-master.md",
-      "phase": "delivery"
-    },
-    {
-      "name": "MAZU-Dev",
-      "file": "agents/dev.md",
-      "phase": "implementation"
-    },
-    {
-      "name": "MAZU-QA",
-      "file": "agents/qa.md",
-      "phase": "acceptance"
-    },
-    {
-      "name": "MAZU-Integrator",
-      "file": "agents/integrator.md",
-      "phase": "connectors"
-    },
-    {
-      "name": "MAZU-Skill-Creator",
-      "file": "agents/skill-creator.md",
-      "phase": "method"
-    },
-    {
-      "name": "MAZU-Researcher",
-      "file": "agents/researcher.md",
-      "phase": "sources"
-    },
-    {
-      "name": "MAZU-Writer",
-      "file": "agents/writer.md",
-      "phase": "docs"
-    },
-    {
-      "name": "MAZU-Release",
-      "file": "agents/release.md",
-      "phase": "audit"
-    },
-    {
-      "name": "MAZU-BMAD-Lead",
-      "file": "agents/bmad-lead.md",
-      "phase": "phases"
-    },
-    {
-      "name": "MAZU-SDD-Author",
-      "file": "agents/sdd-author.md",
-      "phase": "spec"
-    },
-    {
-      "name": "MAZU-BDD-Author",
-      "file": "agents/bdd-author.md",
-      "phase": "acceptance"
-    },
-    {
-      "name": "MAZU-ADR-Keeper",
+      "name": "ADR keeper",
       "file": "agents/adr-keeper.md",
-      "phase": "decisions"
+      "phase": "adr-keeper"
     },
     {
-      "name": "MAZU-Sysl-Modeler",
-      "file": "agents/sysl-modeler.md",
-      "phase": "behavior"
+      "name": "Analyst",
+      "file": "agents/analyst.md",
+      "phase": "analyst"
     },
     {
-      "name": "MAZU-CALM-Modeler",
+      "name": "Architecture chair",
+      "file": "agents/architect.md",
+      "phase": "architect"
+    },
+    {
+      "name": "BDD author",
+      "file": "agents/bdd-author.md",
+      "phase": "bdd-author"
+    },
+    {
+      "name": "BMAD lead",
+      "file": "agents/bmad-lead.md",
+      "phase": "bmad-lead"
+    },
+    {
+      "name": "Business architect",
+      "file": "agents/business-architect.md",
+      "phase": "business-architect"
+    },
+    {
+      "name": "CALM modeler",
       "file": "agents/calm-modeler.md",
-      "phase": "structure"
+      "phase": "calm-modeler"
+    },
+    {
+      "name": "Developer",
+      "file": "agents/dev.md",
+      "phase": "dev"
+    },
+    {
+      "name": "Enterprise architect",
+      "file": "agents/enterprise-architect.md",
+      "phase": "enterprise-architect"
+    },
+    {
+      "name": "Integrator",
+      "file": "agents/integrator.md",
+      "phase": "integrator"
+    },
+    {
+      "name": "Lazy senior",
+      "file": "agents/lazy-senior.md",
+      "phase": "lazy-senior"
+    },
+    {
+      "name": "Product owner",
+      "file": "agents/po.md",
+      "phase": "po"
+    },
+    {
+      "name": "QA",
+      "file": "agents/qa.md",
+      "phase": "qa"
+    },
+    {
+      "name": "Release",
+      "file": "agents/release.md",
+      "phase": "release"
+    },
+    {
+      "name": "Researcher",
+      "file": "agents/researcher.md",
+      "phase": "researcher"
+    },
+    {
+      "name": "Scrum master",
+      "file": "agents/scrum-master.md",
+      "phase": "scrum-master"
+    },
+    {
+      "name": "SDD author",
+      "file": "agents/sdd-author.md",
+      "phase": "sdd-author"
+    },
+    {
+      "name": "Skill creator",
+      "file": "agents/skill-creator.md",
+      "phase": "skill-creator"
+    },
+    {
+      "name": "Solution architect",
+      "file": "agents/solution-architect.md",
+      "phase": "solution-architect"
+    },
+    {
+      "name": "Sysl modeler",
+      "file": "agents/sysl-modeler.md",
+      "phase": "sysl-modeler"
+    },
+    {
+      "name": "Writer",
+      "file": "agents/writer.md",
+      "phase": "writer"
     }
   ],
   "harnesses": [
@@ -123,5 +143,7 @@
     "gigacode",
     "grok",
     "grok-bot"
-  ]
+  ],
+  "rules": "wiki/Rules.md",
+  "standards": "standards/RULES.md"
 }

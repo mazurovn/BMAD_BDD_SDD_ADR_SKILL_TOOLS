@@ -23,3 +23,6 @@ A repeated procedure is not covered by an existing skill.
 Always: YAML frontmatter with `name` and `description`.
 Ask First: change an existing skill's public procedure.
 Never: copy a third-party repository into this one. Link it from docs/SOURCES.md.
+
+## Rules
+Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.

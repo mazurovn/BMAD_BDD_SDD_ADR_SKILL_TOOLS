@@ -1,23 +1,11 @@
 # Agents
 
-Portable prompts. No project data.
+21 roles. Each file has a mission, a thinking model, stats from 0 to 5, a stop rule, and the rule ids it follows.
 
-| Agent | File | Phase |
-|---|---|---|
-| MAZU-Analyst | agents/analyst.md | analysis |
-| MAZU-PO | agents/po.md | planning |
-| MAZU-Architect | agents/architect.md | solutioning |
-| MAZU-SM | agents/scrum-master.md | delivery |
-| MAZU-Dev | agents/dev.md | implementation |
-| MAZU-QA | agents/qa.md | acceptance |
+The chair is `architect.md`. Business, enterprise, and solution architects are separate. `lazy-senior.md` is a developer mode, not an architect.
 
-Grok bots (created earlier, project-agnostic):
+Machine-readable list: `catalog.json`.
+Full rules: `wiki/Rules.md` and `standards/RULES.md` (same text).
+Team table: `wiki/Team.md`.
 
-| Bot | Id | Skill |
-|---|---|---|
-| BMAD Expert | b995f4ac-8a1f-4c1c-a65a-1bc0a32f7064 | skills/bmad |
-| SDD Spec Expert | cd4155e6-1e28-4e19-8871-f9350940449e | skills/sdd |
-| ADR Decision Expert | aa7dc0cc-4c19-4c2b-9a8f-a00852985bd5 | skills/adr |
-| BDD Acceptance Expert | 16411c10-eeb9-45c7-8908-1cf7dac72326 | skills/bdd |
-
-Machine-readable list: [catalog.json](catalog.json).
+The four Grok expert bots named in `catalog.json` stay the BMAD, SDD, ADR, and BDD experts. Every other role is a prompt in this folder.

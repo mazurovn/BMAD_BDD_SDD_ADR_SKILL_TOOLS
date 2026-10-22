@@ -36,3 +36,6 @@ Stories reference the requirement id in `--description` or as `--parent` when th
 ## Quality bar
 
 A requirement is not ready if the reader cannot tell whether a build meets it. Rewrite until a Then line is possible.
+
+## Rules
+Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.

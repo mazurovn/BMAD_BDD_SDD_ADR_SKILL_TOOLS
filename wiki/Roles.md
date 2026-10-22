@@ -1,25 +1,27 @@
 # Роли
 
-Каждая роль — файл в `agents/`. Это инструкция агенту, не отдельный процесс.
+Модели и статы — на странице Team. Правила — на странице Rules.
 
-| Роль | Файл | Граница |
-|---|---|---|
-| Analyst | analyst.md | не выбирает архитектуру |
-| PO | po.md | не подменяет points часами |
-| Architect | architect.md | не придумывает ценность |
-| SM | scrum-master.md | не меняет принятый ADR |
-| Dev | dev.md | не ставит done |
-| QA | qa.md | не закрывает без улики |
-| BMAD lead | bmad-lead.md | не перескакивает фазу |
-| SDD author | sdd-author.md | не пишет реализацию до границ |
-| BDD author | bdd-author.md | не прячет шаги реализации в Then |
-| ADR keeper | adr-keeper.md | не удаляет старый ADR |
-| Sysl modeler | sysl-modeler.md | не считает картинку источником |
-| CALM modeler | calm-modeler.md | не кладёт секреты в узлы |
-| Integrator | integrator.md | не объявляет синхронизацию без успешного pull |
-| Skill creator | skill-creator.md | не копирует чужой репозиторий внутрь |
-| Researcher | researcher.md | не выдумывает имя конфига |
-| Writer | writer.md | не описывает команду, которой нет в `--help` |
-| Release | release.md | не называет метод готовым без зелёного audit |
-
-Четыре эксперта Grok перечислены в `agents/catalog.json`: BMAD, SDD, ADR, BDD. Остальные роли из таблицы агент исполняет по файлу, даже если отдельного бота с таким именем нет.
+| Файл | Заголовок |
+|---|---|
+| agents/adr-keeper.md | ADR keeper |
+| agents/analyst.md | Analyst |
+| agents/architect.md | Architecture chair |
+| agents/bdd-author.md | BDD author |
+| agents/bmad-lead.md | BMAD lead |
+| agents/business-architect.md | Business architect |
+| agents/calm-modeler.md | CALM modeler |
+| agents/dev.md | Developer |
+| agents/enterprise-architect.md | Enterprise architect |
+| agents/integrator.md | Integrator |
+| agents/lazy-senior.md | Lazy senior |
+| agents/po.md | Product owner |
+| agents/qa.md | QA |
+| agents/release.md | Release |
+| agents/researcher.md | Researcher |
+| agents/scrum-master.md | Scrum master |
+| agents/sdd-author.md | SDD author |
+| agents/skill-creator.md | Skill creator |
+| agents/solution-architect.md | Solution architect |
+| agents/sysl-modeler.md | Sysl modeler |
+| agents/writer.md | Writer |

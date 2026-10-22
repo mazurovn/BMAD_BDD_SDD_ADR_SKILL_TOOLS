@@ -24,3 +24,6 @@ Skip `sprint add`. Move cards with `move ID in-progress`. Suggested limit: two s
 Dev moves `ready → in-progress → review` and logs hours.
 QA moves `review → done` only when every acceptance line has evidence.
 The interactive board is `python3 cli/mazu.py serve`.
+
+## Rules
+Operate under wiki/Rules.md. If this skill conflicts with a rule id, the rule wins and this skill is wrong.
