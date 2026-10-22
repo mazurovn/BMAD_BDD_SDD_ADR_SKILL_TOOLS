@@ -11,6 +11,7 @@ import io
 import json
 import os
 import re
+import subprocess
 import sys
 import zipfile
 import xml.etree.ElementTree as ET
@@ -424,10 +425,20 @@ def cmd_doctor(_args: argparse.Namespace) -> None:
         root / "upstream" / "packages" / "openspec" / "package.json",
         root / "upstream" / "packages" / "calm-cli" / "package.json",
         root / "upstream" / "packages" / "bmad-method" / "package.json",
+        root / "upstream" / "node" / "node.xz",
+        root / "bin" / "openspec",
+        root / "bin" / "calm",
+        root / "bin" / "bmad",
+        root / "bin" / "cucumber",
+        root / "bin" / "sysl",
+        root / "bin" / "specify",
+        root / "bin" / "adr",
+        root / "scripts" / "self-demo.sh",
         root / "wiki" / "Manual.md",
         root / "wiki" / "Rules.md",
         root / "wiki" / "Team.md",
         root / "wiki" / "Home.md",
+        root / "wiki" / "Kit.md",
         root / "wiki" / "BDD.md",
         root / "wiki" / "ADR.md",
         root / "wiki" / "Dashboard.md",
@@ -1307,6 +1318,44 @@ def cmd_chat(args: argparse.Namespace) -> None:
 
 
 
+def cmd_probe(_args: argparse.Namespace) -> None:
+    from mazu_method.upstream_cli import resolve
+
+    checks = [
+        ("openspec", ["--version"]),
+        ("calm", ["--version"]),
+        ("bmad", ["--version"]),
+        ("cucumber", ["--version"]),
+        ("sysl", ["--version"]),
+        ("specify", ["version"]),
+        ("adr", ["help"]),
+        ("calm-validate", ["validate", "--architecture", "diagrams/calm/example.calm.json", "--format", "json"]),
+        ("sysl-validate", ["validate", "diagrams/sysl/example.sysl"]),
+    ]
+    data = load()
+    probes = []
+    failed = False
+    for name, args in checks:
+        tool = name.split("-", 1)[0]
+        command = resolve(tool)
+        env = dict(**subprocess.os.environ)
+        node_path = str(KIT / "upstream" / "node_modules")
+        env["NODE_PATH"] = node_path
+        if tool == "adr":
+            env["PATH"] = str(KIT / "upstream/packages/adr-tools/src") + ":" + env.get("PATH", "")
+        proc = subprocess.run(command + args, cwd=KIT, env=env, text=True, capture_output=True)
+        text = (proc.stdout or proc.stderr).strip().splitlines()
+        line = text[0][:180] if text else ""
+        probes.append({"name": name, "code": proc.returncode, "line": line, "at": now()})
+        print(f"{proc.returncode} {name} {line}")
+        if proc.returncode != 0:
+            failed = True
+    data["probes"] = probes
+    save(data)
+    if failed:
+        raise SystemExit(1)
+
+
 def cmd_upstream(args: argparse.Namespace) -> None:
     from mazu_method.upstream_cli import execute
     rest = list(args.rest)
@@ -1426,6 +1475,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_guide = sub.add_parser("guide", help="print one section of the operating manual")
     p_guide.add_argument("topic")
     p_guide.set_defaults(func=cmd_guide)
+
+    p_probe = sub.add_parser("probe", help="run every shipped CLI and store the result")
+    p_probe.set_defaults(func=cmd_probe)
 
     p_up = sub.add_parser("upstream", help="run a pinned OpenSpec, CALM, or BMAD binary")
     p_up.add_argument("tool", choices=("openspec", "calm", "bmad", "bmad-method", "cucumber", "adr", "sysl", "specify"))

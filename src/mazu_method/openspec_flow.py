@@ -51,18 +51,18 @@ Stories that cannot show this outcome stay out of a sprint.
 
 ## ADDED Requirements
 
-### Requirement: {intent}
-The change is done only when the outcome can be observed.
+### Requirement: Observable outcome
+The system MUST make this outcome observable: {intent}
 
 #### Scenario: success
+- **WHEN** the operator finishes the slice for {key}
+- **THEN** {intent}
 - GIVEN the change {key} is proposed
-- WHEN the operator finishes the slice
-- THEN {intent}
 
 #### Scenario: refusal
+- **WHEN** archive is requested and a task has no evidence
+- **THEN** the command exits non-zero and the change stays active
 - GIVEN a task has no evidence
-- WHEN archive is requested
-- THEN the command exits non-zero and the change stays active
 """)
     _write(path / "design.md", f"""
 ## Context

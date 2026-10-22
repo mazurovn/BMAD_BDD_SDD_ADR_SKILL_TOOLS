@@ -88,3 +88,5 @@ python3 cli/mazu.py check calm diagrams/calm/backlog.calm.json
 Команда с ненулевым кодом — стоп. Покажи её stdout. Не называй это частичным успехом.
 Доказательство — строка PASS или id, который команда напечатала. Пока stdout нет, факта нет.
 Дальше работает только роль из раздела «Передача». Не делай её шаги в этой же сессии.
+
+Боевой скрипт: `bin/calm validate --architecture diagrams/calm/example.calm.json --format json`. Успех — `hasErrors: false`, версия 1.65.0.

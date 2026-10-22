@@ -83,3 +83,5 @@ python3 cli/mazu.py openspec complete gate-visible --task 1.1 --evidence "отк
 ## Применение инструментов
 
 Функция в `tools/openai.json` называется `mazu_openspec`. Она не заменяет чтение stdout.
+
+Боевой бинарник-скрипт: `bin/openspec`. Версия в этом дереве 1.14.3. Строгая проверка: `bin/openspec validate ИМЯ --strict`. Наш propose пишет MUST, иначе официальный валидатор отклоняет спеку.

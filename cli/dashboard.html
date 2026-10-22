@@ -51,6 +51,7 @@
 </header>
 <main>
   <section class="stats" id="stats"></section>
+  <section class="panel" id="probes"></section>
   <h2>Сложность и время</h2>
   <section class="bars" id="bars"></section>
   <h2 id="view-title">Канбан</h2>
@@ -170,6 +171,8 @@ function draw() {
   sprintSelect.innerHTML = `<option value="">все спринты</option>` + state.store.sprints.map(sprint => `<option value="${escapeHtml(sprint.id)}">${escapeHtml(sprint.id)} ${escapeHtml(sprint.goal || "")}</option>`).join("");
   if ([...sprintSelect.options].some(option => option.value === previous)) sprintSelect.value = previous;
   document.getElementById("stats").innerHTML = [[items.length,"записей"],[openPoints,"SP открыто"],[donePoints,"SP готово"],[totalHours.toFixed(2),"часов"],[state.store.sprints.length,"спринтов"]].map(([value,label]) => `<div class="stat"><b>${value}</b><span>${label}</span></div>`).join("");
+  const probes = state.store.probes || [];
+  document.getElementById("probes").innerHTML = probes.length ? `<h2>Прогон CLI этого репозитория</h2><div class="row">${probes.map(probe => `<span class="pill ${probe.code === 0 ? "done" : "blocked"}">${escapeHtml(probe.name)} ${probe.code === 0 ? "0" : probe.code}</span>`).join("")}</div>` : "";
   const max = Math.max(openPoints, donePoints, totalHours, 1);
   document.getElementById("bars").innerHTML = [["SP открыто", openPoints, "var(--sand)"],["SP готово", donePoints, "var(--sage)"],["Часы", totalHours, "var(--lilac)"]].map(([label,value,color]) => `<div class="bar"><span>${label}</span><div class="track"><div class="fill" style="width:${Math.round(value/max*100)}%;background:${color}"></div></div><b>${Number(value).toFixed(value % 1 ? 2 : 0)}</b></div>`).join("");
   const shown = visibleItems();

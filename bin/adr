@@ -1,0 +1,4 @@
+#!/bin/sh
+ROOT=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+export PATH="$ROOT/upstream/packages/adr-tools/src:$PATH"
+exec "$ROOT/upstream/packages/adr-tools/src/adr" "$@"
