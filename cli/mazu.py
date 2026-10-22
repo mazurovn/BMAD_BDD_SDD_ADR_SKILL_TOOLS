@@ -1336,6 +1336,18 @@ def cmd_tools(_args: argparse.Namespace) -> None:
         ("doctor", "release", "none", "required files exist"),
         ("check", "qa and architect", "method", "bdd, boundaries, points, adr, sysl, calm, phase, guard"),
         ("workflow", "bmad lead", "epics or sprint", "create-epics-and-stories and sprint-planning"),
+        # Completeness: every top-level subcommand from `mazu -h` gets a row.
+        ("list", "any role", "none", "filter backlog by kind status sprint"),
+        ("show", "any role", "none", "print one item as JSON"),
+        ("trace", "po and sm", "none", "idea/epic cycle and children"),
+        ("tools", "any role", "none", "this table of commands owners gates"),
+        ("probe", "release", "exit 0", "run every shipped CLI and store the result"),
+        ("intake", "analyst and po", "none", "labeled notes into idea epic story spec diagrams"),
+        ("release", "release", "exit 0", "audit pytest doctor sysl calm self-demo pack"),
+        ("upstream", "integrator", "exit 0", "pinned openspec calm bmad binary"),
+        ("openspec", "sdd author", "exit 0", "propose apply archive via upstream"),
+        ("diagram", "architect", "check sysl/calm", "SVG view of a CALM or Sysl file"),
+        ("chat", "any role", "none", "map /opsx chat text onto CLI verbs"),
     ]
     print(f"{'COMMAND':<16} {'OWNER':<28} {'GATE':<18} WHAT")
     for command, owner, gate, what in rows:
