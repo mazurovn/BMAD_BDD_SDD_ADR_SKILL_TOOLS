@@ -56,7 +56,7 @@ Always проходит. Ask First останавливает процесс, к
 
 Ответственность: scrum master. Код: `src/mazu_method/agile.py`.
 
-Делать: колонки backlog, ready, in-progress, review, done. В in-progress не больше двух историй. Проверка: `check wip board`.
+Делать: колонки backlog, ready, in-progress, review, done. В in-progress не больше двух историй. Проверка: `check wip board`. `move ID in-progress` для третьей истории завершается с кодом 1 и строкой FAIL AGILE-6.
 
 Не делать: переводить points в часы. Не ставить done без `gate done`.
 

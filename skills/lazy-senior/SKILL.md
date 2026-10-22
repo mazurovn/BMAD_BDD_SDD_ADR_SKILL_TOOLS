@@ -75,7 +75,7 @@ Review забирает QA вместе с уликой на каждый Then. 
 
 ```bash
 python3 cli/mazu.py show US-001
-python3 cli/mazu.py check guard "add a dependency" --ask "new dependency"
+python3 cli/mazu.py check guard "add a new dependency" --ask "new dependency"
 python3 cli/mazu.py log US-001 1 --note "reused the existing parser"
 ```
 

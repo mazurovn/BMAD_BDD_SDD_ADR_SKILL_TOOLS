@@ -26,6 +26,23 @@ def test_points_and_boundaries_and_bdd():
     assert "commit secrets" in merge(rules, {"never": []})["never"]
 
 
+def test_documented_guard_examples_stop():
+    import re
+    import shlex
+
+    pattern = re.compile(r'check guard "[^"]+"(?: --(?:always|ask|never) "[^".]+")+')
+    examples = set()
+    for path in list((ROOT / "agents").glob("*.md")) + list((ROOT / "skills").glob("*/SKILL.md")):
+        examples.update(pattern.findall(path.read_text(encoding="utf-8")))
+    assert examples
+    for example in sorted(examples):
+        argv = shlex.split(example)
+        if "--ask" not in argv and "--never" not in argv:
+            continue
+        proc = subprocess.run(CLI + argv, text=True, capture_output=True)
+        assert proc.returncode != 0, example
+
+
 def test_diagrams_pass():
     assert sysl_issues((ROOT / "diagrams/sysl/example.sysl").read_text(encoding="utf-8")) == []
     assert calm_issues((ROOT / "diagrams/calm/example.calm.json").read_text(encoding="utf-8")) == []
