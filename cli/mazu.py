@@ -171,7 +171,11 @@ def cmd_add(args: argparse.Namespace) -> None:
         status=args.status,
     )
     if args.kind == "adr":
-        write_adr_file(item)
+        write_adr_file(
+            item,
+            decision=getattr(args, "decision", None),
+            consequences=getattr(args, "consequences", None),
+        )
     print(item["id"])
 
 
@@ -181,14 +185,63 @@ def _split(value: str | None) -> list[str]:
     return [p.strip() for p in value.split("|") if p.strip()]
 
 
-def write_adr_file(item: dict) -> None:
+def write_adr_file(
+    item: dict,
+    decision: str | None = None,
+    consequences: str | None = None,
+) -> None:
     folder = data_dir() / "adr"
     folder.mkdir(parents=True, exist_ok=True)
     path = folder / f"{item['id']}.md"
     path.write_text(
-        render_adr(item["id"], item["title"], item["status"], item.get("description") or ""),
+        render_adr(
+            item["id"],
+            item["title"],
+            item["status"],
+            item.get("description") or "",
+            decision=decision,
+            consequences=consequences,
+        ),
         encoding="utf-8",
     )
+
+
+def cmd_fill(args: argparse.Namespace) -> None:
+    """Complete ADR sections through the CLI (no hand-edit of store history)."""
+    from mazu_method.adr import fill_sections
+
+    if args.kind != "adr":
+        raise SystemExit("fill supports adr only")
+    if not args.id:
+        raise SystemExit("adr id required")
+    if not any([(args.decision or "").strip(), (args.consequences or "").strip(), (args.context or "").strip()]):
+        raise SystemExit("provide --decision and/or --consequences and/or --context")
+    data = load()
+    item = find(data, args.id)
+    if item.get("kind") != "adr":
+        raise SystemExit(f"{args.id} is not an adr")
+    path = data_dir() / "adr" / f"{args.id}.md"
+    if not path.exists():
+        write_adr_file(item)
+    text = path.read_text(encoding="utf-8")
+    updated = fill_sections(
+        text,
+        context=args.context,
+        decision=args.decision,
+        consequences=args.consequences,
+    )
+    path.write_text(updated, encoding="utf-8")
+    item["updated_at"] = now()
+    if args.context and args.context.strip():
+        item["description"] = args.context.strip()
+    save(data)
+    print(f"filled {args.id}")
+    issues = adr_issues(updated)
+    if issues:
+        for issue in issues:
+            print(f"FAIL {issue}")
+        raise SystemExit(1)
+    print(f"PASS adr {args.id}")
 
 
 def cmd_list(args: argparse.Namespace) -> None:
@@ -220,22 +273,45 @@ def cmd_move(args: argparse.Namespace) -> None:
         raise SystemExit(f"status must be one of {STATUSES}")
     data = load()
     item = find(data, args.id)
-    if args.status == "ready":
+    current = item.get("status") or "backlog"
+    target = args.status
+    if item.get("kind") == "story" and current != target:
+        try:
+            here = STATUSES.index(current)
+            there = STATUSES.index(target)
+        except ValueError:
+            raise SystemExit(f"bad status transition {current} -> {target}")
+        if abs(there - here) != 1:
+            print(f"FAIL AGILE-7 move one column only ({current} -> {target})")
+            raise SystemExit(1)
+    if target == "ready":
         issues = ready_issues(item)
         if issues:
             for issue in issues:
                 print(f"FAIL {issue}")
             raise SystemExit(1)
-    if args.status == "done":
+    if target == "in-progress" and current != "in-progress":
+        # Must already satisfy ready; cannot sneak past a failed gate ready.
+        issues = ready_issues(item)
+        if issues:
+            for issue in issues:
+                print(f"FAIL {issue}")
+            raise SystemExit(1)
+        issues = wip_issues([i for i in data["items"] if i is not item] + [{**item, "status": "in-progress"}])
+        if issues:
+            for issue in issues:
+                print(f"FAIL {issue}")
+            raise SystemExit(1)
+    if target == "done":
         issues = done_issues(item)
         if issues:
             for issue in issues:
                 print(f"FAIL {issue}")
             raise SystemExit(1)
-    item["status"] = args.status
+    item["status"] = target
     item["updated_at"] = now()
     save(data)
-    print(f"{item['id']} -> {args.status}")
+    print(f"{item['id']} -> {target}")
 
 
 def cmd_log(args: argparse.Namespace) -> None:
@@ -455,6 +531,17 @@ def cmd_doctor(_args: argparse.Namespace) -> None:
         raise SystemExit(1)
     print(f"ok: {len(required)} required sources present")
     print(f"cli: {Path(__file__).resolve()}")
+    try:
+        import pytest  # noqa: F401
+
+        print("pytest: available")
+    except ImportError:
+        print("pytest: missing (install: python3 -m pip install -r requirements-dev.txt)")
+    specify_site = root / "upstream" / "py" / "lib"
+    if specify_site.exists() and any(specify_site.rglob("specify_cli*")):
+        print("specify: upstream/py present")
+    else:
+        print("specify: missing upstream/py (Ask First to vendor; release/self-demo need it)")
 
 
 def slug(value: str) -> str:
@@ -1039,14 +1126,50 @@ def cmd_serve(args: argparse.Namespace) -> None:
 
 
 def cmd_evidence(args: argparse.Namespace) -> None:
-    if not (args.text or "").strip():
-        raise SystemExit("evidence text required")
+    """Record proof. Free text alone is stored but cannot pass gate done.
+
+    Verified path: `evidence ID --run COMMAND...` runs the command, records
+    stdout and exit code, and refuses to store a failing run.
+    """
+    run_cmd = list(getattr(args, "run", None) or [])
+    if run_cmd and run_cmd[:1] == ["--"]:
+        run_cmd = run_cmd[1:]
     data = load()
     item = find(data, args.id)
-    item.setdefault("evidence", []).append({"text": args.text.strip(), "at": now()})
-    item["updated_at"] = now()
-    save(data)
-    print(f"evidence {len(item['evidence'])} on {item['id']}")
+    if run_cmd:
+        proc = subprocess.run(run_cmd, cwd=KIT, text=True, capture_output=True)
+        blob = ((proc.stdout or "") + (proc.stderr or "")).strip()
+        snippet = blob[:1500] if blob else "(no output)"
+        label = (args.text or "").strip() or " ".join(run_cmd)
+        entry = {
+            "text": f"{label}\nexit:{proc.returncode}\n{snippet}",
+            "at": now(),
+            "command": run_cmd,
+            "exit": proc.returncode,
+            "verified": proc.returncode == 0,
+        }
+        if proc.returncode != 0:
+            print(f"FAIL BDD-4 evidence command exited {proc.returncode}")
+            print(snippet[:500])
+            raise SystemExit(1)
+        item.setdefault("evidence", []).append(entry)
+        item["updated_at"] = now()
+        save(data)
+        print(f"evidence {len(item['evidence'])} on {item['id']} verified exit:0")
+        return
+    raise SystemExit(
+        "FAIL BDD-4 evidence requires a real command: "
+        "evidence ID --run COMMAND  (free-text claims are refused)"
+    )
+
+
+def cmd_audit(_args: argparse.Namespace) -> None:
+    """Run scripts/audit.py through the CLI so release and agents share one entry."""
+    script = KIT / "scripts" / "audit.py"
+    if not script.exists():
+        raise SystemExit(f"missing {script}")
+    proc = subprocess.run([sys.executable, str(script)], cwd=KIT)
+    raise SystemExit(proc.returncode)
 
 
 def ready_issues(item: dict) -> list[str]:
@@ -1094,9 +1217,11 @@ def cmd_tools(_args: argparse.Namespace) -> None:
         ("init", "writer", "none", "create the local store"),
         ("project", "integrator", "none", "separate backlogs"),
         ("add", "role that owns the kind", "gate ready after a story", "record idea epic story task requirement adr"),
-        ("evidence", "qa", "gate done", "record one proof line per acceptance line"),
+        ("evidence --run", "qa", "gate done", "run a command; store only if exit 0"),
+        ("fill adr", "adr keeper", "check adr", "write Decision/Consequences via CLI"),
+        ("audit", "release", "exit 0", "scripts/audit.py through the CLI"),
         ("gate ready", "po and sm", "blocks ready", "parent, points 1-8, acceptance, boundaries"),
-        ("gate done", "qa", "blocks done", "ready gate plus evidence"),
+        ("gate done", "qa", "blocks done", "ready gate plus command-verified evidence"),
         ("gate sprint", "sm", "blocks planning", "goal and every story passes ready"),
         ("move", "dev until review, qa for done", "gate", "change column"),
         ("log", "dev", "none", "hours, not points"),
@@ -1564,7 +1689,17 @@ def build_parser() -> argparse.ArgumentParser:
     p_add.add_argument("--always")
     p_add.add_argument("--ask-first", dest="ask_first")
     p_add.add_argument("--never")
+    p_add.add_argument("--decision", default="", help="ADR Decision text (avoids _fill in_)")
+    p_add.add_argument("--consequences", default="", help="ADR Consequences text")
     p_add.set_defaults(func=cmd_add)
+
+    p_fill = sub.add_parser("fill", help="complete ADR Decision/Consequences via CLI")
+    p_fill.add_argument("kind", choices=("adr",))
+    p_fill.add_argument("id")
+    p_fill.add_argument("--decision", default="")
+    p_fill.add_argument("--consequences", default="")
+    p_fill.add_argument("--context", default="")
+    p_fill.set_defaults(func=cmd_fill)
 
     p_list = sub.add_parser("list", help="list artifacts")
     p_list.add_argument("--kind", choices=KINDS)
@@ -1632,9 +1767,17 @@ def build_parser() -> argparse.ArgumentParser:
     p_skill.add_argument("--force", action="store_true")
     p_skill.set_defaults(func=cmd_skill)
 
-    p_evidence = sub.add_parser("evidence", help="record proof for one acceptance line")
+    p_evidence = sub.add_parser(
+        "evidence",
+        help="record proof for one acceptance line (use --run so gate done can pass)",
+    )
     p_evidence.add_argument("id")
-    p_evidence.add_argument("text")
+    p_evidence.add_argument("text", nargs="?", default="", help="optional label; alone is unverified")
+    p_evidence.add_argument(
+        "--run",
+        nargs=argparse.REMAINDER,
+        help="command to execute; stored only when exit code is 0",
+    )
     p_evidence.set_defaults(func=cmd_evidence)
 
     p_gate = sub.add_parser("gate", help="quality gate: ready, done, or sprint")
@@ -1642,6 +1785,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_gate.add_argument("id")
     p_gate.set_defaults(func=cmd_gate)
 
+    sub.add_parser("audit", help="run scripts/audit.py").set_defaults(func=cmd_audit)
     sub.add_parser("tools", help="commands, owners, and gates").set_defaults(func=cmd_tools)
     p_guide = sub.add_parser("guide", help="print one section of the operating manual")
     p_guide.add_argument("topic")

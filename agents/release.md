@@ -40,8 +40,8 @@
 
 ## Инструменты
 
-- `python3 scripts/audit.py`
-- `python3 -m pytest -q tests`
+- `python3 cli/mazu.py audit` (или `python3 scripts/audit.py`)
+- `python3 -m pytest -q tests` (нужен пакет из `requirements-dev.txt`)
 - `python3 cli/mazu.py doctor`
 - `check sysl`
 - `check calm`

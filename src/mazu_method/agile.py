@@ -23,6 +23,15 @@ def ready_issues(item: dict) -> list[str]:
     return issues
 
 
+def evidence_verified(entry: dict | str) -> bool:
+    """Natural-language claims are not proof. Only command-verified evidence counts."""
+    if not isinstance(entry, dict):
+        return False
+    if entry.get("verified") is True and int(entry.get("exit", 1)) == 0:
+        return True
+    return False
+
+
 def done_issues(item: dict) -> list[str]:
     issues = ready_issues(item)
     acceptance = [line for line in item.get("acceptance") or [] if str(line).strip()]
@@ -31,6 +40,23 @@ def done_issues(item: dict) -> list[str]:
         issues.append("BDD-4 no evidence")
     elif len(evidence) < len(acceptance):
         issues.append("BDD-4 fewer evidence notes than acceptance lines")
+    else:
+        unverified = [i for i, row in enumerate(evidence, 1) if not evidence_verified(row)]
+        if unverified:
+            issues.append(
+                "BDD-4 evidence is not command-verified (use: evidence ID --run COMMAND); "
+                f"bad lines {unverified}"
+            )
+        # Duplicate identical proofs cannot cover two distinct scenarios.
+        fingerprints = []
+        for row in evidence:
+            if isinstance(row, dict):
+                key = " ".join(str(x) for x in (row.get("command") or [])) or str(row.get("text") or "")
+            else:
+                key = str(row)
+            fingerprints.append(key.strip())
+        if len(set(fingerprints)) < len(acceptance):
+            issues.append("BDD-4 duplicate evidence cannot cover distinct acceptance lines")
     return issues
 
 

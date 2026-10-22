@@ -4,6 +4,8 @@ __pycache__/
 *.pyc
 .venv/
 
+# Disposable self-demo OpenSpec change (do not wipe tracked openspec/changes/self-demo)
+openspec/changes/self-demo-run/
 
 upstream/node/node
 dist/*.zip

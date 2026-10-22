@@ -5,8 +5,20 @@ from __future__ import annotations
 REQUIRED = ("status", "context", "decision", "consequences")
 
 
-def render(item_id: str, title: str, status: str, context: str) -> str:
+def render(
+    item_id: str,
+    title: str,
+    status: str,
+    context: str,
+    decision: str | None = None,
+    consequences: str | None = None,
+) -> str:
     body = context.strip() or "_fill in_"
+    decision_body = (decision or "").strip() or "_fill in_"
+    if consequences and consequences.strip():
+        consequences_body = consequences.strip()
+    else:
+        consequences_body = "- Positive:\n- Negative:"
     return "\n".join(
         [
             f"# {item_id}: {title}",
@@ -18,11 +30,51 @@ def render(item_id: str, title: str, status: str, context: str) -> str:
             body,
             "",
             "## Decision",
-            "_fill in_",
+            decision_body,
             "",
             "## Consequences",
-            "- Positive:",
-            "- Negative:",
+            consequences_body,
+            "",
+        ]
+    )
+
+
+def fill_sections(
+    text: str,
+    *,
+    context: str | None = None,
+    decision: str | None = None,
+    consequences: str | None = None,
+) -> str:
+    """Replace named ADR sections. Leaves unspecified sections unchanged."""
+    found = section_map(text or "")
+    if context is not None and context.strip():
+        found["context"] = context.strip()
+    if decision is not None and decision.strip():
+        found["decision"] = decision.strip()
+    if consequences is not None and consequences.strip():
+        found["consequences"] = consequences.strip()
+    # Rebuild from original heading order when possible
+    lines = (text or "").splitlines()
+    if not lines:
+        return text
+    title = lines[0]
+    status = found.get("status") or "backlog"
+    return "\n".join(
+        [
+            title,
+            "",
+            "## Status",
+            status,
+            "",
+            "## Context",
+            found.get("context") or "_fill in_",
+            "",
+            "## Decision",
+            found.get("decision") or "_fill in_",
+            "",
+            "## Consequences",
+            found.get("consequences") or "- Positive:\n- Negative:",
             "",
         ]
     )

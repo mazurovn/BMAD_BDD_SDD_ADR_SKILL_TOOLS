@@ -1,0 +1,3 @@
+# Dev/test dependencies for the method kit.
+# Install: python3 -m pip install -r requirements-dev.txt
+pytest>=8.0

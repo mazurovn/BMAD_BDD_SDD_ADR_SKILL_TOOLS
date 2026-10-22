@@ -36,7 +36,9 @@ def decide(action: str, boundaries: dict | None) -> str:
     for level in ("never", "ask_first", "always"):
         for rule in data[level]:
             rule_l = rule.lower()
-            if rule_l in text or text in rule_l:
+            # One-way substring: the rule must appear in the action.
+            # Reverse match ("e" inside "commit secrets") fails open and is refused.
+            if rule_l and rule_l in text:
                 return level
     return "unspecified"
 

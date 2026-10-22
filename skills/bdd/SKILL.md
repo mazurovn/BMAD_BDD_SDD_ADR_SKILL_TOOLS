@@ -35,7 +35,7 @@ description: Проверяет, что у истории есть Given, When �
 2. Передать их в `--acceptance` при создании или убедиться, что они уже в карточке через `show ID`.
 3. Запустить `python3 cli/mazu.py check bdd ID`.
 4. Исправить каждый FAIL BDD-1. Расплывчатый Then код отвергает словами not observable.
-5. На закрытии записать улику на каждый сценарий: `python3 cli/mazu.py evidence ID "pytest tests/test_x.py passed"`, затем `gate done ID`.
+5. На закрытии записать улику на каждый сценарий через прогон: `python3 cli/mazu.py evidence ID --run python3 -m pytest -q tests/test_x.py`, затем `gate done ID`. Свободный текст без `--run` `gate done` отвергает.
 
 ## Гейты и гардрейлы
 

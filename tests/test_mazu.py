@@ -40,11 +40,25 @@ def test_flow(tmp_path, monkeypatch):
             "delete history",
         ]
     )
-    mod.main(["add", "adr", "Store JSON locally"])
+    mod.main(
+        [
+            "add",
+            "adr",
+            "Store JSON locally",
+            "--description",
+            "One operator",
+            "--decision",
+            "One JSON store file",
+            "--consequences",
+            "- Positive: simple\n- Negative: no concurrent writers",
+        ]
+    )
     mod.main(["sprint", "new", "--goal", "CLI works"])
     mod.main(["sprint", "add", "--id", "US-001", "--sprint", "S1"])
+    mod.main(["move", "US-001", "in-progress"])
     mod.main(["log", "US-001", "1.5", "--note", "first slice"])
-    mod.main(["evidence", "US-001", "list printed the ids"])
+    mod.main(["evidence", "US-001", "--run", sys.executable, "-c", "print('list printed the ids')"])
+    mod.main(["move", "US-001", "review"])
     mod.main(["move", "US-001", "done"])
     data = json.loads((tmp_path / "mazu-data" / "store.json").read_text())
     assert data["items"][2]["points"] == 3

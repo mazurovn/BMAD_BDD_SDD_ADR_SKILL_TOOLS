@@ -42,21 +42,21 @@ Always проходит. Ask First останавливает процесс, к
 
 Не делать: Then из слов «works well», «работает хорошо», «ok», «tbd».
 
-Гейт: `check bdd ID`. До ready нужен хотя бы один сценарий. До done на каждый сценарий нужна улика `evidence ID "текст"`, затем `gate done ID`.
+Гейт: `check bdd ID`. До ready нужен хотя бы один сценарий. До done на каждый сценарий нужна **проверенная** улика: `evidence ID --run КОМАНДА` (код выхода 0). Свободный текст сохраняется, но `gate done` его отвергает (BDD-4).
 
 ## adr
 
 Ответственность: ADR keeper. Код: `src/mazu_method/adr.py`.
 
-Делать: `add adr "название" --description "факты"`. Файл появляется в `mazu-data/adr/`. В нём четыре части: Status, Context, Decision, Consequences. Пока Decision или Context пустые, `check adr ID` не проходит.
+Делать: `add adr "название" --description "факты" --decision "выбор" --consequences "цена"`. Либо после создания: `fill adr ID --decision "..." --consequences "..."`. Файл появляется в `mazu-data/adr/`. В нём четыре части: Status, Context, Decision, Consequences. Пока Decision или Context пустые, `check adr ID` не проходит.
 
-Не делать: удалять старый ADR. Новый файл называет старый id.
+Не делать: удалять старый ADR. Новый файл называет старый id. Не править Decision вручную в обход CLI, если есть `fill adr`.
 
 ## agile
 
 Ответственность: scrum master. Код: `src/mazu_method/agile.py`.
 
-Делать: колонки backlog, ready, in-progress, review, done. В in-progress не больше двух историй. Проверка: `check wip board`.
+Делать: колонки backlog, ready, in-progress, review, done. В in-progress не больше двух историй. Проверка: `check wip board`. `move ID in-progress` для третьей истории завершается с кодом 1 и строкой FAIL AGILE-6. Историю двигают на одну колонку за раз (иначе FAIL AGILE-7). В in-progress нельзя уйти, пока `gate ready` не проходит.
 
 Не делать: переводить points в часы. Не ставить done без `gate done`.
 
@@ -132,7 +132,9 @@ Points только 1, 2, 3, 5, 8, 13, 21. Иное CLI не запишет. 13 
 
 `gate ready ID` не двигает карточку. Он говорит, можно ли считать историю готовой.
 
-`gate done ID` требует всё то же плюс улику на каждый сценарий.
+`gate done ID` требует всё то же плюс **command-verified** улику на каждый сценарий (`evidence ID --run …`).
+
+`audit` запускает `scripts/audit.py` через CLI.
 
 `gate sprint ID` требует цель и ready у каждой истории спринта.
 
