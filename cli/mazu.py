@@ -421,6 +421,7 @@ def cmd_doctor(_args: argparse.Namespace) -> None:
         root / "src" / "mazu_method" / "openspec_flow.py",
         root / "src" / "mazu_method" / "upstream_cli.py",
         root / "src" / "mazu_method" / "release_pack.py",
+        root / "src" / "mazu_method" / "intake.py",
         root / "upstream" / "package.json",
         root / "upstream" / "package-lock.json",
         root / "upstream" / "packages" / "openspec" / "package.json",
@@ -925,6 +926,7 @@ def render_html(data: dict, live: bool) -> str:
         "store": data,
         "hours": {item["id"]: hours_for(data, item["id"]) for item in data["items"]},
         "blocked": blocked_map(data),
+        "cycle": {item["id"]: cycle_row(item) for item in data["items"]},
         "calm": diagram_svg("calm"),
         "sysl": diagram_svg("sysl"),
     }
@@ -944,6 +946,7 @@ def snapshot(live: bool = True) -> dict:
         "store": data,
         "hours": {item["id"]: hours_for(data, item["id"]) for item in data["items"]},
         "blocked": blocked_map(data),
+        "cycle": {item["id"]: cycle_row(item) for item in data["items"]},
         "calm": diagram_svg("calm"),
         "sysl": diagram_svg("sysl"),
     }
@@ -1011,6 +1014,8 @@ def cmd_serve(args: argparse.Namespace) -> None:
                         ask_first=payload.get("ask_first"),
                         never=payload.get("never"),
                     ))
+                elif self.path == "/api/intake":
+                    cmd_intake(argparse.Namespace(file=None, text=payload.get("text") or ""))
                 elif self.path == "/api/evidence":
                     cmd_evidence(argparse.Namespace(id=payload["id"], text=payload.get("text") or ""))
                 elif self.path == "/api/sprint-add":
@@ -1359,6 +1364,100 @@ def cmd_probe(_args: argparse.Namespace) -> None:
         raise SystemExit(1)
 
 
+def cycle_row(item: dict) -> list[dict]:
+    story = item.get("kind") == "story"
+    bounds = item.get("boundaries") or {}
+    spec_file = data_dir() / "specs" / f"{item['id']}.md"
+    spec_ok = bool(item.get("acceptance")) or spec_file.exists() or item.get("kind") in {"requirement", "adr"}
+
+    def mark(name: str, state: str) -> dict:
+        return {"name": name, "ok": state == "ok", "state": state}
+
+    return [
+        mark("источник", "ok" if (item.get("description") or item.get("title") or "").strip() else "no"),
+        mark("декомпозиция", "ok" if item.get("parent") or item.get("kind") == "idea" else "no"),
+        mark("спека", "ok" if spec_ok else "no"),
+        mark("границы", "ok" if any(bounds.get(key) for key in ("always", "ask_first", "never")) else ("no" if story else "skip")),
+        mark("гейт", "ok" if not ready_issues(item) else "no") if story else mark("гейт", "skip"),
+        mark("улика", "ok" if item.get("evidence") else ("no" if story else "skip")),
+        mark("спринт", "ok" if item.get("sprint") else ("no" if story else "skip")),
+        mark("готово", "ok" if item.get("status") == "done" else "no"),
+    ]
+
+
+def cmd_intake(args: argparse.Namespace) -> None:
+    from mazu_method.intake import calm_document, plan, spec_document, sysl_document
+
+    if args.file:
+        text = Path(args.file).read_text(encoding="utf-8")
+    else:
+        text = args.text or ""
+    try:
+        built = plan(text)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
+    epics = []
+    stories = []
+    for group in built["slices"]:
+        idea = add_item("idea", group["idea"], description="intake")
+        epic = add_item("epic", f"Срез: {group['idea'][:80]}", parent=idea["id"], description=group["idea"])
+        epics.append(epic)
+        made = []
+        for row in group["stories"]:
+            story = add_item(
+                "story",
+                row["title"],
+                parent=epic["id"],
+                description=row["description"],
+                points=row["points"],
+                acceptance=[row["acceptance"]],
+                boundaries=row["boundaries"],
+            )
+            stories.append(story)
+            made.append(story)
+            print(f"INTAKE story {story['id']} from {row['source']}")
+        for row in group["requirements"]:
+            req = add_item("requirement", row["title"], parent=epic["id"], description=row["description"])
+            print(f"INTAKE requirement {req['id']} from {row['source']}")
+        spec = data_dir() / "specs" / f"{epic['id']}.md"
+        spec.parent.mkdir(parents=True, exist_ok=True)
+        spec.write_text(spec_document(epic["id"], group["idea"], made), encoding="utf-8")
+        print(f"SPEC {spec}")
+        print(f"INTAKE idea {idea['id']} epic {epic['id']}")
+    (data_dir() / "calm.json").write_text(calm_document(epics), encoding="utf-8")
+    (data_dir() / "system.sysl").write_text(sysl_document(stories), encoding="utf-8")
+    print("ARCH calm.json system.sysl")
+    ready = []
+    for story in stories:
+        issues = ready_issues(story)
+        if issues:
+            for issue in issues:
+                print(f"FAIL {story['id']} {issue}")
+            continue
+        print(f"PASS ready {story['id']}")
+        ready.append(story)
+    if not ready:
+        return
+    goal = epics[0]["title"] if epics else "Intake"
+    cmd_sprint(argparse.Namespace(action="new", goal=goal, id=None, sprint=None))
+    data = load()
+    sprint_id = data["sprints"][-1]["id"]
+    for story in ready:
+        cmd_sprint(argparse.Namespace(action="add", goal=None, id=story["id"], sprint=sprint_id))
+
+
+def cmd_trace(args: argparse.Namespace) -> None:
+    data = load()
+    root = find(data, args.id)
+    rows = [root]
+    rows.extend(item for item in data["items"] if item.get("parent") == root["id"])
+    seen = {item["id"] for item in rows}
+    rows.extend(item for item in data["items"] if item.get("parent") in seen and item["id"] not in seen)
+    for item in rows:
+        marks = " ".join(f"{step['name']}:{step.get('state', 'ok' if step['ok'] else 'no')}" for step in cycle_row(item))
+        print(f"{item['id']} {item['kind']} {marks}")
+
+
 def cmd_release(args: argparse.Namespace) -> None:
     from mazu_method.release_pack import write_zip
 
@@ -1541,6 +1640,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_probe = sub.add_parser("probe", help="run every shipped CLI and store the result")
     p_probe.set_defaults(func=cmd_probe)
+
+    p_in = sub.add_parser("intake", help="turn labeled notes into ideas, epics, stories, a spec, and diagrams")
+    p_in.add_argument("--file", default="")
+    p_in.add_argument("--text", default="")
+    p_in.set_defaults(func=cmd_intake)
+    p_tr = sub.add_parser("trace", help="show the cycle of one item and its children")
+    p_tr.add_argument("id")
+    p_tr.set_defaults(func=cmd_trace)
 
     p_rel = sub.add_parser("release", help="run the release gates and pack sources, without the Node runtime")
     p_rel.add_argument("--version", required=True)

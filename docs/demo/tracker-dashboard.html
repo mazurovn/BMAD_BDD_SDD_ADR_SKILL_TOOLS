@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MAZU-ADGILE</title>
+<style>
+  :root { --bg:#f3efe7; --ink:#2c2830; --muted:#6f6676; --card:#fffaf6; --line:#eadfd3; --sage:#d7ead4; --blush:#f6d5d5; --lilac:#e4daf6; --sand:#f7e7c4; --sky:#d5e7f6; --shadow:0 10px 30px rgba(70,50,40,.06); }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family: Palatino, Georgia, sans-serif; color:var(--ink); background:radial-gradient(1000px 400px at 0% -10%, #f8e7ea, transparent 50%), radial-gradient(800px 400px at 100% 0%, #e7f0e4, transparent 46%), var(--bg); }
+  header, main { width:min(1180px, calc(100% - 2rem)); margin:0 auto; }
+  header { padding:1.4rem 0 .4rem; display:flex; justify-content:space-between; gap:1rem; align-items:end; }
+  h1 { font-weight:560; font-size:2rem; margin:0; letter-spacing:-.03em; }
+  h2 { font-size:1.05rem; margin:1.2rem 0 .6rem; }
+  p { color:var(--muted); }
+  button, input, select { font:inherit; color:var(--ink); border:1px solid transparent; background:white; border-radius:999px; padding:.45rem .8rem; box-shadow:var(--shadow); }
+  button { cursor:pointer; } button:hover { background:#fff4ea; } button:disabled { opacity:.45; cursor:not-allowed; }
+  button.active { background:#efe4f6; }
+  .row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+  .stats { display:grid; grid-template-columns:repeat(5,1fr); gap:.7rem; margin-top:1rem; }
+  .stat, .bars, .panel, .note, .drawer { background:var(--card); border-radius:18px; padding:.9rem 1rem; box-shadow:var(--shadow); }
+  .stat b { display:block; font-size:1.6rem; } .stat span, .muted { color:var(--muted); font-size:.85rem; }
+  .bar { display:grid; grid-template-columns:88px 1fr 48px; gap:.6rem; align-items:center; margin:.45rem 0; }
+  .track { background:#f3ebe3; border-radius:999px; height:14px; overflow:hidden; } .fill { height:100%; }
+  .board { display:grid; grid-template-columns:repeat(5,1fr); gap:.7rem; }
+  .col { background:rgba(255,250,246,.72); border-radius:18px; padding:.7rem; min-height:180px; }
+  .card { background:var(--card); border-radius:16px; padding:.75rem; margin-bottom:.55rem; box-shadow:var(--shadow); cursor:pointer; }
+  .card .id, .muted { color:var(--muted); font-size:.78rem; }
+  .meta { display:flex; gap:.35rem; flex-wrap:wrap; margin:.4rem 0; }
+  .pill { border-radius:999px; padding:.1rem .45rem; font-size:.75rem; background:var(--sand); }
+  .backlog { background:var(--sand);} .ready { background:var(--sky);} .in-progress { background:var(--lilac);} .review { background:var(--blush);} .done { background:var(--sage);} .blocked { background:var(--blush); }
+  table { width:100%; border-collapse:collapse; } th, td { text-align:left; padding:.45rem; border-bottom:1px solid var(--line); }
+  .drawer { margin-top:.8rem; display:none; } .drawer.open { display:block; }
+  .diagrams svg { max-width:100%; height:auto; }
+  .stage { width:.7rem; height:.7rem; border-radius:999px; display:inline-block; background:#f6d5d5; } .stage.ok { background:#b7d7b2; } .stage.skip { background:#eadfd3; }
+  .cycle { display:grid; gap:.8rem; } .slice { background:rgba(255,250,246,.8); border-radius:18px; padding:.8rem; }
+  @media (max-width:900px) { .stats, .board { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div><h1>MAZU-ADGILE</h1><p id="sub"></p></div>
+  <div class="row">
+    <button type="button" id="view-backlog">бэклог</button>
+    <button type="button" id="view-kanban" class="active">канбан</button>
+    <button type="button" id="view-scrum">спринт</button>
+    <button type="button" id="view-cycle">цикл</button>
+    <select id="sprint"></select>
+    <input id="q" placeholder="поиск id или названия" />
+    <select id="kind"><option value="">все виды</option><option>idea</option><option>epic</option><option>story</option><option>task</option><option>requirement</option><option>adr</option></select>
+    <button id="reload" type="button">обновить</button>
+  </div>
+</header>
+<main>
+  <section class="stats" id="stats"></section>
+  <section class="panel" id="probes"></section>
+  <h2>Сложность и время</h2>
+  <section class="bars" id="bars"></section>
+  <h2 id="view-title">Канбан</h2>
+  <section id="view"></section>
+  <article class="drawer" id="drawer"></article>
+  <h2>Схемы</h2>
+  <section class="diagrams panel" id="diagrams"></section>
+  <h2>Действия</h2>
+  <form class="panel" id="intake-form"><div class="row">
+    <textarea name="text" rows="4" placeholder="pain: ... / idea: ... / interview: ... / task: ... / research: ..." required style="min-width:min(100%,420px);border-radius:16px"></textarea>
+    <button type="submit">разобрать заметки</button>
+  </div></form>
+    <select name="kind"><option>story</option><option>epic</option><option>idea</option><option>task</option><option>requirement</option><option>adr</option></select>
+    <input name="title" placeholder="название" required />
+    <input name="parent" placeholder="родитель IDEA/EPIC" />
+    <input name="points" placeholder="points" inputmode="numeric" />
+    <input name="acceptance" placeholder="Given ... When ... Then ..." />
+    <input name="never" placeholder="Never" />
+    <button type="submit">добавить</button>
+  </div></form>
+  <form class="panel" id="log-form"><div class="row">
+    <input name="id" placeholder="US-001" required />
+    <input name="hours" placeholder="часы" required />
+    <input name="note" placeholder="заметка" />
+    <button type="submit">записать часы</button>
+  </div></form>
+  <form class="panel" id="sprint-form"><div class="row">
+    <input name="goal" placeholder="цель спринта" required />
+    <button type="submit">новый спринт</button>
+  </div></form>
+  <p class="note" id="mode"></p>
+</main>
+<div id="toast"></div>
+<script id="boot" type="application/json">{"live": false, "generated": "2026-10-22T15:03:43Z", "project": "local", "store": {"version": 1, "items": [{"id": "IDEA-001", "kind": "idea", "title": "Доска показывает путь от боли до релиза", "description": "intake", "status": "backlog", "points": null, "parent": null, "sprint": null, "acceptance": [], "boundaries": {"always": [], "ask_first": [], "never": []}, "created_at": "2026-10-22T15:03:24Z", "updated_at": "2026-10-22T15:03:24Z"}, {"id": "EPIC-001", "kind": "epic", "title": "Срез: Доска показывает путь от боли до релиза", "description": "Доска показывает путь от боли до релиза", "status": "backlog", "points": null, "parent": "IDEA-001", "sprint": null, "acceptance": [], "boundaries": {"always": [], "ask_first": [], "never": []}, "created_at": "2026-10-22T15:03:24Z", "updated_at": "2026-10-22T15:03:24Z"}, {"id": "US-001", "kind": "story", "title": "Трекер показывает только статус, а цикл по карточке не виден", "description": "Трекер показывает только статус, а цикл по карточке не виден", "status": "ready", "points": 3, "parent": "EPIC-001", "sprint": "S1", "acceptance": ["Given the source note is stored When the operator opens the card Then the card shows: Трекер показывает только статус, а цикл по карточке не виден"], "boundaries": {"always": ["keep the source quote on the card"], "ask_first": ["merge two notes into one story"], "never": ["invent a customer quote"]}, "created_at": "2026-10-22T15:03:24Z", "updated_at": "2026-10-22T15:03:24Z"}, {"id": "US-002", "kind": "story", "title": "На карточке видны гейт, улика, родитель и точки цикла", "description": "На карточке видны гейт, улика, родитель и точки цикла", "status": "ready", "points": 2, "parent": "EPIC-001", "sprint": "S1", "acceptance": ["Given the source note is stored When the operator opens the card Then the card shows: На карточке видны гейт, улика, родитель и точки цикла"], "boundaries": {"always": ["keep the source quote on the card"], "ask_first": ["merge two notes into one story"], "never": ["invent a customer quote"]}, "created_at": "2026-10-22T15:03:24Z", "updated_at": "2026-10-22T15:03:24Z"}, {"id": "REQ-001", "kind": "requirement", "title": "Заказчик вставляет заметки из разных трекеров и хочет эпики, а не свалку строк", "description": "Заказчик вставляет заметки из разных трекеров и хочет эпики, а не свалку строк", "status": "backlog", "points": null, "parent": "EPIC-001", "sprint": null, "acceptance": [], "boundaries": {"always": [], "ask_first": [], "never": []}, "created_at": "2026-10-22T15:03:24Z", "updated_at": "2026-10-22T15:03:24Z"}, {"id": "REQ-002", "kind": "requirement", "title": "Команды путают story points и часы, поэтому на доске это разные числа", "description": "Команды путают story points и часы, поэтому на доске это разные числа", "status": "backlog", "points": null, "parent": "EPIC-001", "sprint": null, "acceptance": [], "boundaries": {"always": [], "ask_first": [], "never": []}, "created_at": "2026-10-22T15:03:24Z", "updated_at": "2026-10-22T15:03:24Z"}], "sprints": [{"id": "S1", "goal": "Срез: Доска показывает путь от боли до релиза", "status": "planned", "created_at": "2026-10-22T15:03:24Z"}], "time_logs": [], "links": []}, "hours": {"IDEA-001": 0, "EPIC-001": 0, "US-001": 0, "US-002": 0, "REQ-001": 0, "REQ-002": 0}, "blocked": {}, "cycle": {"IDEA-001": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": false, "state": "no"}, {"name": "границы", "ok": false, "state": "skip"}, {"name": "гейт", "ok": false, "state": "skip"}, {"name": "улика", "ok": false, "state": "skip"}, {"name": "спринт", "ok": false, "state": "skip"}, {"name": "готово", "ok": false, "state": "no"}], "EPIC-001": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": true, "state": "ok"}, {"name": "границы", "ok": false, "state": "skip"}, {"name": "гейт", "ok": false, "state": "skip"}, {"name": "улика", "ok": false, "state": "skip"}, {"name": "спринт", "ok": false, "state": "skip"}, {"name": "готово", "ok": false, "state": "no"}], "US-001": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": true, "state": "ok"}, {"name": "границы", "ok": true, "state": "ok"}, {"name": "гейт", "ok": true, "state": "ok"}, {"name": "улика", "ok": false, "state": "no"}, {"name": "спринт", "ok": true, "state": "ok"}, {"name": "готово", "ok": false, "state": "no"}], "US-002": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": true, "state": "ok"}, {"name": "границы", "ok": true, "state": "ok"}, {"name": "гейт", "ok": true, "state": "ok"}, {"name": "улика", "ok": false, "state": "no"}, {"name": "спринт", "ok": true, "state": "ok"}, {"name": "готово", "ok": false, "state": "no"}], "REQ-001": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": true, "state": "ok"}, {"name": "границы", "ok": false, "state": "skip"}, {"name": "гейт", "ok": false, "state": "skip"}, {"name": "улика", "ok": false, "state": "skip"}, {"name": "спринт", "ok": false, "state": "skip"}, {"name": "готово", "ok": false, "state": "no"}], "REQ-002": [{"name": "источник", "ok": true, "state": "ok"}, {"name": "декомпозиция", "ok": true, "state": "ok"}, {"name": "спека", "ok": true, "state": "ok"}, {"name": "границы", "ok": false, "state": "skip"}, {"name": "гейт", "ok": false, "state": "skip"}, {"name": "улика", "ok": false, "state": "skip"}, {"name": "спринт", "ok": false, "state": "skip"}, {"name": "готово", "ok": false, "state": "no"}]}, "calm": "\u003csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"220\" viewBox=\"0 0 400 220\">\u003crect width=\"100%\" height=\"100%\" fill=\"#f7f1e8\"/>\u003crect x=\"30\" y=\"40\" width=\"140\" height=\"64\" rx=\"14\" fill=\"#fffaf6\" stroke=\"#e4d9cc\"/>\u003ctext x=\"42\" y=\"68\" font-size=\"14\" fill=\"#2c2830\">Operator\u003c/text>\u003ctext x=\"42\" y=\"88\" font-size=\"11\" fill=\"#6f6676\">webclient · client\u003c/text>\u003crect x=\"210\" y=\"40\" width=\"140\" height=\"64\" rx=\"14\" fill=\"#fffaf6\" stroke=\"#e4d9cc\"/>\u003ctext x=\"222\" y=\"68\" font-size=\"14\" fill=\"#2c2830\">EPIC-001\u003c/text>\u003ctext x=\"222\" y=\"88\" font-size=\"11\" fill=\"#6f6676\">service · epic-1\u003c/text>\u003cline x1=\"170\" y1=\"72\" x2=\"210\" y2=\"72\" stroke=\"#b9a99a\" stroke-width=\"2\"/>\u003ctext x=\"190.0\" y=\"66\" font-size=\"11\" fill=\"#6f6676\">interacts\u003c/text>\u003c/svg>", "sysl": "\u003csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"420\" height=\"152\" viewBox=\"0 0 420 152\">\u003crect width=\"100%\" height=\"100%\" fill=\"#f7f1e8\"/>\u003crect x=\"24\" y=\"24\" width=\"360\" height=\"80\" rx=\"14\" fill=\"#fffaf6\" stroke=\"#e4d9cc\"/>\u003ctext x=\"40\" y=\"46\" font-size=\"14\" fill=\"#2c2830\">Backlog\u003c/text>\u003ctext x=\"40\" y=\"68\" font-size=\"12\" fill=\"#6f6676\">/story1\u003c/text>\u003ctext x=\"40\" y=\"90\" font-size=\"12\" fill=\"#6f6676\">/story2\u003c/text>\u003c/svg>"}</script>
+<script>
+const STATUSES = ["backlog", "ready", "in-progress", "review", "done"];
+const boot = JSON.parse(document.getElementById("boot").textContent);
+let state = boot;
+let view = "kanban";
+let openId = null;
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"]/g, function (char) {
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[char];
+  });
+}
+function toast(text) { const el = document.getElementById("toast"); el.textContent = text; el.style.display = "block"; clearTimeout(toast._t); toast._t = setTimeout(() => { el.style.display = "none"; }, 2600); }
+async function call(path, body) {
+  if (!state.live) { toast("Снимок. Для записи: python3 cli/mazu.py serve"); return; }
+  const response = await fetch(path, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+  const payload = await response.json();
+  if (!response.ok) { toast(payload.error || "ошибка"); return; }
+  state = payload; draw();
+}
+function stagesOf(id) { return (state.cycle || {})[id] || []; }
+function stageHtml(id) {
+  return stagesOf(id).map(step => `<span class="stage ${step.state === "ok" ? "ok" : step.state === "skip" ? "skip" : ""}" title="${escapeHtml(step.name + ": " + (step.state || ""))}"></span>`).join("");
+}
+function blocked(id) { return (state.blocked || {})[id] || []; }
+function itemBy(id) { return state.store.items.find(item => item.id === id); }
+function childrenOf(id) { return state.store.items.filter(item => item.parent === id); }
+function visibleItems() {
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  const kind = document.getElementById("kind").value;
+  const sprint = document.getElementById("sprint").value;
+  return state.store.items.filter(item => {
+    if (kind && item.kind !== kind) return false;
+    if (view === "scrum" && sprint && item.sprint !== sprint) return false;
+    if (!q) return true;
+    return (item.id + " " + item.title).toLowerCase().includes(q);
+  });
+}
+function cardHtml(item) {
+  const blocks = blocked(item.id);
+  return `<article class="card" data-open="${escapeHtml(item.id)}">
+    <div class="id">${escapeHtml(item.id)} · ${escapeHtml(item.kind)}${item.parent ? " · родитель " + escapeHtml(item.parent) : ""}</div>
+    <strong>${escapeHtml(item.title)}</strong>
+    <div class="meta">
+      <span class="pill ${escapeHtml(item.status)}">${escapeHtml(item.status)}</span>
+      <span class="pill">${item.points == null ? "без SP" : item.points + " SP"}</span>
+      <span class="pill">${hoursOf(item.id)} ч</span>
+      ${item.sprint ? `<span class="pill">${escapeHtml(item.sprint)}</span>` : ""}
+      ${blocks.length ? `<span class="pill blocked">гейт ${blocks.length}</span>` : ""}
+      <span class="meta">${stageHtml(item.id)}</span>
+    </div>
+    <div class="row">
+      ${STATUSES.map(status => `<button type="button" data-move="${escapeHtml(item.id)}" data-status="${status}" ${item.status === status ? "disabled" : ""}>${status}</button>`).join("")}
+    </div>
+  </article>`;
+}
+function drawDrawer() {
+  const drawer = document.getElementById("drawer");
+  const item = openId ? itemBy(openId) : null;
+  if (!item) { drawer.className = "drawer"; drawer.innerHTML = ""; return; }
+  const blocks = blocked(item.id);
+  const acceptance = (item.acceptance || []).map(line => `<li>${escapeHtml(line)}</li>`).join("") || "<li>нет сценария</li>";
+  const evidence = (item.evidence || []).map(line => `<li>${escapeHtml(line.text || "")}</li>`).join("") || "<li>нет улики</li>";
+  const bounds = item.boundaries || {};
+  drawer.className = "drawer open";
+  drawer.innerHTML = `<h2>${escapeHtml(item.id)} ${escapeHtml(item.title)}</h2>
+    <p>${escapeHtml(item.description || "без описания")}</p>
+    <p class="muted">Цикл: ${stagesOf(item.id).map(step => `${escapeHtml(step.name)} ${escapeHtml(step.state || "")}`).join(" · ") || "нет"}</p>
+    <p class="muted">Дети: ${childrenOf(item.id).map(child => escapeHtml(child.id)).join(", ") || "нет"}</p>
+    <h3>Приёмка</h3><ul>${acceptance}</ul>
+    <h3>Границы</h3>
+    <p>Always: ${escapeHtml((bounds.always || []).join(" | ") || "нет")}</p>
+    <p>Ask First: ${escapeHtml((bounds.ask_first || []).join(" | ") || "нет")}</p>
+    <p>Never: ${escapeHtml((bounds.never || []).join(" | ") || "нет")}</p>
+    <h3>Улики</h3><ul>${evidence}</ul>
+    ${blocks.length ? `<h3>Почему гейт не пускает</h3><ul>${blocks.map(line => `<li>${escapeHtml(line)}</li>`).join("")}</ul>` : "<p>Гейт ready для этой истории не возражает, либо это не история.</p>"}
+    <form id="evidence-form"><div class="row"><input name="text" placeholder="улика" required /><button type="submit">добавить улику</button></div></form>`;
+  document.getElementById("evidence-form").addEventListener("submit", event => {
+    event.preventDefault();
+    call("/api/evidence", {id: item.id, text: new FormData(event.target).get("text")});
+  });
+}
+function draw() {
+  const items = state.store.items;
+  const stories = items.filter(item => item.kind === "story");
+  const openPoints = stories.filter(item => item.status !== "done").reduce((sum, item) => sum + (item.points || 0), 0);
+  const donePoints = stories.filter(item => item.status === "done").reduce((sum, item) => sum + (item.points || 0), 0);
+  const totalHours = Object.values(state.hours || {}).reduce((sum, value) => sum + Number(value || 0), 0);
+  document.getElementById("sub").textContent = "Проект " + state.project + " · " + state.generated + " · одна карточка — один id";
+  const sprintSelect = document.getElementById("sprint");
+  const previous = sprintSelect.value;
+  sprintSelect.innerHTML = `<option value="">все спринты</option>` + state.store.sprints.map(sprint => `<option value="${escapeHtml(sprint.id)}">${escapeHtml(sprint.id)} ${escapeHtml(sprint.goal || "")}</option>`).join("");
+  if ([...sprintSelect.options].some(option => option.value === previous)) sprintSelect.value = previous;
+  document.getElementById("stats").innerHTML = [[items.length,"записей"],[openPoints,"SP открыто"],[donePoints,"SP готово"],[totalHours.toFixed(2),"часов"],[state.store.sprints.length,"спринтов"]].map(([value,label]) => `<div class="stat"><b>${value}</b><span>${label}</span></div>`).join("");
+  const probes = state.store.probes || [];
+  document.getElementById("probes").innerHTML = probes.length ? `<h2>Прогон CLI этого репозитория</h2><div class="row">${probes.map(probe => `<span class="pill ${probe.code === 0 ? "done" : "blocked"}">${escapeHtml(probe.name)} ${probe.code === 0 ? "0" : probe.code}</span>`).join("")}</div>` : "";
+  const max = Math.max(openPoints, donePoints, totalHours, 1);
+  document.getElementById("bars").innerHTML = [["SP открыто", openPoints, "var(--sand)"],["SP готово", donePoints, "var(--sage)"],["Часы", totalHours, "var(--lilac)"]].map(([label,value,color]) => `<div class="bar"><span>${label}</span><div class="track"><div class="fill" style="width:${Math.round(value/max*100)}%;background:${color}"></div></div><b>${Number(value).toFixed(value % 1 ? 2 : 0)}</b></div>`).join("");
+  const shown = visibleItems();
+  const titles = {backlog:"Бэклог", kanban:"Канбан", scrum:"Спринт", cycle:"Цикл"};
+  document.getElementById("view-title").textContent = titles[view];
+  document.querySelectorAll("header button[id^='view-']").forEach(button => button.classList.toggle("active", button.id === "view-" + view));
+  const host = document.getElementById("view");
+  if (view === "cycle") {
+    const ideas = shown.filter(item => item.kind === "idea");
+    const body = (ideas.length ? ideas : shown.filter(item => !item.parent)).map(idea => {
+      const epics = childrenOf(idea.id);
+      const blocks = epics.map(epic => {
+        const kids = childrenOf(epic.id).map(cardHtml).join("") || "<p>нет карточек</p>";
+        return `<div class="slice"><strong>${escapeHtml(epic.id)} ${escapeHtml(epic.title)}</strong><div>${stageHtml(epic.id)}</div>${kids}</div>`;
+      }).join("") || "<p>нет эпиков</p>";
+      return `<section class="panel"><h3>${escapeHtml(idea.id)} ${escapeHtml(idea.title)}</h3><div>${stageHtml(idea.id)}</div>${blocks}</section>`;
+    }).join("");
+    host.innerHTML = `<div class="cycle">${body || "<p>пусто</p>"}</div>`;
+  } else if (view === "backlog") {
+    host.innerHTML = `<table><thead><tr><th>ID</th><th>Вид</th><th>Статус</th><th>SP</th><th>Часы</th><th>Родитель</th><th>Спринт</th><th>Название</th></tr></thead><tbody>${shown.map(item => `<tr data-open="${escapeHtml(item.id)}"><td>${escapeHtml(item.id)}</td><td>${escapeHtml(item.kind)}</td><td>${escapeHtml(item.status)}</td><td>${item.points == null ? "" : item.points}</td><td>${hoursOf(item.id)}</td><td>${escapeHtml(item.parent || "")}</td><td>${escapeHtml(item.sprint || "")}</td><td>${escapeHtml(item.title)}</td></tr>`).join("")}</tbody></table>`;
+  } else if (view === "scrum") {
+    const sprintId = document.getElementById("sprint").value || (state.store.sprints[0] || {}).id || "";
+    const sprint = state.store.sprints.find(item => item.id === sprintId);
+    const scoped = shown.filter(item => !sprintId || item.sprint === sprintId);
+    const velocity = scoped.filter(item => item.kind === "story" && item.status === "done").reduce((sum, item) => sum + (item.points || 0), 0);
+    host.innerHTML = `<p class="panel">Цель: ${escapeHtml(sprint ? sprint.goal || "не задана" : "спринта нет")} · velocity ${velocity}</p><div class="board">${STATUSES.map(status => `<section class="col ${status}"><h3>${status}</h3>${scoped.filter(item => item.status === status).map(cardHtml).join("") || "<p>пусто</p>"}</section>`).join("")}</div>`;
+  } else {
+    host.innerHTML = `<div class="board">${STATUSES.map(status => `<section class="col ${status}"><h3>${status} · ${shown.filter(item => item.status === status).length}</h3>${shown.filter(item => item.status === status).map(cardHtml).join("") || "<p>пусто</p>"}</section>`).join("")}</div>`;
+  }
+  document.getElementById("diagrams").innerHTML = `<h3>CALM</h3>${state.calm || ""}<h3>Sysl</h3>${state.sysl || ""}`;
+  document.getElementById("mode").textContent = state.live ? "Запись идёт в активный проект. Стрелки статуса зовут тот же move, что и CLI, включая гейт ready и done." : "Снимок. Запись: python3 cli/mazu.py serve";
+  drawDrawer();
+}
+document.getElementById("view").addEventListener("click", event => {
+  const move = event.target.closest("button[data-move]");
+  if (move) { event.stopPropagation(); call("/api/move", {id: move.dataset.move, status: move.dataset.status}); return; }
+  const open = event.target.closest("[data-open]");
+  if (open) { openId = open.dataset.open; drawDrawer(); }
+});
+["backlog","kanban","scrum","cycle"].forEach(name => document.getElementById("view-" + name).addEventListener("click", () => { view = name; draw(); }));
+document.getElementById("q").addEventListener("input", draw);
+document.getElementById("kind").addEventListener("change", draw);
+document.getElementById("sprint").addEventListener("change", draw);
+document.getElementById("reload").addEventListener("click", async () => { if (!state.live) { draw(); return; } state = await (await fetch("/api/store")).json(); draw(); });
+document.getElementById("intake-form").addEventListener("submit", event => { event.preventDefault(); const form = new FormData(event.target); call("/api/intake", {text: form.get("text") || ""}); });
+document.getElementById("add-form").addEventListener("submit", event => { event.preventDefault(); const form = new FormData(event.target); call("/api/add", {kind:form.get("kind"), title:form.get("title"), parent:form.get("parent") || null, points:form.get("points") || null, acceptance:form.get("acceptance") || "", never:form.get("never") || ""}); event.target.reset(); });
+document.getElementById("log-form").addEventListener("submit", event => { event.preventDefault(); const form = new FormData(event.target); call("/api/log", {id:form.get("id"), hours:Number(form.get("hours")), note:form.get("note") || ""}); });
+document.getElementById("sprint-form").addEventListener("submit", event => { event.preventDefault(); call("/api/sprint", {goal:new FormData(event.target).get("goal")}); });
+draw();
+</script>
+</body>
+</html>
