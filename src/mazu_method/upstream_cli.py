@@ -4,13 +4,17 @@ from __future__ import annotations
 
 import lzma
 import os
+import shutil
 import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def node_binary() -> Path:
+def node_binary() -> str:
+    found = shutil.which("node")
+    if found:
+        return found
     binary = ROOT / "upstream" / "node" / "node"
     if binary.exists():
         return binary
@@ -19,7 +23,7 @@ def node_binary() -> Path:
         raise SystemExit("UPSTREAM-1 upstream/node/node.xz is missing")
     binary.write_bytes(lzma.open(packed, "rb").read())
     binary.chmod(0o755)
-    return binary
+    return str(binary)
 
 
 def resolve(tool: str) -> list[str]:

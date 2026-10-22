@@ -4,7 +4,7 @@
 
 Страницы:
 
-- CLI — все команды
+- Onboarding — с чего начать и как проверить архив без установки Node
 - Workflows — фазы и два именованных потока
 - BMAD-v6 — роли фаз и нарезка
 - SDD-boundaries — Always / Ask First / Never

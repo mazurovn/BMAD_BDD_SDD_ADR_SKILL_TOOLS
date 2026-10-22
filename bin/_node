@@ -1,0 +1,12 @@
+#!/bin/sh
+# Node уже установлен в окружении. Запасной архив нужен только если команды node нет.
+ROOT=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+if command -v node >/dev/null 2>&1; then
+  command -v node
+  exit 0
+fi
+NODE="$ROOT/upstream/node/node"
+if [ ! -x "$NODE" ]; then
+  "$ROOT/upstream/cpython/bin/python3.12" -c 'import lzma, pathlib, sys; dest = pathlib.Path(sys.argv[1]); dest.write_bytes(lzma.open(sys.argv[2], "rb").read()); dest.chmod(0o755)' "$NODE" "$ROOT/upstream/node/node.xz"
+fi
+printf '%s\n' "$NODE"

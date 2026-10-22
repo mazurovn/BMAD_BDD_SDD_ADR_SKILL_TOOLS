@@ -83,3 +83,7 @@ agents/business-architect.md, agents/enterprise-architect.md, agents/solution-ar
 Ненулевой код гейта — остановка. В ответе человеку будут команда, код выхода и строка FAIL или PASS.
 Не продолжай работу роли из раздела «Передача». Назови её и остановись.
 Чужой бэклог, секрет и токен в ответ не попадают.
+
+## Релиз
+
+Релиз: Sysl и CALM вместе. `bin/sysl validate` и `bin/calm validate` до того, как схема названа готовой.

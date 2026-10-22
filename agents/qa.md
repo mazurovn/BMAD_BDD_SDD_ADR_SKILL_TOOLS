@@ -84,3 +84,7 @@ src/mazu_method/agile.py done_issues и src/mazu_method/bdd.py
 Ненулевой код гейта — остановка. В ответе человеку будут команда, код выхода и строка FAIL или PASS.
 Не продолжай работу роли из раздела «Передача». Назови её и остановись.
 Чужой бэклог, секрет и токен в ответ не попадают.
+
+## Релиз
+
+Релиз: улика — stdout. `bin/cucumber examples/bdd/gate.feature --require examples/bdd/steps.js`, затем `gate done`.
